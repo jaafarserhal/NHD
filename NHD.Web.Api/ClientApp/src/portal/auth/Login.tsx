@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import apiClient from '../../api/base/apiClient'; // Adjust import path as needed
-import './login.css'; // Import your CSS styles
+import { Eye, EyeOff, Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
+import apiClient from '../../api/base/apiClient';
+import { useNavigate } from 'react-router-dom';
 
 interface LoginFormData {
     email: string;
@@ -25,8 +26,9 @@ const Login: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string>('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
 
-    // Check if user is already authenticated on component mount
     useEffect(() => {
         const token = localStorage.getItem('authToken');
         if (token) {
@@ -73,7 +75,7 @@ const Login: React.FC = () => {
         if (!validateForm()) return;
 
         setIsLoading(true);
-        setError('');
+        if (error) setError('');
 
         try {
             const response: LoginResponse = await apiClient.post('/users/login', {
@@ -91,7 +93,7 @@ const Login: React.FC = () => {
             setIsAuthenticated(true);
 
             // Redirect to dashboard or home page
-            window.location.href = '/';
+            navigate('/');
 
         } catch (err: any) {
             console.error('Login error:', err);
@@ -112,213 +114,444 @@ const Login: React.FC = () => {
         }
     };
 
-    const handleLogout = () => {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-        setIsAuthenticated(false);
-        setFormData({ email: '', password: '' });
-    };
-
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !isLoading) {
             handleSubmit();
         }
     };
 
-    // If already authenticated, show logout option
-    //   if (isAuthenticated) {
-    //     const user = localStorage.getItem('user');
-    //     return (
-    //       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
-    //         <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
-    //           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-    //             <span className="text-3xl text-green-600">✅</span>
-    //           </div>
-    //           <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back!</h2>
-    //           <p className="text-gray-600 mb-6">
-    //             You're logged in as <span className="font-semibold">{user}</span>
-    //           </p>
-    //           <div className="space-y-4">
-    //             <button
-    //               onClick={() => window.location.href = '/dashboard'}
-    //               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200"
-    //             >
-    //               Go to Dashboard
-    //             </button>
-    //             <button
-    //               onClick={handleLogout}
-    //               className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg transition duration-200"
-    //             >
-    //               Logout
-    //             </button>
-    //           </div>
-    //         </div>
-    //       </div>
-    //     );
-    //   }
+    if (isAuthenticated) {
+        return (
+            <div className="login-page">
+                <div className="success-container">
+                    <div className="success-icon">
+                        <div className="success-checkmark">✓</div>
+                    </div>
+                    <h2 className="success-title">Welcome!</h2>
+                    <p className="success-message">You are successfully logged in.</p>
+                    <button
+                        onClick={() => setIsAuthenticated(false)}
+                        className="demo-button"
+                    >
+                        Back to Login (Demo)
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
-    //   return (
-    //     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
-    //       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
-    //         <div className="text-center mb-8">
-    //           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-    //             <span className="text-3xl text-blue-600">🔐</span>
-    //           </div>
-    //           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-    //           <p className="text-gray-600 mb-6">Please sign in to your account</p>
-    //         </div>
-
-    //         <div className="space-y-6">
-    //           {/* Email Field */}
-    //           <div>
-    //             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-    //               Email Address
-    //             </label>
-    //             <div className="relative">
-    //               <input
-    //                 id="email"
-    //                 name="email"
-    //                 type="email"
-    //                 autoComplete="email"
-    //                 required
-    //                 value={formData.email}
-    //                 onChange={handleInputChange}
-    //                 onKeyDown={handleKeyDown}
-    //                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 outline-none"
-    //                 placeholder="Enter your email"
-    //                 disabled={isLoading}
-    //               />
-    //             </div>
-    //           </div>
-
-    //           {/* Password Field */}
-    //           <div>
-    //             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-    //               Password
-    //             </label>
-    //             <div className="relative">
-    //               <input
-    //                 id="password"
-    //                 name="password"
-    //                 type={showPassword ? 'text' : 'password'}
-    //                 autoComplete="current-password"
-    //                 required
-    //                 value={formData.password}
-    //                 onChange={handleInputChange}
-    //                 onKeyDown={handleKeyDown}
-    //                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 outline-none"
-    //                 placeholder="Enter your password"
-    //                 disabled={isLoading}
-    //               />
-    //               <button
-    //                 type="button"
-    //                 onClick={() => setShowPassword(!showPassword)}
-    //                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition duration-200"
-    //                 disabled={isLoading}
-    //               >
-    //                 <span className="text-lg">{showPassword ? '🙈' : '👁️'}</span>
-    //               </button>
-    //             </div>
-    //           </div>
-
-    //           {/* Error Message */}
-    //           {error && (
-    //             <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
-    //               <span className="text-red-500">⚠️</span>
-    //               <span className="text-sm">{error}</span>
-    //             </div>
-    //           )}
-
-    //           {/* Submit Button */}
-    //           <button
-    //             type="button"
-    //             onClick={handleSubmit}
-    //             disabled={isLoading}
-    //             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center space-x-2"
-    //           >
-    //             {isLoading ? (
-    //               <>
-    //                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-    //                 <span>Signing In...</span>
-    //               </>
-    //             ) : (
-    //               <span>Sign In</span>
-    //             )}
-    //           </button>
-    //         </div>
-
-    //         {/* Additional Links */}
-    //         <div className="mt-6 text-center space-y-2">
-    //           <a
-    //             href="/forgot-password"
-    //             className="text-sm text-blue-600 hover:text-blue-800 transition duration-200"
-    //           >
-    //             Forgot your password?
-    //           </a>
-    //           <div className="text-sm text-gray-600">
-    //             Don't have an account?{' '}
-    //             <a
-    //               href="/register"
-    //               className="text-blue-600 hover:text-blue-800 font-medium transition duration-200"
-    //             >
-    //               Sign up
-    //             </a>
-    //           </div>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   );
     return (
-        <div className="login-container">
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="username">Username:</label>
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        required
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Enter your email"
-                        disabled={isLoading}
-                    />
+        <>
+            <style>{`
+                .login-page {
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: #f9fafb;
+                    padding: 1rem;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+                }
+
+                .login-container {
+                    max-width: 400px;
+                    width: 100%;
+                    background: white;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                    overflow: hidden;
+                }
+
+                .login-header {
+                    background: #2563eb;
+                    padding: 2rem 1.5rem;
+                    text-align: center;
+                    color: white;
+                }
+
+                .login-icon {
+                    width: 48px;
+                    height: 48px;
+                    background: rgba(255, 255, 255, 0.2);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 1rem;
+                }
+
+                .login-title {
+                    font-size: 1.25rem;
+                    font-weight: 600;
+                    margin: 0 0 0.5rem;
+                }
+
+                .login-subtitle {
+                    color: #bfdbfe;
+                    font-size: 0.875rem;
+                    margin: 0;
+                }
+
+                .login-form {
+                    padding: 1.5rem;
+                }
+
+                .demo-info {
+                    margin-bottom: 1rem;
+                    padding: 0.75rem;
+                    background: #eff6ff;
+                    border: 1px solid #bfdbfe;
+                    border-radius: 6px;
+                }
+
+                .demo-info-title {
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    color: #1e40af;
+                    margin: 0 0 0.25rem;
+                }
+
+                .demo-info-text {
+                    font-size: 0.75rem;
+                    color: #2563eb;
+                    margin: 0;
+                }
+
+                .error-message {
+                    margin-bottom: 1rem;
+                    padding: 0.75rem;
+                    background: #fef2f2;
+                    border: 1px solid #fecaca;
+                    border-radius: 6px;
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 0.5rem;
+                }
+
+                .error-message svg {
+                    color: #ef4444;
+                    flex-shrink: 0;
+                    margin-top: 2px;
+                }
+
+                .error-text {
+                    font-size: 0.875rem;
+                    color: #b91c1c;
+                    margin: 0;
+                }
+
+                .form-group {
+                    margin-bottom: 1rem;
+                }
+
+                .form-label {
+                    display: block;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    color: #374151;
+                    margin-bottom: 0.25rem;
+                }
+
+                .input-wrapper {
+                    position: relative;
+                }
+
+                .input-icon-left {
+                    position: absolute;
+                    left: 0.75rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #9ca3af;
+                    pointer-events: none;
+                }
+
+                .form-input {
+                    width: 100%;
+                    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    font-size: 0.875rem;
+                    transition: all 0.2s;
+                    box-sizing: border-box;
+                }
+
+                .form-input:focus {
+                    outline: none;
+                    border-color: #2563eb;
+                    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+                }
+
+                .form-input:disabled {
+                    background-color: #f3f4f6;
+                    cursor: not-allowed;
+                    opacity: 0.6;
+                }
+
+                .password-input {
+                    padding-right: 2.5rem;
+                }
+
+                .password-toggle {
+                    position: absolute;
+                    right: 0.75rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: none;
+                    border: none;
+                    color: #9ca3af;
+                    cursor: pointer;
+                    padding: 0;
+                    display: flex;
+                    align-items: center;
+                }
+
+                .password-toggle:hover {
+                    color: #6b7280;
+                }
+
+                .password-toggle:disabled {
+                    cursor: not-allowed;
+                }
+
+                .forgot-password {
+                    text-align: right;
+                    margin-bottom: 1.5rem;
+                }
+
+                .forgot-link {
+                    font-size: 0.875rem;
+                    color: #2563eb;
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    font-weight: 500;
+                    text-decoration: none;
+                }
+
+                .forgot-link:hover {
+                    color: #1d4ed8;
+                }
+
+                .login-button {
+                    width: 100%;
+                    padding: 0.5rem 1rem;
+                    background: #2563eb;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: background-color 0.2s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                    margin-bottom: 1.5rem;
+                }
+
+                .login-button:hover:not(:disabled) {
+                    background: #1d4ed8;
+                }
+
+                .login-button:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+
+                .login-button svg {
+                    animation: spin 1s linear infinite;
+                }
+
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+
+                .signup-link {
+                    text-align: center;
+                }
+
+                .signup-text {
+                    font-size: 0.875rem;
+                    color: #6b7280;
+                    margin: 0;
+                }
+
+                .signup-button {
+                    color: #2563eb;
+                    background: none;
+                    border: none;
+                    font-weight: 500;
+                    cursor: pointer;
+                    text-decoration: none;
+                }
+
+                .signup-button:hover {
+                    color: #1d4ed8;
+                }
+
+                .success-container {
+                    max-width: 400px;
+                    width: 100%;
+                    background: white;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                    padding: 2rem;
+                    text-align: center;
+                }
+
+                .success-icon {
+                    width: 64px;
+                    height: 64px;
+                    background: #dcfce7;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 1rem;
+                }
+
+                .success-checkmark {
+                    width: 32px;
+                    height: 32px;
+                    background: #22c55e;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 1.25rem;
+                    font-weight: bold;
+                }
+
+                .success-title {
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    color: #111827;
+                    margin: 0 0 0.5rem;
+                }
+
+                .success-message {
+                    color: #6b7280;
+                    margin: 0 0 1.5rem;
+                }
+
+                .demo-button {
+                    width: 100%;
+                    padding: 0.5rem 1rem;
+                    background: #2563eb;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    font-weight: 500;
+                    cursor: pointer;
+                }
+
+                .demo-button:hover {
+                    background: #1d4ed8;
+                }
+            `}</style>
+
+            <div className="login-page">
+                <div className="login-container">
+                    {/* Header */}
+                    <div className="login-header">
+                        <div className="login-icon">
+                            <Lock size={24} />
+                        </div>
+                        <h1 className="login-title">Nawa Home Of Dates</h1>
+                        <p className="login-subtitle">Sign in to your account</p>
+                    </div>
+
+                    {/* Form */}
+                    <div className="login-form">
+                        {/* Error Message */}
+                        {error && (
+                            <div className="error-message">
+                                <AlertCircle size={16} />
+                                <p className="error-text">{error}</p>
+                            </div>
+                        )}
+
+                        {/* Email Field */}
+                        <div className="form-group">
+                            <label htmlFor="email" className="form-label">
+                                Email Address
+                            </label>
+                            <div className="input-wrapper">
+                                <div className="input-icon-left">
+                                    <Mail size={16} />
+                                </div>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    required
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder="Enter your email"
+                                    disabled={isLoading}
+                                    className="form-input"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Password Field */}
+                        <div className="form-group">
+                            <label htmlFor="password" className="form-label">
+                                Password
+                            </label>
+                            <div className="input-wrapper">
+                                <div className="input-icon-left">
+                                    <Lock size={16} />
+                                </div>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    autoComplete="current-password"
+                                    required
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder="Enter your password"
+                                    disabled={isLoading}
+                                    className="form-input password-input"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    disabled={isLoading}
+                                    className="password-toggle"
+                                >
+                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={isLoading}
+                            className="login-button"
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2 size={16} />
+                                    <span>Signing In...</span>
+                                </>
+                            ) : (
+                                <span>Sign In</span>
+                            )}
+                        </button>
+                    </div>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        id="password"
-                        name="password"
-                        type={'password'}
-                        autoComplete="current-password"
-                        required
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Enter your password"
-                        disabled={isLoading}
-                    />
-                </div>
-                {/* Submit Button */}
-                <button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            <span>Signing In...</span>
-                        </>
-                    ) : (
-                        <span>Sign In</span>
-                    )}
-                </button>
-            </form>
-        </div>
+            </div>
+        </>
     );
 };
 
