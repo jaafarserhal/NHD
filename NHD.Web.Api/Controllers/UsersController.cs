@@ -52,9 +52,8 @@ namespace NHD.Web.Api.Controllers
 
             var userResponse = new UserLoginResponse
             {
-                Email = user.Email,
+                Email = user.EmailAddress,
                 FullName = user.FullName,
-                PhoneNumber = user.PhoneNumber
             };
             _logger.LogInformation("User {Email} logged in successfully", login.Email);
 

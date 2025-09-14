@@ -64,7 +64,7 @@ namespace NHD.Web.Api
             });
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString(AppConstants.DEV_CONNECTION_NAME)));
+                options.UseSqlServer(Configuration.GetConnectionString(AppConstants.DEV_CONNECTION_NAME)));
 
             // Add SPA services
             services.AddSpaStaticFiles(configuration =>
@@ -142,7 +142,6 @@ namespace NHD.Web.Api
         /// <param name="services"></param>
         private void RegisterServices(IServiceCollection services)
         {
-            services.AddScoped<IUsersCodeRepository, UsersCodeRepository>();
             services.AddScoped<ILookupRepository, LookupRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();

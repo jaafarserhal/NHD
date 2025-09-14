@@ -269,6 +269,4 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-src/BnI.Web/Properties/PublishProfiles/bicare-app - FTP.pubxml
-src/BnI.Web/wwwroot/lib
-src/BnI.Web/wwwroot/Upload
+.DS_Store

@@ -9,15 +9,21 @@ public partial class GenLookup
 
     public int LookupTypeId { get; set; }
 
-    public string Name { get; set; }
+    public string NameEn { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+    public string NameSv { get; set; }
+
+    public DateTime CreatedAt { get; set; }
 
     public bool? IsActive { get; set; }
 
-    public virtual GenLookuptype LookupType { get; set; }
+    public virtual GenLookupType LookupType { get; set; }
 
-    public virtual ICollection<Store> Stores { get; set; } = new List<Store>();
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
-    public virtual ICollection<UsersCode> UsersCodes { get; set; } = new List<UsersCode>();
+    public virtual ICollection<Product> ProductPrdLookupCategories { get; set; } = new List<Product>();
+
+    public virtual ICollection<Product> ProductPrdLookupSizes { get; set; } = new List<Product>();
+
+    public virtual ICollection<Product> ProductPrdLookupTypes { get; set; } = new List<Product>();
 }

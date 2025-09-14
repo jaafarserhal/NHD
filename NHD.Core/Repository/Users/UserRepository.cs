@@ -20,17 +20,16 @@ namespace NHD.Core.Repository.Users
         public async Task<User> GetByUsernameAsync(string username)
         {
 
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == username && u.IsActive && u.RoleId == RoleType.Admin.AsInt());
+            return await _context.Users.FirstOrDefaultAsync(u => u.EmailAddress == username && u.IsActive == true);
         }
 
         public async Task<IEnumerable<User>> GetUsersAsync(int page, int limit)
         {
             return await _context.Users
-                .Include(u => u.Role)
                 .OrderBy(u => u.UserId)
                 .Skip((page - 1) * limit)
                 .Take(limit)
-                .Where(u => u.IsActive)
+                .Where(u => u.IsActive == true)
                 .ToListAsync();
         }
 
