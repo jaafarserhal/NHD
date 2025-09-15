@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using NHD.Core.Common.Models;
 using NHD.Core.Repository.Lookup;
+using NHD.Core.Repository.Products;
+using NHD.Core.Services.Products;
 
 
 namespace NHD.Web.Api
@@ -146,6 +148,8 @@ namespace NHD.Web.Api
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductService, ProductService>();
         }
     }
 }

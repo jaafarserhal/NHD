@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import PageHeader from './PageHeader';
+import PageHeader from '../PageHeader';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Grid, Container, Typography, Chip } from '@mui/material';
 import Footer from 'src/components/Footer';
@@ -32,40 +32,40 @@ function Users() {
     );
   }
 
-const columns = [
-  {
-    key: 'userId',
-    label: 'ID'
-  },
-  {
-    key: 'firstName',
-    label: 'User',
-    render: (user) => (
-      <Typography fontWeight="bold">
-        {user.firstName} {user.lastName}
-      </Typography>
-    )
-  },
-  {
-    key: 'phoneNumber',
-    label: 'Phone Number'
-  },
-  {
-    key: 'email',
-    label: 'Email'
-  },
-  {
-    key: 'isActive',
-    label: 'Status',
-    render: (user) => (
-      <Chip
-        label={user.isActive ? 'Active' : 'Inactive'}
-        color={user.isActive ? 'success' : 'error'}
-        size="small"
-      />
-    )
-  }
-];
+  const columns = [
+    {
+      key: 'userId',
+      label: 'ID'
+    },
+    {
+      key: 'firstName',
+      label: 'User',
+      render: (user) => (
+        <Typography fontWeight="bold">
+          {user.firstName} {user.lastName}
+        </Typography>
+      )
+    },
+    {
+      key: 'phoneNumber',
+      label: 'Phone Number'
+    },
+    {
+      key: 'email',
+      label: 'Email'
+    },
+    {
+      key: 'isActive',
+      label: 'Status',
+      render: (user) => (
+        <Chip
+          label={user.isActive ? 'Active' : 'Inactive'}
+          color={user.isActive ? 'success' : 'error'}
+          size="small"
+        />
+      )
+    }
+  ];
 
   return (
     <>
@@ -73,7 +73,7 @@ const columns = [
         <title>Users - Applications</title>
       </Helmet>
       <PageTitleWrapper>
-        <PageHeader />
+        <PageHeader sectionTitle="User" />
       </PageTitleWrapper>
       <Container maxWidth="lg">
         <Grid
@@ -84,7 +84,7 @@ const columns = [
           spacing={3}
         >
           <Grid item xs={12}>
-             <GenericTable
+            <GenericTable
               data={users && users.data ? users.data : []}
               idKey="userId"
               columns={columns}

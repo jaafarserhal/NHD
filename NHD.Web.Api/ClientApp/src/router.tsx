@@ -7,6 +7,7 @@ import BaseLayout from 'src/layouts/BaseLayout';
 
 import SuspenseLoader from 'src/components/SuspenseLoader';
 import Users from './portal/users/Index';
+import Products from './portal/products/Index';
 import Login from './portal/auth/Login';
 
 const Loader = (Component) => (props) =>
@@ -85,10 +86,10 @@ const routes: RouteObject[] = [
     children: [
       {
         path: '/',
-        element: <Users />
+        element: <Products />
       },
       {
-        path: 'Users',
+        path: 'Products',
         element: <Navigate to="/" replace />
       }
     ]
