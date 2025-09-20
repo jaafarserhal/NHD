@@ -38,7 +38,7 @@ public partial class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 
-        => optionsBuilder.UseSqlServer($"Name=ConnectionStrings:{Utilities.AppConstants.DEV_CONNECTION_NAME}");
+        => optionsBuilder.UseSqlServer($"Name=ConnectionStrings:{Utilities.AppConstants.CONNECTION_NAME}");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

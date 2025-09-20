@@ -57,7 +57,7 @@ namespace NHD.Web.Api
                 {
                     policy.WithOrigins(
                         "http://localhost:3000",           // Development
-                        "https://myappadmin.onrender.com"  // Production
+                        "http://portal.nawahomeofdates.com/"  // Production
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
@@ -66,7 +66,7 @@ namespace NHD.Web.Api
             });
 
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString(AppConstants.DEV_CONNECTION_NAME)));
+                options.UseSqlServer(Configuration.GetConnectionString(AppConstants.CONNECTION_NAME)));
 
             // Add SPA services
             services.AddSpaStaticFiles(configuration =>
