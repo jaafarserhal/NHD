@@ -31,6 +31,7 @@ import ChromeReaderModeTwoToneIcon from '@mui/icons-material/ChromeReaderModeTwo
 import WorkspacePremiumTwoToneIcon from '@mui/icons-material/WorkspacePremiumTwoTone';
 import CameraFrontTwoToneIcon from '@mui/icons-material/CameraFrontTwoTone';
 import DisplaySettingsTwoToneIcon from '@mui/icons-material/DisplaySettingsTwoTone';
+import EmergencyShareIcon from '@mui/icons-material/EmergencyShare';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -147,9 +148,9 @@ const SubMenuWrapper = styled(Box)(
                 background: ${theme.colors.alpha.trueWhite[100]};
                 opacity: 0;
                 transition: ${theme.transitions.create([
-                  'transform',
-                  'opacity'
-                ])};
+    'transform',
+    'opacity'
+  ])};
                 width: 6px;
                 height: 6px;
                 transform: scale(0);
@@ -179,25 +180,25 @@ function SidebarMenu() {
 
   return (
     <>
-    <MenuWrapper>
-      <List component="div">
-        <SubMenuWrapper>
-          <List component="div">
-            <ListItem component="div">
-              <Button
+      <MenuWrapper>
+        <List component="div">
+          <SubMenuWrapper>
+            <List component="div">
+              <ListItem component="div">
+                <Button
                   disableRipple
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/"
-                  startIcon={<TableChartTwoToneIcon />}
+                  startIcon={<EmergencyShareIcon />}
                 >
-                 Users
+                  Products
                 </Button>
-            </ListItem>
-          </List>
-        </SubMenuWrapper>
-      </List>
-    </MenuWrapper>
+              </ListItem>
+            </List>
+          </SubMenuWrapper>
+        </List>
+      </MenuWrapper>
       {/* <MenuWrapper>
         <List component="div">
           <SubMenuWrapper>

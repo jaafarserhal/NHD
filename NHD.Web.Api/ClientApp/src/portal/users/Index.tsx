@@ -19,7 +19,6 @@ function Users() {
   );
 
 
-  if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   if (!users || !users.data || users.data.length === 0) {

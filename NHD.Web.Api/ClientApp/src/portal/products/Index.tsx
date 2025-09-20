@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Grid, Container, Typography, Chip } from '@mui/material';
+import { Grid, Container, Typography, Chip, Box } from '@mui/material';
 import Footer from 'src/components/Footer';
 import { useApiCall } from '../../api/hooks/useApi';
 import productService from '../../api/productService';
@@ -12,20 +12,6 @@ function Products() {
         () => productService.getProducts(),
         []
     );
-
-
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error.message}</div>;
-
-    if (!products || !products.data || products.data.length === 0) {
-        return (
-            <Container maxWidth="lg">
-                <Typography variant="h6" color="textSecondary" align="center">
-                    No products found.
-                </Typography>
-            </Container>
-        );
-    }
 
     const columns = [
         {
@@ -66,35 +52,58 @@ function Products() {
     ];
 
     return (
-        <>
+        <Box
+            display="flex"
+            flexDirection="column"
+            minHeight="100vh"
+            overflow="hidden"
+        >
             <Helmet>
                 <title>Products - Applications</title>
             </Helmet>
+
             <PageTitleWrapper>
                 <PageHeader sectionTitle="Product" />
             </PageTitleWrapper>
-            <Container maxWidth="lg">
-                <Grid
-                    container
-                    direction="row"
-                    justifyContent="center"
-                    alignItems="stretch"
-                    spacing={3}
-                >
-                    <Grid item xs={12}>
-                        <GenericTable
-                            data={products && products.data ? products.data : []}
-                            idKey="id"
-                            columns={columns}
-                            onEdit={(user) => console.log('Edit', user)}
-                            onDelete={(user) => console.log('Delete', user)}
-                        />
-                    </Grid>
-                </Grid>
-            </Container>
-            <Footer />
-        </>
-    );
-}
 
+            <Container
+                maxWidth="lg"
+                sx={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center", // centers vertically if little content
+                }}
+            >
+                {!products || !products.data || products.data.length === 0 ? (
+                    <Typography variant="h6" color="textSecondary" align="center">
+                        No products found.
+                    </Typography>
+                ) : (
+                    <Grid
+                        container
+                        direction="row"
+                        justifyContent="center"
+                        alignItems="stretch"
+                        spacing={3}
+                        sx={{ flex: 1 }}
+                    >
+                        <Grid item xs={12}>
+                            <GenericTable
+                                data={products.data}
+                                idKey="id"
+                                columns={columns}
+                                onEdit={(user) => console.log("Edit", user)}
+                                onDelete={(user) => console.log("Delete", user)}
+                            />
+                        </Grid>
+                    </Grid>
+                )}
+            </Container>
+
+            <Footer />
+        </Box>
+    );
+
+}
 export default Products;
