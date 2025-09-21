@@ -17,7 +17,9 @@ namespace NHD.Core.Utilities
     public enum LookupType
     {
         Undefined = 0,
-        StoreCategory = 1,
+        ProductCategory = 100,
+        ProductType = 200,
+        ProductSize = 300,
     }
 
     public enum HttpStatusCodeEnum

@@ -11,7 +11,9 @@ namespace NHD.Core.Repository.Lookup
     {
         Task<List<GenLookup>> GetLookupsByTypeAsync(int lookupType);
 
-        Task<List<GenLookup>> GetStoresGategory();
+        Task<List<GenLookup>> GetProductCategoriesAsync();
+        Task<List<GenLookup>> GetProductTypesAsync();
+        Task<List<GenLookup>> GetProductSizesAsync();
 
     }
 }

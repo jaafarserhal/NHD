@@ -9,26 +9,38 @@ class productService extends apiService {
     async getProducts(page = 1, limit = 10) {
         return this.get('', { page, limit });
     }
-    // Add a new product
+
     async addProduct(product) {
         const formData = new FormData();
-        formData.append('CategoryId', product.categoryId);
-        formData.append('TypeId', product.typeId);
-        formData.append('SizeId', product.sizeId);
-        formData.append('NameEN', product.nameEN);
-        formData.append('NameSV', product.nameSV);
-        formData.append('DescriptionEN', product.descriptionEN);
-        formData.append('DescriptionSV', product.descriptionSV);
-        formData.append('Price', product.price.toString());
-        formData.append('IsActive', product.isActive.toString());
-        if (product.image) {
-            formData.append('ImageUrl', product.image);
+
+        formData.append('CategoryId', String(product.categoryId));
+        formData.append('TypeId', String(product.typeId));
+        formData.append('SizeId', String(product.sizeId));
+        formData.append('NameEn', product.nameEn || '');
+        formData.append('NameSv', product.nameSv || '');
+        formData.append('DescriptionEn', product.descriptionEn || '');
+        formData.append('DescriptionSv', product.descriptionSv || '');
+        formData.append('Price', String(product.price));
+        formData.append('IsActive', String(product.isActive));
+
+        if (product.imageFile && product.imageFile instanceof File) {
+            formData.append('ImageUrl', product.imageFile, product.imageFile.name);
         }
-        return this.post('/Add', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+
+        return this.post(formData, 'Add');
+    }
+
+    // Get product categories
+    async getCategories() {
+        return this.get('/Categories');
+    }
+    // Get product types
+    async getTypes() {
+        return this.get('/Types');
+    }
+    // Get product sizes
+    async getSizes() {
+        return this.get('/Sizes');
     }
 }
 

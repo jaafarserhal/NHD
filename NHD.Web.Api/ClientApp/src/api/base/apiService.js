@@ -20,12 +20,24 @@ class apiService {
   async post(data, endpoint = '') {
     try {
       const url = endpoint ? `${this.baseEndpoint}/${endpoint}` : this.baseEndpoint;
-      const response = await apiClient.post(url, data);
+
+      const config = {};
+
+      // If data is FormData, don't set Content-Type
+      if (!(data instanceof FormData)) {
+        config.headers = {
+          'Content-Type': 'application/json'
+        };
+      }
+
+      const response = await apiClient.post(url, data, config);
       return response;
     } catch (error) {
       throw this.handleError(error);
     }
   }
+
+
 
   // PUT request
   async put(data, endpoint = '') {
@@ -81,7 +93,7 @@ class apiService {
     const message = error.response?.data?.message || error.message || 'An error occurred';
     const status = error.response?.status;
     const data = error.response?.data;
-    
+
     return {
       message,
       status,

@@ -22,9 +22,19 @@ namespace NHD.Core.Repository.Lookup
                                  .ToListAsync();
         }
 
-        public async Task<List<GenLookup>> GetStoresGategory()
+        public async Task<List<GenLookup>> GetProductCategoriesAsync()
         {
-            return await GetLookupsByTypeAsync(LookupType.StoreCategory.AsInt());
+            return await GetLookupsByTypeAsync(LookupType.ProductCategory.AsInt());
+        }
+
+        public async Task<List<GenLookup>> GetProductTypesAsync()
+        {
+            return await GetLookupsByTypeAsync(LookupType.ProductType.AsInt());
+        }
+
+        public async Task<List<GenLookup>> GetProductSizesAsync()
+        {
+            return await GetLookupsByTypeAsync(LookupType.ProductSize.AsInt());
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NHD.Core.Common.Models;
 using NHD.Core.Models;
+using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Products;
 using NHD.Core.Services.Products;
 
@@ -33,10 +34,45 @@ namespace NHD.Web.Api.Controllers
             return BadRequest(data);
         }
 
+        [HttpGet]
+        [Route("Categories")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetCategories()
+        {
+            var data = await _productService.GetCategoriesAsync();
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
+        }
+
+        [HttpGet]
+        [Route("Types")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetTypes()
+        {
+            var data = await _productService.GetTypesAsync();
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
+        }
+
+        [HttpGet]
+        [Route("Sizes")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetSizes()
+        {
+            var data = await _productService.GetSizesAsync();
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
+        }
+
         [HttpPost]
         [Route("Add")]
         public async Task<IActionResult> AddProduct([FromForm] ProductBindingModel dto)
         {
+            if (dto == null)
+            {
+                return BadRequest("DTO is null");
+            }
+
             if (dto.ImageUrl == null || dto.ImageUrl.Length == 0)
                 return BadRequest("Image is required");
 
@@ -58,10 +94,10 @@ namespace NHD.Web.Api.Controllers
                 PrdLookupCategoryId = dto.CategoryId,
                 PrdLookupTypeId = dto.TypeId,
                 PrdLookupSizeId = dto.SizeId,
-                NameEn = dto.NameEN,
-                NameSv = dto.NameSV,
-                DescriptionEn = dto.DescriptionEN,
-                DescriptionSv = dto.DescriptionSV,
+                NameEn = dto.NameEn,
+                NameSv = dto.NameSv,
+                DescriptionEn = dto.DescriptionEn,
+                DescriptionSv = dto.DescriptionSv,
                 Price = dto.Price,
                 IsActive = dto.IsActive,
                 ImageUrl = $"/uploads/{fileName}"

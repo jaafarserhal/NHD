@@ -10,34 +10,38 @@ import PageTitleWrapper from "src/components/PageTitleWrapper";
 import Editor from "src/components/Editor/Index";
 import UploadImage from "src/components/UploadImage/Index";
 
-
-
 export default function AddProduct() {
+    const { data: categories, loading: categoriesLoading } = useApiCall(
+        () => productService.getCategories(),
+        []
+    );
+    const { data: types, loading: typesLoading } = useApiCall(
+        () => productService.getTypes(),
+        []
+    );
+    const { data: sizes, loading: sizesLoading } = useApiCall(
+        () => productService.getSizes(),
+        []
+    );
+
     const [form, setForm] = useState<Omit<Product, "id" | "imageUrl">>({
         categoryId: undefined,
         typeId: undefined,
         sizeId: undefined,
-        nameEN: "",
-        nameSV: "",
-        descriptionEN: "",
-        descriptionSV: "",
+        nameEn: "",
+        nameSv: "",
+        descriptionEn: "",
+        descriptionSv: "",
         price: 0,
         isActive: true,
     });
 
     const [image, setImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
-    const [submitFormData, setSubmitFormData] = useState<FormData | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    // Use useApiCall for the add product API call
-    const { data: addedProduct, loading, error, refetch: addProduct } = useApiCall(
-        () => submitFormData ? productService.addProduct(submitFormData) : Promise.resolve(null),
-        [submitFormData]
-    );
-
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
         const checked = (e.target as HTMLInputElement).checked;
 
@@ -47,8 +51,15 @@ export default function AddProduct() {
                 type === "checkbox"
                     ? checked
                     : name.toLowerCase().includes("id") || name === "price"
-                        ? Number(value)
+                        ? (value === "" ? undefined : Number(value)) // Fixed this line
                         : value,
+        }));
+    };
+
+    const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm((prev) => ({
+            ...prev,
+            isActive: e.target.checked,
         }));
     };
 
@@ -62,414 +73,293 @@ export default function AddProduct() {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!image) {
-            alert("Please select an image");
-            return;
-        }
-
-        const formData = new FormData();
-
-        // Append form data with correct field names
-        Object.entries(form).forEach(([key, value]) => {
-            if (value !== undefined && value !== null) {
-                formData.append(key, value.toString());
-            }
-        });
-        formData.append("image", image);
-
-        // Trigger the API call by setting the form data
-        setSubmitFormData(formData);
+    // Handle editor content changes
+    const handleEditorChange = (field: string, content: string) => {
+        setForm((prev) => ({
+            ...prev,
+            [field]: content,
+        }));
     };
 
-    // Handle the result of the API call
-    React.useEffect(() => {
-        if (addedProduct && !loading && !error) {
-            alert(`Product added successfully!`);
+    const validateForm = () => {
+        if (!form.nameEn.trim()) {
+            setError("English name is required");
+            return false;
+        }
+        if (!form.nameSv.trim()) {
+            setError("Swedish name is required");
+            return false;
+        }
+        if (!form.categoryId) {
+            setError("Category is required");
+            return false;
+        }
+        if (!form.typeId) {
+            setError("Type is required");
+            return false;
+        }
+        if (!form.sizeId) {
+            setError("Size is required");
+            return false;
+        }
+        if (!form.price || form.price <= 0) {
+            setError("Valid price is required");
+            return false;
+        }
+        if (!image) {
+            setError("Image is required");
+            return false;
+        }
+        return true;
+    };
+
+    // handleSubmit in your component
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+
+        if (!validateForm()) return;
+
+        setLoading(true);
+
+        try {
+            if (!image) throw new Error("Please select an image.");
+
+            const productData = { ...form, imageFile: image }; // Pass File object
+
+            await productService.addProduct(productData);
+
+            alert('Product added successfully!');
 
             // Reset form
             setForm({
                 categoryId: undefined,
                 typeId: undefined,
                 sizeId: undefined,
-                nameEN: "",
-                nameSV: "",
-                descriptionEN: "",
-                descriptionSV: "",
+                nameEn: "",
+                nameSv: "",
+                descriptionEn: "",
+                descriptionSv: "",
                 price: 0,
                 isActive: true,
             });
             setImage(null);
             setPreview(null);
-            setSubmitFormData(null);
 
-            // Clear the file input
+            // Clear file input
             const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-            if (fileInput) {
-                fileInput.value = '';
-            }
-        }
-
-        if (error) {
+            if (fileInput) fileInput.value = '';
+        } catch (error: any) {
             console.error(error);
-            alert(`Error while saving product: ${error.message || 'Unknown error'}`);
-            setSubmitFormData(null);
+            setError(error.message || 'Failed to add product');
+        } finally {
+            setLoading(false);
         }
-    }, [addedProduct, loading, error]);
+    };
 
-    // return (
-    //     <Card className="max-w-2xl mx-auto mt-8 shadow-lg rounded-2xl">
-    //         <CardContent>
-    //             <h2 className="text-2xl font-bold mb-6 text-center">Add New Product</h2>
-    //             <form onSubmit={handleSubmit} className="space-y-5">
-    //                 {/* Category ID */}
-    //                 <div className="flex flex-col space-y-1">
-    //                     <label htmlFor="categoryId" className="text-sm font-medium text-gray-700">
-    //                         Category ID
-    //                     </label>
-    //                     <Input
-    //                         id="categoryId"
-    //                         type="number"
-    //                         name="categoryId"
-    //                         value={form.categoryId ?? ""}
-    //                         onChange={handleChange}
-    //                         required
-    //                     />
-    //                 </div>
 
-    //                 {/* Type ID */}
-    //                 <div className="flex flex-col space-y-1">
-    //                     <label htmlFor="typeId" className="text-sm font-medium text-gray-700">
-    //                         Type ID
-    //                     </label>
-    //                     <Input
-    //                         id="typeId"
-    //                         type="number"
-    //                         name="typeId"
-    //                         value={form.typeId ?? ""}
-    //                         onChange={handleChange}
-    //                         required
-    //                     />
-    //                 </div>
-
-    //                 {/* Size ID */}
-    //                 <div className="flex flex-col space-y-1">
-    //                     <label htmlFor="sizeId" className="text-sm font-medium text-gray-700">
-    //                         Size ID
-    //                     </label>
-    //                     <Input
-    //                         id="sizeId"
-    //                         type="number"
-    //                         name="sizeId"
-    //                         value={form.sizeId ?? ""}
-    //                         onChange={handleChange}
-    //                         required
-    //                     />
-    //                 </div>
-
-    //                 {/* Names */}
-    //                 <div className="flex flex-col space-y-1">
-    //                     <label htmlFor="nameEN" className="text-sm font-medium text-gray-700">
-    //                         Name (English)
-    //                     </label>
-    //                     <Input
-    //                         id="nameEN"
-    //                         type="text"
-    //                         name="nameEN"
-    //                         value={form.nameEN}
-    //                         onChange={handleChange}
-    //                         required
-    //                     />
-    //                 </div>
-
-    //                 <div className="flex flex-col space-y-1">
-    //                     <label htmlFor="nameSV" className="text-sm font-medium text-gray-700">
-    //                         Name (Swedish)
-    //                     </label>
-    //                     <Input
-    //                         id="nameSV"
-    //                         type="text"
-    //                         name="nameSV"
-    //                         value={form.nameSV}
-    //                         onChange={handleChange}
-    //                         required
-    //                     />
-    //                 </div>
-
-    //                 {/* Descriptions */}
-    //                 <div className="flex flex-col space-y-1">
-    //                     <label htmlFor="descriptionEN" className="text-sm font-medium text-gray-700">
-    //                         Description (English)
-    //                     </label>
-    //                     <Textarea
-    //                         id="descriptionEN"
-    //                         name="descriptionEN"
-    //                         value={form.descriptionEN}
-    //                         onChange={handleChange}
-    //                         minRows={3}
-    //                         className="w-full resize-y"
-    //                     />
-    //                 </div>
-
-    //                 <div className="flex flex-col space-y-1">
-    //                     <label htmlFor="descriptionSV" className="text-sm font-medium text-gray-700">
-    //                         Description (Swedish)
-    //                     </label>
-    //                     <Textarea
-    //                         id="descriptionSV"
-    //                         name="descriptionSV"
-    //                         value={form.descriptionSV}
-    //                         onChange={handleChange}
-    //                         minRows={3}
-    //                         className="w-full resize-y"
-    //                     />
-    //                 </div>
-
-    //                 {/* Price */}
-    //                 <div className="flex flex-col space-y-1">
-    //                     <label htmlFor="price" className="text-sm font-medium text-gray-700">
-    //                         Price
-    //                     </label>
-    //                     <Input
-    //                         id="price"
-    //                         type="number"
-    //                         name="price"
-    //                         value={form.price}
-    //                         onChange={handleChange}
-    //                         required
-    //                     // min={0}
-    //                     />
-    //                 </div>
-
-    //                 {/* Active checkbox */}
-    //                 <label className="flex items-center space-x-2">
-    //                     <input
-    //                         type="checkbox"
-    //                         name="isActive"
-    //                         checked={form.isActive}
-    //                         onChange={handleChange}
-    //                         className="h-4 w-4"
-    //                     />
-    //                     <span className="text-sm text-gray-700">Active</span>
-    //                 </label>
-
-    //                 {/* File upload */}
-    //                 <div className="flex flex-col space-y-1">
-    //                     <label className="text-sm font-medium text-gray-700">Product Image</label>
-    //                     <Input
-    //                         type="file"
-    //                         onChange={handleFileChange}
-    //                         required
-    //                     // accept="image/jpeg,image/jpg,image/png,image/gif"
-    //                     />
-    //                 </div>
-
-    //                 {/* Preview */}
-    //                 {preview && (
-    //                     <div className="mt-2">
-    //                         <img
-    //                             src={preview}
-    //                             alt="Preview"
-    //                             className="h-32 rounded-lg object-cover border border-gray-300"
-    //                         />
-    //                     </div>
-    //                 )}
-
-    //                 {/* Submit */}
-    //                 <Button
-    //                     type="submit"
-    //                     disabled={loading}
-    //                     className="w-full py-2 rounded-xl"
-    //                 >
-    //                     {loading ? "Saving..." : "Save Product"}
-    //                 </Button>
-    //             </form>
-    //         </CardContent>
-    //     </Card>
-    // );
     const label = { inputProps: { 'aria-label': 'Switch demo' } };
-    const currencies = [
-        {
-            value: 'USD',
-            label: '$'
-        },
-        {
-            value: 'EUR',
-            label: '€'
-        },
-        {
-            value: 'BTC',
-            label: '฿'
-        },
-        {
-            value: 'JPY',
-            label: '¥'
-        }
-    ];
-
-    const [currency, setCurrency] = useState('EUR');
 
     return (
         <>
             <Helmet>
-                <title>Products - Application</title>
+                <title>Add Product - Application</title>
             </Helmet>
             <PageTitleWrapper>
                 <PageTitle
-                    heading="Dates"
-                    subHeading="Manage your dates"
+                    heading="Add Product"
+                    subHeading="Add a new product to your catalog"
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
-                <Grid
-                    container
-                    direction="row"
-                    justifyContent="center"
-                    alignItems="stretch"
-                    spacing={3}
-                >
-                    <Grid item xs={12}>
-                        <Card>
-                            <CardHeader title="Details" />
-                            <Divider />
-                            <CardContent>
-                                <Box
-                                    component="form"
-                                    sx={{
-                                        '& .MuiTextField-root': { m: 1, width: '100ch' }
-                                    }}
-                                    noValidate
-                                    autoComplete="off"
-                                >
-                                    <div>
-                                        <TextField
-                                            required
-                                            id="standard-required"
-                                            label="Required"
-                                            defaultValue="English Name"
-                                            variant="standard"
-                                        />
-                                        <Editor label="English Description" />
-                                        <TextField
-                                            required
-                                            id="standard-required"
-                                            label="Required"
-                                            defaultValue="Swedish Name"
-                                            variant="standard"
-                                        />
-                                        <Editor label="Swedish Description" />
-                                    </div>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Card>
-                            <CardHeader title="Categories" />
-                            <Divider />
-                            <CardContent>
-                                <Box
-                                    component="form"
-                                    sx={{
-                                        '& .MuiTextField-root': { m: 1, width: '100ch' }
-                                    }}
-                                    noValidate
-                                    autoComplete="off"
-                                >
-                                    <div>
-                                        <TextField
-                                            id="standard-select-currency-native"
-                                            select
-                                            label="Dates Category"
-                                            value={currency}
-                                            onChange={handleChange}
-                                            SelectProps={{
-                                                native: true
-                                            }}
-                                            helperText="Please select your category"
-                                            variant="standard"
-                                        >
-                                            {currencies.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </TextField>
+                {error && (
+                    <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', color: 'error.contrastText', borderRadius: 1 }}>
+                        {error}
+                    </Box>
+                )}
 
-                                        <TextField
-                                            id="standard-select-currency-native"
-                                            select
-                                            label="Dates Type"
-                                            value={currency}
-                                            onChange={handleChange}
-                                            SelectProps={{
-                                                native: true
-                                            }}
-                                            helperText="Please select your Type"
-                                            variant="standard"
-                                        >
-                                            {currencies.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </TextField>
-
-                                        <TextField
-                                            id="standard-select-currency-native"
-                                            select
-                                            label="Dates Size"
-                                            value={currency}
-                                            onChange={handleChange}
-                                            SelectProps={{
-                                                native: true
-                                            }}
-                                            helperText="Please select your Size"
-                                            variant="standard"
-                                        >
-                                            {currencies.map((option) => (
-                                                <option key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </TextField>
-                                    </div>
-                                </Box>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Card>
-                            <CardHeader title="Image Upload" />
-                            <Divider />
-                            <CardContent>
-                                <UploadImage />
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Card>
-                            <CardHeader title="Active" />
-                            <Divider />
-                            <CardContent>
-                                <Switch {...label} defaultChecked />
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                </Grid>
-                {/* Submit */}
-                <Box textAlign='center' m={2}>
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        disabled={loading}
-                        className="w-25 py-2 rounded-xl"
-                        onClick={handleSubmit}
+                <form onSubmit={handleSubmit}>
+                    <Grid
+                        container
+                        direction="row"
+                        justifyContent="center"
+                        alignItems="stretch"
+                        spacing={3}
                     >
-                        {loading ? "Saving..." : "Save Product"}
-                    </Button>
-                </Box>
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Product Details" />
+                                <Divider />
+                                <CardContent>
+                                    <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
+                                        <TextField
+                                            required
+                                            name="nameEn"
+                                            label="English Name"
+                                            value={form.nameEn}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                        <Box sx={{ m: 1 }}>
+                                            <Editor
+                                                label="English Description"
+                                                value={form.descriptionEn}
+                                                onChange={(content) => handleEditorChange('descriptionEn', content)}
+                                            />
+                                        </Box>
+                                        <TextField
+                                            required
+                                            name="nameSv"
+                                            label="Swedish Name"
+                                            value={form.nameSv}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                        <Box sx={{ m: 1 }}>
+                                            <Editor
+                                                label="Swedish Description"
+                                                value={form.descriptionSv}
+                                                onChange={(content) => handleEditorChange('descriptionSv', content)}
+                                            />
+                                        </Box>
+                                        <TextField
+                                            required
+                                            name="price"
+                                            label="Price"
+                                            type="number"
+                                            value={form.price}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                            inputProps={{ min: 0, step: 0.01 }}
+                                        />
+                                    </Box>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Categories" />
+                                <Divider />
+                                <CardContent>
+                                    <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
+                                        <TextField
+                                            required
+                                            name="categoryId"
+                                            select
+                                            value={form.categoryId || ''} // controlled
+                                            onChange={handleChange}
+                                            SelectProps={{ native: true }}
+                                            variant="standard"
+                                            disabled={categoriesLoading}
+                                        >
+                                            <option value="">Select Category</option> {/* placeholder */}
+                                            {categories?.data?.map((option) => (
+                                                <option key={option.id} value={option.id}>
+                                                    {option.nameEn}
+                                                </option>
+                                            ))}
+                                        </TextField>
+
+                                        <TextField
+                                            required
+                                            name="typeId"
+                                            select
+                                            value={form.typeId || ''}
+                                            onChange={handleChange}
+                                            SelectProps={{ native: true }}
+                                            variant="standard"
+                                            disabled={typesLoading}
+                                        >
+                                            <option value="">Select Type</option> {/* placeholder */}
+                                            {types?.data?.map((option) => (
+                                                <option key={option.id} value={option.id}>
+                                                    {option.nameEn}
+                                                </option>
+                                            ))}
+                                        </TextField>
+
+                                        <TextField
+                                            required
+                                            name="sizeId"
+                                            select
+                                            value={form.sizeId || ''}
+                                            onChange={handleChange}
+                                            SelectProps={{ native: true }}
+                                            variant="standard"
+                                            disabled={sizesLoading}
+                                        >
+                                            <option value="">Select Size</option> {/* placeholder */}
+                                            {sizes?.data?.map((option) => (
+                                                <option key={option.id} value={option.id}>
+                                                    {option.nameEn}
+                                                </option>
+                                            ))}
+                                        </TextField>
+                                    </Box>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Image Upload" />
+                                <Divider />
+                                <CardContent>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        style={{ marginBottom: '1rem' }}
+                                    />
+                                    {preview && (
+                                        <Box sx={{ mt: 2 }}>
+                                            <img
+                                                src={preview}
+                                                alt="Preview"
+                                                style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
+                                            />
+                                        </Box>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Status" />
+                                <Divider />
+                                <CardContent>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={form.isActive}
+                                                onChange={handleSwitchChange}
+                                                name="isActive"
+                                            />
+                                        }
+                                        label=''
+                                    />
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    </Grid>
+
+                    {/* Submit Button */}
+                    <Box textAlign='center' m={2}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={loading}
+                            size="large"
+                        >
+                            {loading ? "Saving..." : "Save Product"}
+                        </Button>
+                    </Box>
+                </form>
             </Container>
             <Footer />
         </>

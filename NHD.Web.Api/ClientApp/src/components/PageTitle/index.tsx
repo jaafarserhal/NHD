@@ -35,9 +35,9 @@ const PageTitle: FC<PageTitleProps> = ({
           rel="noopener noreferrer"
           sx={{ mt: { xs: 2, md: 0 } }}
           variant="contained"
-          startIcon={<AddTwoToneIcon fontSize="small" />}
+
         >
-          {heading} Documentation
+          Back to List
         </Button>
       </Grid>
     </Grid>

@@ -9,11 +9,11 @@ namespace NHD.Core.Services.Model.Products
     public class ProductBindingModel
     {
         public int Id { get; set; }
-        public string NameEN { get; set; }
-        public string NameSV { get; set; }
+        public string NameEn { get; set; }
+        public string NameSv { get; set; }
 
-        public string DescriptionEN { get; set; }
-        public string DescriptionSV { get; set; }
+        public string DescriptionEn { get; set; }
+        public string DescriptionSv { get; set; }
         public int CategoryId { get; set; }
         public int TypeId { get; set; }
         public int SizeId { get; set; }
