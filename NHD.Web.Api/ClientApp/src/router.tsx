@@ -8,6 +8,7 @@ import BaseLayout from 'src/layouts/BaseLayout';
 import SuspenseLoader from 'src/components/SuspenseLoader';
 import Users from './portal/users/Index';
 import Products from './portal/products/Index';
+import AddProduct from './portal/products/Add';
 import Login from './portal/auth/Login';
 
 const Loader = (Component) => (props) =>
@@ -91,6 +92,10 @@ const routes: RouteObject[] = [
       {
         path: 'Products',
         element: <Navigate to="/" replace />
+      },
+      {
+        path: '/product/add',
+        element: <AddProduct />
       }
     ]
   },

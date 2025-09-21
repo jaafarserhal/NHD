@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NHD.Core.Common.Models;
-using NHD.Core.Services.Model;
+using NHD.Core.Models;
+using NHD.Core.Services.Model.Products;
 using NHD.Core.Services.Products;
 
 namespace NHD.Web.Api.Controllers
@@ -32,5 +33,42 @@ namespace NHD.Web.Api.Controllers
             return BadRequest(data);
         }
 
+        [HttpPost]
+        [Route("Add")]
+        public async Task<IActionResult> AddProduct([FromForm] ProductBindingModel dto)
+        {
+            if (dto.ImageUrl == null || dto.ImageUrl.Length == 0)
+                return BadRequest("Image is required");
+
+            // Create unique file name
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
+            var folderPath = Path.Combine("wwwroot", "uploads");
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var filePath = Path.Combine(folderPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await dto.ImageUrl.CopyToAsync(stream);
+            }
+
+            var product = new Product
+            {
+                PrdLookupCategoryId = dto.CategoryId,
+                PrdLookupTypeId = dto.TypeId,
+                PrdLookupSizeId = dto.SizeId,
+                NameEn = dto.NameEN,
+                NameSv = dto.NameSV,
+                DescriptionEn = dto.DescriptionEN,
+                DescriptionSv = dto.DescriptionSV,
+                Price = dto.Price,
+                IsActive = dto.IsActive,
+                ImageUrl = $"/uploads/{fileName}"
+            };
+
+            var created = await _productService.AddProductAsync(product);
+            return CreatedAtAction("GetProducts", new { id = created.PrdId }, created);
+        }
     }
 }
