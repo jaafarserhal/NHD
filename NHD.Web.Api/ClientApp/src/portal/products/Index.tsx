@@ -6,6 +6,7 @@ import { useApiCall } from '../../api/hooks/useApi';
 import productService from '../../api/productService';
 import GenericTable from 'src/components/GenericTable/index';
 import PageHeader from '../PageHeader';
+import { render } from 'react-dom';
 
 function Products() {
     const { data: products, loading, error, refetch } = useApiCall(
@@ -16,7 +17,24 @@ function Products() {
     const columns = [
         {
             key: 'createdAt',
-            label: 'Date'
+            label: 'Date',
+            render: (prd) => {
+                return (
+                    <span>
+                        {new Date(prd.createdAt).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "numeric",
+                            day: "numeric",
+                        })}{" "}
+                        -{" "}
+                        {new Date(prd.createdAt).toLocaleTimeString(undefined, {
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: false, // change to false for 24-hour format
+                        })}
+                    </span>
+                );
+            }
         },
         {
             key: 'name',
@@ -39,12 +57,29 @@ function Products() {
             label: 'Price'
         },
         {
+            key: 'imageUrl',
+            label: 'Image',
+            render: (prd) => (
+                <img
+                    src={prd.imageUrl ? `/uploads/products/${prd.imageUrl}` : "/uploads/placeholder-image.png"}
+                    alt={prd.name}
+                    style={{
+                        width: '50px',
+                        height: '50px',
+                        objectFit: 'cover',
+                        borderRadius: '4px'
+                    }}
+                />
+
+            )
+        },
+        {
             key: 'isActive',
             label: 'Status',
-            render: (user) => (
+            render: (prd) => (
                 <Chip
-                    label={user.isActive ? 'Active' : 'Inactive'}
-                    color={user.isActive ? 'success' : 'error'}
+                    label={prd.isActive ? 'Active' : 'Inactive'}
+                    color={prd.isActive ? 'success' : 'error'}
                     size="small"
                 />
             )

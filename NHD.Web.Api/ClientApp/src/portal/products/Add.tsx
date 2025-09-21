@@ -8,7 +8,6 @@ import Footer from "src/components/Footer";
 import PageTitle from "src/components/PageTitle";
 import PageTitleWrapper from "src/components/PageTitleWrapper";
 import Editor from "src/components/Editor/Index";
-import UploadImage from "src/components/UploadImage/Index";
 
 export default function AddProduct() {
     const { data: categories, loading: categoriesLoading } = useApiCall(

@@ -21,10 +21,9 @@ namespace NHD.Core.Repository.Products
                 .Include(p => p.PrdLookupCategory)
                 .Include(p => p.PrdLookupType)
                 .Include(p => p.PrdLookupSize)
+                .OrderByDescending(p => p.CreatedAt)
                 .Skip((page - 1) * limit)
                 .Take(limit)
-                .Where(p => p.IsActive == true)
-                .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
         }
     }

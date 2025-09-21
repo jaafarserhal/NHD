@@ -70,7 +70,7 @@ namespace NHD.Web.Api.Controllers
         {
             if (dto == null)
             {
-                return BadRequest("DTO is null");
+                return BadRequest("Product data is required");
             }
 
             if (dto.ImageUrl == null || dto.ImageUrl.Length == 0)
@@ -78,7 +78,7 @@ namespace NHD.Web.Api.Controllers
 
             // Create unique file name
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
-            var folderPath = Path.Combine("wwwroot", "uploads");
+            var folderPath = Path.Combine("wwwroot/uploads", "products");
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
@@ -100,7 +100,7 @@ namespace NHD.Web.Api.Controllers
                 DescriptionSv = dto.DescriptionSv,
                 Price = dto.Price,
                 IsActive = dto.IsActive,
-                ImageUrl = $"/uploads/{fileName}"
+                ImageUrl = fileName
             };
 
             var created = await _productService.AddProductAsync(product);

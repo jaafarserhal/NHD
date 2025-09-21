@@ -57,7 +57,7 @@ namespace NHD.Core.Services.Products
                 Category = product.PrdLookupCategory?.NameEn,
                 Type = product.PrdLookupType?.NameEn,
                 Size = product.PrdLookupSize?.NameEn,
-                ImageUrl = product.ImageUrl,
+                ImageUrl = product.ImageUrl ?? null,
                 Price = product.Price,
                 IsActive = product.IsActive ?? false,
                 CreatedAt = product.CreatedAt
