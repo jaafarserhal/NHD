@@ -8,8 +8,11 @@ import Footer from "src/components/Footer";
 import PageTitle from "src/components/PageTitle";
 import PageTitleWrapper from "src/components/PageTitleWrapper";
 import Editor from "src/components/Editor/Index";
+import { useNavigate } from 'react-router-dom';
 
 export default function AddProduct() {
+
+    const navigate = useNavigate();
     const { data: categories, loading: categoriesLoading } = useApiCall(
         () => productService.getCategories(),
         []
@@ -357,6 +360,16 @@ export default function AddProduct() {
                         >
                             {loading ? "Saving..." : "Save Product"}
                         </Button>
+                        <Button
+                            type="button"
+                            variant="outlined"
+                            onClick={() => { navigate(-1); }}
+                            size="large"
+                            sx={{ ml: 2 }}
+                        >
+                            Cancel
+                        </Button>
+
                     </Box>
                 </form>
             </Container>

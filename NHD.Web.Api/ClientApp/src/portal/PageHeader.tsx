@@ -21,7 +21,7 @@ function PageHeader({ sectionTitle }: PageHeaderProps) {
           startIcon={<AddTwoToneIcon fontSize="small" />}
           href={`/${sectionTitle?.toLowerCase()}/add`}
         >
-          Create {sectionTitle}
+          Add {sectionTitle}
         </Button>
       </Grid>
     </Grid>

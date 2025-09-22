@@ -18,7 +18,7 @@ function Footer() {
       >
         <Box>
           <Typography variant="subtitle1">
-            &copy; 2025 - My Near By Stores Admin Dashboard
+            &copy; 2025 - Nawa Home of Dates
           </Typography>
         </Box>
         <Typography

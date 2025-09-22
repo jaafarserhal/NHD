@@ -2,6 +2,7 @@ import { FC } from 'react';
 import PropTypes from 'prop-types';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { Typography, Button, Grid } from '@mui/material';
+import { useNavigate } from 'react-router';
 
 interface PageTitleProps {
   heading?: string;
@@ -15,6 +16,8 @@ const PageTitle: FC<PageTitleProps> = ({
   docs = '',
   ...rest
 }) => {
+  const navigate = useNavigate();
+
   return (
     <Grid
       container
@@ -30,12 +33,9 @@ const PageTitle: FC<PageTitleProps> = ({
       </Grid>
       <Grid item>
         <Button
-          href={docs}
-          target="_blank"
-          rel="noopener noreferrer"
+          onClick={() => navigate(-1)}
           sx={{ mt: { xs: 2, md: 0 } }}
           variant="contained"
-
         >
           Back to List
         </Button>
