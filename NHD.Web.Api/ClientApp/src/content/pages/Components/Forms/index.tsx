@@ -75,7 +75,6 @@ function Forms() {
         <PageTitle
           heading="Forms"
           subHeading="Components that are used to build interactive placeholders used for data collection from users."
-          docs="https://material-ui.com/components/text-fields/"
         />
       </PageTitleWrapper>
       <Container maxWidth="lg">

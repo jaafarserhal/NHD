@@ -99,14 +99,6 @@ function Products() {
         setPage(0); // Reset to first page when changing page size
     };
 
-    if (loading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-                <Typography>Loading products...</Typography>
-            </Box>
-        );
-    }
-
     if (error) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">

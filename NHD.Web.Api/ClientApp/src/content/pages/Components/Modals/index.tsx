@@ -103,7 +103,6 @@ function Modals() {
         <PageTitle
           heading="Modals"
           subHeading="Dialogs inform users about a task and can contain critical information, require decisions, or involve multiple tasks."
-          docs="https://material-ui.com/components/dialogs/"
         />
       </PageTitleWrapper>
       <Container maxWidth="lg">

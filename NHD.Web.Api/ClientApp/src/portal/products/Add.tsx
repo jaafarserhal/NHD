@@ -9,6 +9,8 @@ import PageTitle from "src/components/PageTitle";
 import PageTitleWrapper from "src/components/PageTitleWrapper";
 import Editor from "src/components/Editor/Index";
 import { useNavigate } from 'react-router-dom';
+import { Bounce, ToastContainer, toast } from 'react-toastify';
+import { PortalToastContainer } from "src/components/Toaster/Index";
 
 export default function AddProduct() {
 
@@ -41,7 +43,8 @@ export default function AddProduct() {
     const [image, setImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<string[]>([]);
+    const errorBoxRef = React.useRef<HTMLDivElement>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -53,9 +56,14 @@ export default function AddProduct() {
                 type === "checkbox"
                     ? checked
                     : name.toLowerCase().includes("id") || name === "price"
-                        ? (value === "" ? undefined : Number(value)) // Fixed this line
+                        ? (value === "" ? undefined : Number(value))
                         : value,
         }));
+
+        // Clear errors when user starts typing/selecting
+        if (errors.length > 0) {
+            setErrors([]);
+        }
     };
 
     const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,6 +81,11 @@ export default function AddProduct() {
         } else {
             setPreview(null);
         }
+
+        // Clear errors when user selects a file
+        if (errors.length > 0) {
+            setErrors([]);
+        }
     };
 
     // Handle editor content changes
@@ -81,44 +94,57 @@ export default function AddProduct() {
             ...prev,
             [field]: content,
         }));
+
+        // Clear errors when user starts typing in editor
+        if (errors.length > 0) {
+            setErrors([]);
+        }
     };
 
     const validateForm = () => {
+        const validationErrors: string[] = [];
+
         if (!form.nameEn.trim()) {
-            setError("English name is required");
-            return false;
+            validationErrors.push("English name is required");
         }
         if (!form.nameSv.trim()) {
-            setError("Swedish name is required");
-            return false;
+            validationErrors.push("Swedish name is required");
         }
         if (!form.categoryId) {
-            setError("Category is required");
-            return false;
+            validationErrors.push("Category is required");
         }
         if (!form.typeId) {
-            setError("Type is required");
-            return false;
+            validationErrors.push("Type is required");
         }
         if (!form.sizeId) {
-            setError("Size is required");
-            return false;
+            validationErrors.push("Size is required");
         }
         if (!form.price || form.price <= 0) {
-            setError("Valid price is required");
-            return false;
+            validationErrors.push("Valid price is required");
         }
         if (!image) {
-            setError("Image is required");
-            return false;
+            validationErrors.push("Image is required");
         }
-        return true;
+
+        setErrors(validationErrors);
+
+        // Scroll to error box if there are validation errors
+        if (validationErrors.length > 0) {
+            setTimeout(() => {
+                errorBoxRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 100);
+        }
+
+        return validationErrors.length === 0;
     };
 
     // handleSubmit in your component
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
+        setErrors([]);
 
         if (!validateForm()) return;
 
@@ -127,11 +153,11 @@ export default function AddProduct() {
         try {
             if (!image) throw new Error("Please select an image.");
 
-            const productData = { ...form, imageFile: image }; // Pass File object
+            const productData = { ...form, imageFile: image };
 
             await productService.addProduct(productData);
 
-            alert('Product added successfully!');
+            notifySuccess();
 
             // Reset form
             setForm({
@@ -153,17 +179,29 @@ export default function AddProduct() {
             if (fileInput) fileInput.value = '';
         } catch (error: any) {
             console.error(error);
-            setError(error.message || 'Failed to add product');
+            setErrors([error.message || 'Failed to add product']);
         } finally {
             setLoading(false);
         }
     };
 
-
     const label = { inputProps: { 'aria-label': 'Switch demo' } };
+    const notifySuccess = () => {
+        toast.success('Product added successfully!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+        });
+    };
 
     return (
         <>
+            <PortalToastContainer />
             <Helmet>
                 <title>Add Product - Application</title>
             </Helmet>
@@ -171,16 +209,28 @@ export default function AddProduct() {
                 <PageTitle
                     heading="Add Product"
                     subHeading="Add a new product to your catalog"
+                    backUrl="/products"
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
-                {error && (
-                    <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', color: 'error.contrastText', borderRadius: 1 }}>
-                        {error}
+                {errors.length > 0 && (
+                    <Box
+                        ref={errorBoxRef}
+                        sx={{ mb: 2, p: 2, bgcolor: 'error.light', color: 'error.contrastText', borderRadius: 1 }}
+                    >
+                        {errors.length === 1 ? (
+                            errors[0]
+                        ) : (
+                            <Box component="ul" sx={{ m: 0, pl: 2 }}>
+                                {errors.map((error, index) => (
+                                    <li key={index}>{error}</li>
+                                ))}
+                            </Box>
+                        )}
                     </Box>
                 )}
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate>
                     <Grid
                         container
                         direction="row"
@@ -252,13 +302,13 @@ export default function AddProduct() {
                                             required
                                             name="categoryId"
                                             select
-                                            value={form.categoryId || ''} // controlled
+                                            value={form.categoryId || ''}
                                             onChange={handleChange}
                                             SelectProps={{ native: true }}
                                             variant="standard"
                                             disabled={categoriesLoading}
                                         >
-                                            <option value="">Select Category</option> {/* placeholder */}
+                                            <option value="">Select Category</option>
                                             {categories?.data?.map((option) => (
                                                 <option key={option.id} value={option.id}>
                                                     {option.nameEn}
@@ -276,7 +326,7 @@ export default function AddProduct() {
                                             variant="standard"
                                             disabled={typesLoading}
                                         >
-                                            <option value="">Select Type</option> {/* placeholder */}
+                                            <option value="">Select Type</option>
                                             {types?.data?.map((option) => (
                                                 <option key={option.id} value={option.id}>
                                                     {option.nameEn}
@@ -294,7 +344,7 @@ export default function AddProduct() {
                                             variant="standard"
                                             disabled={sizesLoading}
                                         >
-                                            <option value="">Select Size</option> {/* placeholder */}
+                                            <option value="">Select Size</option>
                                             {sizes?.data?.map((option) => (
                                                 <option key={option.id} value={option.id}>
                                                     {option.nameEn}
@@ -363,13 +413,12 @@ export default function AddProduct() {
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => { navigate(-1); }}
+                            onClick={() => navigate('/products')}
                             size="large"
                             sx={{ ml: 2 }}
                         >
                             Cancel
                         </Button>
-
                     </Box>
                 </form>
             </Container>

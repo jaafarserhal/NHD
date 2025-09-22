@@ -66,7 +66,6 @@ function TabsDemo() {
         <PageTitle
           heading="Tabs"
           subHeading="Tabs make it easy to explore and switch between different views."
-          docs="https://material-ui.com/components/tabs/"
         />
       </PageTitleWrapper>
       <Container maxWidth="lg">

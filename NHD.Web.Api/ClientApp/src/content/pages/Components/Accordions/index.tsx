@@ -27,7 +27,6 @@ function Accordions() {
         <PageTitle
           heading="Accordions"
           subHeading="Accordions contain creation flows and allow lightweight editing of an element."
-          docs="https://material-ui.com/components/accordion/"
         />
       </PageTitleWrapper>
       <Container maxWidth="lg">

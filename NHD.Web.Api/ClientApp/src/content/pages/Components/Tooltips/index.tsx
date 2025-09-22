@@ -24,7 +24,6 @@ function Tooltips() {
         <PageTitle
           heading="Tooltips"
           subHeading="Tooltips display informative text when users hover over, focus on, or tap an element."
-          docs="https://material-ui.com/components/tooltips/"
         />
       </PageTitleWrapper>
       <Container maxWidth="lg">

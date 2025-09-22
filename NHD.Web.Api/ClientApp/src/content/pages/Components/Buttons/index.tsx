@@ -25,7 +25,6 @@ function Buttons() {
         <PageTitle
           heading="Buttons"
           subHeading="Buttons allow users to take actions, and make choices, with a single tap."
-          docs="https://material-ui.com/components/buttons/"
         />
       </PageTitleWrapper>
       <Container maxWidth="lg">

@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import {
   Card,
   Table,
@@ -12,7 +12,9 @@ import {
   Typography,
   IconButton,
   Tooltip,
-  Box
+  Box,
+  CircularProgress,
+  Backdrop
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
@@ -29,13 +31,13 @@ type GenericTableProps<T> = {
   columns: ColumnDefinition<T>[];
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
-  // External pagination props
   currentPage?: number;
   pageSize?: number;
   totalCount?: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   disableInternalPagination?: boolean;
+  loadingDelay?: number; // in ms
 };
 
 function GenericTable<T extends Record<string, any>>({
@@ -49,18 +51,26 @@ function GenericTable<T extends Record<string, any>>({
   totalCount: externalTotalCount,
   onPageChange: externalOnPageChange,
   onPageSizeChange: externalOnPageSizeChange,
-  disableInternalPagination = false
+  disableInternalPagination = false,
+  loadingDelay = 1000
 }: GenericTableProps<T>) {
   const [selected, setSelected] = useState<any[]>([]);
-
-  // Internal pagination state (only used when external pagination is disabled)
   const [internalPage, setInternalPage] = useState(0);
   const [internalLimit, setInternalLimit] = useState(10);
+  const [loading, setLoading] = useState(true);
 
-  // Use external or internal pagination values
   const page = disableInternalPagination ? (externalPage ?? 0) : internalPage;
   const limit = disableInternalPagination ? (externalPageSize ?? 10) : internalLimit;
   const totalCount = disableInternalPagination ? (externalTotalCount ?? data.length) : data.length;
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, loadingDelay);
+
+    return () => clearTimeout(timer);
+  }, [data, page, limit, loadingDelay]);
 
   const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
     setSelected(event.target.checked ? data.map((row) => row[idKey]) : []);
@@ -92,7 +102,6 @@ function GenericTable<T extends Record<string, any>>({
     }
   };
 
-  // Only paginate data internally if external pagination is disabled
   const displayData = disableInternalPagination
     ? data
     : data.slice(page * limit, page * limit + limit);
@@ -102,6 +111,11 @@ function GenericTable<T extends Record<string, any>>({
 
   return (
     <Card>
+      {loading && (
+        <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      )}
       <TableContainer>
         <Table>
           <TableHead>
@@ -119,50 +133,49 @@ function GenericTable<T extends Record<string, any>>({
                   {col.label}
                 </TableCell>
               ))}
-              {(onEdit || onDelete) && (
-                <TableCell align="right">Actions</TableCell>
-              )}
+              {(onEdit || onDelete) && <TableCell align="right">Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
-            {displayData.map((row) => {
-              const rowId = row[idKey];
-              const isSelected = selected.includes(rowId);
-              return (
-                <TableRow key={rowId} hover selected={isSelected}>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      color="primary"
-                      checked={isSelected}
-                      onChange={(e) => handleSelectOne(e, rowId)}
-                    />
-                  </TableCell>
-                  {columns.map((col) => (
-                    <TableCell key={col.key.toString()} align={col.align || 'left'}>
-                      {col.render ? col.render(row) : row[col.key]}
+            {!loading &&
+              displayData.map((row) => {
+                const rowId = row[idKey];
+                const isSelected = selected.includes(rowId);
+                return (
+                  <TableRow key={rowId} hover selected={isSelected}>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={isSelected}
+                        onChange={(e) => handleSelectOne(e, rowId)}
+                      />
                     </TableCell>
-                  ))}
-                  {(onEdit || onDelete) && (
-                    <TableCell align="right">
-                      {onEdit && (
-                        <Tooltip title="Edit" arrow>
-                          <IconButton onClick={() => onEdit(row)} color="primary">
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      {onDelete && (
-                        <Tooltip title="Delete" arrow>
-                          <IconButton onClick={() => onDelete(row)} color="error">
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </TableCell>
-                  )}
-                </TableRow>
-              );
-            })}
+                    {columns.map((col) => (
+                      <TableCell key={col.key.toString()} align={col.align || 'left'}>
+                        {col.render ? col.render(row) : row[col.key]}
+                      </TableCell>
+                    ))}
+                    {(onEdit || onDelete) && (
+                      <TableCell align="right">
+                        {onEdit && (
+                          <Tooltip title="Edit" arrow>
+                            <IconButton onClick={() => onEdit(row)} color="primary">
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {onDelete && (
+                          <Tooltip title="Delete" arrow>
+                            <IconButton onClick={() => onDelete(row)} color="error">
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })}
           </TableBody>
         </Table>
       </TableContainer>

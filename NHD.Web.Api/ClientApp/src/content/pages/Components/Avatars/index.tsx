@@ -56,7 +56,6 @@ function Avatars() {
         <PageTitle
           heading="Avatars"
           subHeading="Avatars are found throughout material design with uses in everything from tables to dialog menus."
-          docs="https://material-ui.com/components/avatars/"
         />
       </PageTitleWrapper>
       <Container maxWidth="lg">

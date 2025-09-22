@@ -7,13 +7,13 @@ import { useNavigate } from 'react-router';
 interface PageTitleProps {
   heading?: string;
   subHeading?: string;
-  docs?: string;
+  backUrl?: string;
 }
 
 const PageTitle: FC<PageTitleProps> = ({
   heading = '',
   subHeading = '',
-  docs = '',
+  backUrl = '',
   ...rest
 }) => {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const PageTitle: FC<PageTitleProps> = ({
       </Grid>
       <Grid item>
         <Button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(backUrl)}
           sx={{ mt: { xs: 2, md: 0 } }}
           variant="contained"
         >
@@ -47,7 +47,7 @@ const PageTitle: FC<PageTitleProps> = ({
 PageTitle.propTypes = {
   heading: PropTypes.string,
   subHeading: PropTypes.string,
-  docs: PropTypes.string
+  backUrl: PropTypes.string
 };
 
 export default PageTitle;

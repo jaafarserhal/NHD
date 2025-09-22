@@ -48,7 +48,6 @@ function Badges() {
         <PageTitle
           heading="Badges"
           subHeading="Badge generates a small badge to the top-right of its child(ren)."
-          docs="https://material-ui.com/components/badges/"
         />
       </PageTitleWrapper>
       <Container maxWidth="lg">

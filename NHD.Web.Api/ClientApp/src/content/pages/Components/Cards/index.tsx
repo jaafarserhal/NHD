@@ -68,7 +68,6 @@ function Cards() {
         <PageTitle
           heading="Cards"
           subHeading="Cards contain content and actions about a single subject."
-          docs="https://material-ui.com/components/cards/"
         />
       </PageTitleWrapper>
       <Container maxWidth="lg">
