@@ -11,7 +11,7 @@ namespace NHD.Core.Services.Products
 {
     public interface IProductService
     {
-        Task<ServiceResult<IEnumerable<ProductViewModel>>> GetProductsAsync(int page = 1, int limit = 10);
+        Task<PagedServiceResult<IEnumerable<ProductViewModel>>> GetProductsAsync(int page = 1, int limit = 10);
         Task<Product> AddProductAsync(Product product);
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetCategoriesAsync();
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetTypesAsync();

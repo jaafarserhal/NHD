@@ -27,24 +27,29 @@ namespace NHD.Core.Services.Products
 
         #region Products
 
-        public async Task<ServiceResult<IEnumerable<ProductViewModel>>> GetProductsAsync(int page = 1, int limit = 10)
+        public async Task<PagedServiceResult<IEnumerable<ProductViewModel>>> GetProductsAsync(int page = 1, int limit = 10)
         {
             try
             {
                 if (page <= 0 || limit <= 0)
                 {
-                    return ServiceResult<IEnumerable<ProductViewModel>>.Failure("Page and limit must be greater than 0");
+                    return PagedServiceResult<IEnumerable<ProductViewModel>>.Failure("Page and limit must be greater than 0");
                 }
 
-                var products = await _productRepository.GetProductsAsync(page, limit);
-                var productDtos = products.Select(MapToProductDto).ToList();
+                var pagedResult = await _productRepository.GetProductsAsync(page, limit);
+                var productDtos = pagedResult.Data.Select(MapToProductDto).ToList();
 
-                return ServiceResult<IEnumerable<ProductViewModel>>.Success(productDtos);
+                return PagedServiceResult<IEnumerable<ProductViewModel>>.Success(
+                    productDtos,
+                    pagedResult.Total,
+                    pagedResult.Page,
+                    pagedResult.Limit
+                );
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving products");
-                return ServiceResult<IEnumerable<ProductViewModel>>.Failure("An error occurred while retrieving products");
+                return PagedServiceResult<IEnumerable<ProductViewModel>>.Failure("An error occurred while retrieving products");
             }
         }
 

@@ -2,16 +2,20 @@ import { Helmet } from 'react-helmet-async';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Grid, Container, Typography, Chip, Box } from '@mui/material';
 import Footer from 'src/components/Footer';
+import { useState, useEffect } from 'react';
 import { useApiCall } from '../../api/hooks/useApi';
 import productService from '../../api/productService';
 import GenericTable from 'src/components/GenericTable/index';
 import PageHeader from '../PageHeader';
-import { render } from 'react-dom';
 
 function Products() {
+    const [page, setPage] = useState(0); // 0-based for MUI TablePagination
+    const [limit, setLimit] = useState(10);
+
+    // Convert 0-based page to 1-based for API
     const { data: products, loading, error, refetch } = useApiCall(
-        () => productService.getProducts(),
-        []
+        () => productService.getProducts(page + 1, limit),
+        [page, limit] // Dependencies to refetch when page/limit changes
     );
 
     const columns = [
@@ -30,7 +34,7 @@ function Products() {
                         {new Date(prd.createdAt).toLocaleTimeString(undefined, {
                             hour: "numeric",
                             minute: "2-digit",
-                            hour12: false, // change to false for 24-hour format
+                            hour12: false,
                         })}
                     </span>
                 );
@@ -70,7 +74,6 @@ function Products() {
                         borderRadius: '4px'
                     }}
                 />
-
             )
         },
         {
@@ -85,6 +88,32 @@ function Products() {
             )
         }
     ];
+
+    // Handle pagination changes
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    const handleLimitChange = (newLimit) => {
+        setLimit(newLimit);
+        setPage(0); // Reset to first page when changing page size
+    };
+
+    if (loading) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+                <Typography>Loading products...</Typography>
+            </Box>
+        );
+    }
+
+    if (error) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+                <Typography color="error">Error loading products: {error.message}</Typography>
+            </Box>
+        );
+    }
 
     return (
         <Box
@@ -107,7 +136,7 @@ function Products() {
                     flex: 1,
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "center", // centers vertically if little content
+                    justifyContent: "center",
                 }}
             >
                 {!products || !products.data || products.data.length === 0 ? (
@@ -130,6 +159,14 @@ function Products() {
                                 columns={columns}
                                 onEdit={(user) => console.log("Edit", user)}
                                 onDelete={(user) => console.log("Delete", user)}
+                                // Pass pagination props to GenericTable
+                                currentPage={page}
+                                pageSize={limit}
+                                totalCount={products.total || products.data.length}
+                                onPageChange={handlePageChange}
+                                onPageSizeChange={handleLimitChange}
+                                // Disable internal pagination since we're doing server-side
+                                disableInternalPagination={true}
                             />
                         </Grid>
                     </Grid>
@@ -139,6 +176,6 @@ function Products() {
             <Footer />
         </Box>
     );
-
 }
+
 export default Products;

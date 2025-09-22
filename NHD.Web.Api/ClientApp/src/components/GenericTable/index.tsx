@@ -29,6 +29,13 @@ type GenericTableProps<T> = {
   columns: ColumnDefinition<T>[];
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  // External pagination props
+  currentPage?: number;
+  pageSize?: number;
+  totalCount?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+  disableInternalPagination?: boolean;
 };
 
 function GenericTable<T extends Record<string, any>>({
@@ -36,11 +43,24 @@ function GenericTable<T extends Record<string, any>>({
   idKey,
   columns,
   onEdit,
-  onDelete
+  onDelete,
+  currentPage: externalPage,
+  pageSize: externalPageSize,
+  totalCount: externalTotalCount,
+  onPageChange: externalOnPageChange,
+  onPageSizeChange: externalOnPageSizeChange,
+  disableInternalPagination = false
 }: GenericTableProps<T>) {
   const [selected, setSelected] = useState<any[]>([]);
-  const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(10);
+
+  // Internal pagination state (only used when external pagination is disabled)
+  const [internalPage, setInternalPage] = useState(0);
+  const [internalLimit, setInternalLimit] = useState(10);
+
+  // Use external or internal pagination values
+  const page = disableInternalPagination ? (externalPage ?? 0) : internalPage;
+  const limit = disableInternalPagination ? (externalPageSize ?? 10) : internalLimit;
+  const totalCount = disableInternalPagination ? (externalTotalCount ?? data.length) : data.length;
 
   const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
     setSelected(event.target.checked ? data.map((row) => row[idKey]) : []);
@@ -54,13 +74,29 @@ function GenericTable<T extends Record<string, any>>({
     }
   };
 
-  const handlePageChange = (_: unknown, newPage: number) => setPage(newPage);
-  const handleLimitChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setLimit(parseInt(event.target.value));
-    setPage(0);
+  const handlePageChange = (_: unknown, newPage: number) => {
+    if (disableInternalPagination && externalOnPageChange) {
+      externalOnPageChange(newPage);
+    } else {
+      setInternalPage(newPage);
+    }
   };
 
-  const paginatedData = data.slice(page * limit, page * limit + limit);
+  const handleLimitChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newLimit = parseInt(event.target.value);
+    if (disableInternalPagination && externalOnPageSizeChange) {
+      externalOnPageSizeChange(newLimit);
+    } else {
+      setInternalLimit(newLimit);
+      setInternalPage(0);
+    }
+  };
+
+  // Only paginate data internally if external pagination is disabled
+  const displayData = disableInternalPagination
+    ? data
+    : data.slice(page * limit, page * limit + limit);
+
   const allSelected = selected.length === data.length;
   const someSelected = selected.length > 0 && selected.length < data.length;
 
@@ -89,7 +125,7 @@ function GenericTable<T extends Record<string, any>>({
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedData.map((row) => {
+            {displayData.map((row) => {
               const rowId = row[idKey];
               const isSelected = selected.includes(rowId);
               return (
@@ -133,7 +169,7 @@ function GenericTable<T extends Record<string, any>>({
       <Box p={2}>
         <TablePagination
           component="div"
-          count={data.length}
+          count={totalCount}
           page={page}
           onPageChange={handlePageChange}
           rowsPerPage={limit}

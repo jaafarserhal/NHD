@@ -26,12 +26,33 @@ namespace NHD.Web.Api.Controllers
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
         }
 
-        public async Task<ActionResult<ServiceResult<IEnumerable<ProductViewModel>>>> GetProducts([FromQuery] int page = 1, [FromQuery] int limit = 10)
+        [HttpGet]
+        public async Task<ActionResult> GetProducts([FromQuery] int page = 1, [FromQuery] int limit = 10)
         {
-            var data = await _productService.GetProductsAsync(page, limit);
-            if (data.IsSuccess)
-                return Ok(data);
-            return BadRequest(data);
+            var result = await _productService.GetProductsAsync(page, limit);
+
+            if (!result.IsSuccess)
+            {
+                if (result.ValidationErrors?.Any() == true)
+                {
+                    return BadRequest(new
+                    {
+                        message = result.ErrorMessage,
+                        errors = result.ValidationErrors
+                    });
+                }
+                return BadRequest(new { message = result.ErrorMessage });
+            }
+
+            // Return the structure that your frontend expects
+            return Ok(new
+            {
+                data = result.Data,
+                total = result.Total,
+                page = result.Page,
+                limit = result.Limit,
+                totalPages = result.TotalPages
+            });
         }
 
         [HttpGet]
