@@ -2,21 +2,48 @@ import { Helmet } from 'react-helmet-async';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Grid, Container, Typography, Chip, Box } from '@mui/material';
 import Footer from 'src/components/Footer';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useApiCall } from '../../api/hooks/useApi';
 import productService from '../../api/productService';
 import GenericTable from 'src/components/GenericTable/index';
 import PageHeader from '../PageHeader';
+import ConfirmDialog from 'src/components/ConfirmDialog/Index';
 
 function Products() {
     const [page, setPage] = useState(0); // 0-based for MUI TablePagination
     const [limit, setLimit] = useState(10);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     // Convert 0-based page to 1-based for API
     const { data: products, loading, error, refetch } = useApiCall(
         () => productService.getProducts(page + 1, limit),
         [page, limit] // Dependencies to refetch when page/limit changes
     );
+
+    const handleDeleteClick = (product) => {
+        setSelectedProduct(product);
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        // if (!selectedProduct) return;
+        // try {
+        //   await productService.deleteProduct(selectedProduct.id);
+        //   setConfirmOpen(false);
+        //   setSelectedProduct(null);
+        //   refetch(); // refresh table
+        // } catch (err) {
+        //   console.error("Delete failed:", err);
+        //   setConfirmOpen(false);
+        // }
+        setConfirmOpen(false);
+    };
+
+    const handleCancelDelete = () => {
+        setConfirmOpen(false);
+        setSelectedProduct(null);
+    };
 
     const columns = [
         {
@@ -149,15 +176,13 @@ function Products() {
                                 data={products.data}
                                 idKey="id"
                                 columns={columns}
-                                onEdit={(user) => console.log("Edit", user)}
-                                onDelete={(user) => console.log("Delete", user)}
-                                // Pass pagination props to GenericTable
+                                onEdit={(prd) => console.log("Edit", prd)}
+                                onDelete={(prd) => handleDeleteClick(prd)}
                                 currentPage={page}
                                 pageSize={limit}
                                 totalCount={products.total || products.data.length}
                                 onPageChange={handlePageChange}
                                 onPageSizeChange={handleLimitChange}
-                                // Disable internal pagination since we're doing server-side
                                 disableInternalPagination={true}
                             />
                         </Grid>
@@ -166,6 +191,16 @@ function Products() {
             </Container>
 
             <Footer />
+            <ConfirmDialog
+                open={confirmOpen}
+                onClose={handleCancelDelete}
+                onConfirm={handleConfirmDelete}
+                title="Delete Product"
+                message={`Are you sure you want to delete "${selectedProduct?.name}"? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                confirmVariant="danger"
+            />
         </Box>
     );
 }

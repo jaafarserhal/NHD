@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, CardContent, TextField as Input, Button, Box, CardHeader, Checkbox, Container, Divider, FormControl, FormControlLabel, FormLabel, Grid, MenuItem, Radio, RadioGroup, Slider, Stack, Switch, TextField } from "@mui/material";
+import { Card, CardContent, Button, Box, CardHeader, Container, Divider, FormControlLabel, Grid, Switch, TextField } from "@mui/material";
 import { Product } from "../models/Types";
 import { useApiCall } from '../../api/hooks/useApi';
 import productService from '../../api/productService';
@@ -9,7 +9,7 @@ import PageTitle from "src/components/PageTitle";
 import PageTitleWrapper from "src/components/PageTitleWrapper";
 import Editor from "src/components/Editor/Index";
 import { useNavigate } from 'react-router-dom';
-import { Bounce, ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 
 export default function AddProduct() {
