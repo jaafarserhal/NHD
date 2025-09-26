@@ -19,7 +19,7 @@ function PageHeader({ sectionTitle }: PageHeaderProps) {
           sx={{ mt: { xs: 2, md: 0 } }}
           variant="contained"
           startIcon={<AddTwoToneIcon fontSize="small" />}
-          href={`/${sectionTitle?.toLowerCase()}/add`}
+          href={`/${sectionTitle?.toLowerCase().replace(/\s+/g, '-')}/add`}
         >
           Add {sectionTitle}
         </Button>

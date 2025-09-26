@@ -91,15 +91,15 @@ const routes: RouteObject[] = [
         element: <Products />
       },
       {
-        path: 'Products',
+        path: 'dates-set',
         element: <Navigate to="/" replace />
       },
       {
-        path: '/product/add',
+        path: '/dates-set/add',
         element: <AddProduct />
       },
       {
-        path: '/product/edit/:id',
+        path: '/dates-set/edit/:id',
         element: <EditProduct />
       }
     ]

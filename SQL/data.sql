@@ -11,29 +11,53 @@ VALUES
 -- =============================================
 -- INSERT INTO gen_lookup
 -- =============================================
-INSERT INTO dbo.gen_lookup (lookup_id, lookup_type_id, name_en, name_sv, created_at, is_active)
-VALUES 
-    -- Product Categories (100 series)
-    (100, 100, 'Signature Date Gift', 'Signatur Dadel Present', SYSUTCDATETIME(), 1),
-    (101, 100, 'Classic Date Pack', 'Klassisk Dadel Förpackning', SYSUTCDATETIME(), 1),
-    (102, 100, 'Date Snack', 'Dadel Snacks', SYSUTCDATETIME(), 1),
-    (103, 100, 'Date Sweeteners', 'Dadel Sötningsmedel', SYSUTCDATETIME(), 1),
-    
-    -- Product Types (200 series)
-    (200, 200, 'Date Filling', 'Date Filling', SYSUTCDATETIME(), 1),
-    
-    -- Product Sizes (300 series)
-    (300, 300, '8 Pieces', '8 Stycken', SYSUTCDATETIME(), 1),
-    (301, 300, '20 Pieces', '20 Stycken', SYSUTCDATETIME(), 1),
-    (302, 300, '35 Pieces', '35 Stycken', SYSUTCDATETIME(), 1),
-    
-    -- Order Status (400 series)
-    (400, 400, 'Pending', 'Väntande', SYSUTCDATETIME(), 1),
-    (401, 400, 'Confirmed', 'Bekräftad', SYSUTCDATETIME(), 1),
-    (402, 400, 'Processing', 'Bearbetas', SYSUTCDATETIME(), 1),
-    (403, 400, 'Shipped', 'Skickad', SYSUTCDATETIME(), 1),
-    (404, 400, 'Delivered', 'Levererad', SYSUTCDATETIME(), 1),
-    (405, 400, 'Cancelled', 'Avbruten', SYSUTCDATETIME(), 1);
+INSERT INTO dbo.gen_lookup
+(lookup_id, lookup_type_id, name_en, name_sv, created_at, is_active)
+VALUES
+(100, 100, N'Signature Date Gifts', N'DelikatessDadelgåvor',SYSUTCDATETIME(), 1),
+(101, 100, N'Signature Dates', N'DelikatessDadlar',SYSUTCDATETIME(), 1),
+(102, 100, N'Signature Filled Dates', N'Delikatessfyllda Dadlar',SYSUTCDATETIME(), 1),
+(103, 100, N'Classic Date Pouches', N'Klassisk dadelpåse',SYSUTCDATETIME(), 1),
+(104, 100, N'Date Snacks', N'Dadelmellanmål',SYSUTCDATETIME(), 1),
+(105, 100, N'Date Sweetners', N'Dadelsötning',SYSUTCDATETIME(), 1),
+ -- Product Types (200 series)
+(200, 200, 'Rectangular Box', 'Rektangulär låda', SYSUTCDATETIME(), 1),
+(201, 200, 'Square Box', 'Fyrkantig låda', SYSUTCDATETIME(), 1),
+(202, 200, 'Square Box', 'Fyrkantig låda', SYSUTCDATETIME(), 1),
+(203, 200, 'Ajwa Dates', 'Ajwa-dadlar', SYSUTCDATETIME(), 1),
+(204, 200, 'Khudri Dates', 'Khudri-dadlar', SYSUTCDATETIME(), 1),
+(205, 200, 'Safawi Dates', 'Safawi-dadlar', SYSUTCDATETIME(), 1),
+(206, 200, 'Majdool Dates', 'Majdool-dadlar', SYSUTCDATETIME(), 1),
+(207, 200, 'Sagi Dates', 'Sagi-dadlar', SYSUTCDATETIME(), 1),
+(208, 200, 'Dates with peeled Orange', 'Dadlar med skalad apelsin', SYSUTCDATETIME(), 1),
+(209, 200, 'Dates with Pistachio', 'Dadlar med pistage', SYSUTCDATETIME(), 1),
+(210, 200, 'Sagai Date Pouch', 'Sagai-dadelpåse', SYSUTCDATETIME(), 1),
+(211, 200, 'Khidri Date Pouch', 'Khidri-dadelpåse', SYSUTCDATETIME(), 1),
+(212, 200, 'Ajwa Date Pouch', 'Ajwa-dadelpåse', SYSUTCDATETIME(), 1),
+(213, 200, 'Madjool Dates Pouch', 'Madjool-dadelpåse', SYSUTCDATETIME(), 1),
+(214, 200, 'Assorted Dates Pouch', 'Blandad dadelpåse', SYSUTCDATETIME(), 1),
+(215, 200, 'Nawa Snack', 'Nawa-snack', SYSUTCDATETIME(), 1),
+(216, 200, 'Nawa Snack', 'Nawa-snack', SYSUTCDATETIME(), 1),
+(217, 200, 'Date Syrup', 'Dadelsirap', SYSUTCDATETIME(), 1),
+(218, 200, 'Date Sugar', 'Dadel­socker', SYSUTCDATETIME(), 1),
+ -- Product Sizes (300 series)
+(300, 300, '8 pieces', '8 stycken', SYSUTCDATETIME(), 1),
+(301, 300, '20 pieces', '20 stycken', SYSUTCDATETIME(), 1),
+(302, 300, '35 pieces', '35 stycken', SYSUTCDATETIME(), 1),
+(303, 300, '250g', '250g', SYSUTCDATETIME(), 1),
+(305, 300, '400g', '400g', SYSUTCDATETIME(), 1),
+(311, 300, '450 g', '450g', SYSUTCDATETIME(), 1),
+(304, 300, '500g', '500g', SYSUTCDATETIME(), 1),
+(308, 300, '3 pieces', '3 bitar', SYSUTCDATETIME(), 1),
+(309, 300, '1 piece', '1 bitar', SYSUTCDATETIME(), 1),
+(310, 300, '400ml', '400ml', SYSUTCDATETIME(), 1),
+ -- Status (400 series)
+(400, 400, 'Pending', 'Väntande', SYSUTCDATETIME(), 1),
+(401, 400, 'Confirmed', 'Bekräftad', SYSUTCDATETIME(), 1),
+(402, 400, 'Processing', 'Bearbetas', SYSUTCDATETIME(), 1),
+(403, 400, 'Shipped', 'Skickad', SYSUTCDATETIME(), 1),
+(404, 400, 'Delivered', 'Levererad', SYSUTCDATETIME(), 1),
+(405, 400, 'Cancelled', 'Avbruten', SYSUTCDATETIME(), 1);
 	
 	
 	INSERT INTO nhd_db.dbo.[user]

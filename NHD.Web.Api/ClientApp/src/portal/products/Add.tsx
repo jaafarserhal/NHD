@@ -72,17 +72,39 @@ export default function AddProduct() {
             isActive: e.target.checked,
         }));
     };
-
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
-        setImage(file);
+
         if (file) {
+            // Check file size (1MB = 1024 * 1024 bytes)
+            const maxSize = 1024 * 1024; // 1MB in bytes
+            if (file.size > maxSize) {
+                setErrors([`Image size must be less than 1MB. Selected file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`]);
+                // Clear the file input
+                e.target.value = '';
+                setImage(null);
+                // Reset to original image
+                setPreview(null);
+
+                // Scroll to error box
+                setTimeout(() => {
+                    errorBoxRef.current?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }, 100);
+                return;
+            }
+
+            setImage(file);
             setPreview(URL.createObjectURL(file));
         } else {
+            setImage(null);
+            // Reset to original image if no new file selected
             setPreview(null);
         }
 
-        // Clear errors when user selects a file
+        // Clear errors when user selects a valid file
         if (errors.length > 0) {
             setErrors([]);
         }
@@ -187,7 +209,7 @@ export default function AddProduct() {
 
     const label = { inputProps: { 'aria-label': 'Switch demo' } };
     const notifySuccess = () => {
-        toast.success('Product added successfully!', {
+        toast.success('Date Set added successfully!', {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -203,13 +225,13 @@ export default function AddProduct() {
         <>
             <PortalToastContainer />
             <Helmet>
-                <title>Add Product - Application</title>
+                <title>Add Set - Application</title>
             </Helmet>
             <PageTitleWrapper>
                 <PageTitle
-                    heading="Add Product"
-                    subHeading="Add a new product to your catalog"
-                    backUrl="/products"
+                    heading="Add Date Set"
+                    subHeading="Add a new date set to your catalog"
+                    backUrl="/dates-set"
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
@@ -240,7 +262,7 @@ export default function AddProduct() {
                     >
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Product Details" />
+                                <CardHeader title="Set Details" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -379,7 +401,11 @@ export default function AddProduct() {
                                         accept="image/*"
                                         onChange={handleFileChange}
                                         style={{ marginBottom: '1rem' }}
+                                        required
                                     />
+                                    {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
+                                        * Image is required (max size: 1MB)
+                                    </Box>}
                                     {preview && (
                                         <Box sx={{ mt: 2 }}>
                                             <img
@@ -421,12 +447,12 @@ export default function AddProduct() {
                             disabled={loading}
                             size="large"
                         >
-                            {loading ? "Saving..." : "Save Product"}
+                            {loading ? "Saving..." : "Save Set"}
                         </Button>
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => navigate('/products')}
+                            onClick={() => navigate('/dates-set')}
                             size="large"
                             sx={{ ml: 2 }}
                         >

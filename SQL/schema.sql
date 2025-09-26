@@ -97,6 +97,21 @@ CREATE TABLE dbo.product (
 );
 
 -- =============================================
+-- Dates Gourmet Filling
+-- =============================================
+CREATE TABLE dbo.dates_gourmet_filling (
+    dates_filling_id INT IDENTITY(1,1) PRIMARY KEY,
+    name_en NVARCHAR(200) NOT NULL,
+    name_sv NVARCHAR(200) NULL,
+    price DECIMAL(18,2) NOT NULL CHECK (price >= 0),
+    created_at DATETIME2 NOT NULL 
+        CONSTRAINT DF_dates_gourmet_filling_created DEFAULT SYSUTCDATETIME(),
+    is_active BIT NULL DEFAULT 1
+);
+
+
+
+-- =============================================
 -- CUSTOMER (with is_guest)
 -- =============================================
 CREATE TABLE dbo.customer (

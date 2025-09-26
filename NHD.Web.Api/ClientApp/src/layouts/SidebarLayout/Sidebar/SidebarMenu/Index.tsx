@@ -192,7 +192,7 @@ function SidebarMenu() {
                   to="/"
                   startIcon={<EmergencyShareIcon />}
                 >
-                  Products
+                  Dates Set
                 </Button>
               </ListItem>
             </List>

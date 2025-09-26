@@ -272,13 +272,13 @@ export default function UpdateProduct() {
         return (
             <>
                 <Helmet>
-                    <title>Update Product - Application</title>
+                    <title>Update Set - Application</title>
                 </Helmet>
                 <PageTitleWrapper>
                     <PageTitle
-                        heading="Update Product"
-                        subHeading="Loading product details..."
-                        backUrl="/products"
+                        heading="Update Set"
+                        subHeading="Loading set details..."
+                        backUrl="/dates-set"
                     />
                 </PageTitleWrapper>
                 <Container maxWidth="lg">
@@ -295,13 +295,13 @@ export default function UpdateProduct() {
         <>
             <PortalToastContainer />
             <Helmet>
-                <title>Update Product - Application</title>
+                <title>Update Set - Application</title>
             </Helmet>
             <PageTitleWrapper>
                 <PageTitle
-                    heading="Update Product"
-                    subHeading="Update existing product information"
-                    backUrl="/products"
+                    heading="Update Set"
+                    subHeading="Update existing dates set information"
+                    backUrl="/dates-set"
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
@@ -332,7 +332,7 @@ export default function UpdateProduct() {
                     >
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Product Details" />
+                                <CardHeader title="Set Details" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -519,12 +519,12 @@ export default function UpdateProduct() {
                             disabled={loading}
                             size="large"
                         >
-                            {loading ? "Updating..." : "Update Product"}
+                            {loading ? "Updating..." : "Update Set"}
                         </Button>
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => navigate('/products')}
+                            onClick={() => navigate('/dates-set')}
                             size="large"
                             sx={{ ml: 2 }}
                         >

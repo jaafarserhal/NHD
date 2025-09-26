@@ -144,11 +144,11 @@ function Products() {
             overflow="hidden"
         >
             <Helmet>
-                <title>Products - Applications</title>
+                <title>Dates Set - Applications</title>
             </Helmet>
 
             <PageTitleWrapper>
-                <PageHeader sectionTitle="Product" />
+                <PageHeader sectionTitle="Dates Set" />
             </PageTitleWrapper>
 
             <Container
@@ -162,7 +162,7 @@ function Products() {
             >
                 {!products || !products.data || products.data.length === 0 ? (
                     <Typography variant="h6" color="textSecondary" align="center">
-                        No products found.
+                        No sets found.
                     </Typography>
                 ) : (
                     <Grid
@@ -178,7 +178,7 @@ function Products() {
                                 data={products.data}
                                 idKey="id"
                                 columns={columns}
-                                onEdit={(prd) => navigate(`/product/edit/${prd.id}`)}
+                                onEdit={(prd) => navigate(`/dates-set/edit/${prd.id}`)}
                                 onDelete={(prd) => handleDeleteClick(prd)}
                                 currentPage={page}
                                 pageSize={limit}
