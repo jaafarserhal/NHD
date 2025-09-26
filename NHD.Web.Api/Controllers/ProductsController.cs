@@ -26,6 +26,7 @@ namespace NHD.Web.Api.Controllers
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
         }
 
+        #region Products
         [HttpGet]
         public async Task<ActionResult> GetProducts([FromQuery] int page = 1, [FromQuery] int limit = 10)
         {
@@ -56,30 +57,10 @@ namespace NHD.Web.Api.Controllers
         }
 
         [HttpGet]
-        [Route("Categories")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetCategories()
+        [Route("GetById/{id}")]
+        public async Task<ActionResult<ServiceResult<ProductViewModel>>> GetProductById(int id)
         {
-            var data = await _productService.GetCategoriesAsync();
-            if (data.IsSuccess)
-                return Ok(data);
-            return BadRequest(data);
-        }
-
-        [HttpGet]
-        [Route("Types")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetTypes()
-        {
-            var data = await _productService.GetTypesAsync();
-            if (data.IsSuccess)
-                return Ok(data);
-            return BadRequest(data);
-        }
-
-        [HttpGet]
-        [Route("Sizes")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetSizes()
-        {
-            var data = await _productService.GetSizesAsync();
+            var data = await _productService.GetProductWithDetailsByIdAsync(id);
             if (data.IsSuccess)
                 return Ok(data);
             return BadRequest(data);
@@ -127,5 +108,118 @@ namespace NHD.Web.Api.Controllers
             var created = await _productService.AddProductAsync(product);
             return CreatedAtAction("GetProducts", new { id = created.PrdId }, created);
         }
+
+        [HttpPut]
+        [Route("Update")]
+        public async Task<IActionResult> UpdateProduct([FromForm] ProductBindingModel dto)
+        {
+            if (dto == null || dto.Id <= 0)
+            {
+                return BadRequest("Valid product data is required.");
+            }
+
+            var existingProduct = await _productService.GetProductAsync(dto.Id);
+            if (existingProduct == null)
+            {
+                return NotFound("Product not found.");
+            }
+
+            // Handle new image upload if provided
+            if (dto.ImageUrl != null && dto.ImageUrl.Length > 0)
+            {
+                // Optional: delete old image file
+                var imagePath = existingProduct.ImageUrl;
+                if (!string.IsNullOrEmpty(imagePath))
+                {
+                    var oldImagePath = Path.Combine("wwwroot/uploads/products", imagePath);
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
+                // Save new image
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
+                var folderPath = Path.Combine("wwwroot/uploads", "products");
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                var filePath = Path.Combine(folderPath, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ImageUrl.CopyToAsync(stream);
+                }
+
+                existingProduct.ImageUrl = fileName;
+            }
+
+            // Update product properties
+            existingProduct.PrdLookupCategoryId = dto.CategoryId;
+            existingProduct.PrdLookupTypeId = dto.TypeId;
+            existingProduct.PrdLookupSizeId = dto.SizeId;
+            existingProduct.NameEn = dto.NameEn;
+            existingProduct.NameSv = dto.NameSv;
+            existingProduct.DescriptionEn = dto.DescriptionEn;
+            existingProduct.DescriptionSv = dto.DescriptionSv;
+            existingProduct.Price = dto.Price;
+            existingProduct.IsActive = dto.IsActive;
+            existingProduct.CreatedAt = DateTime.UtcNow;
+
+            // Save changes
+            var updatedProduct = await _productService.UpdateProductAsync(existingProduct);
+
+            return Ok(updatedProduct);
+        }
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var result = await _productService.DeleteProductAsync(id);
+
+            if (!result.IsSuccess)
+            {
+                if (result.ErrorMessage?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true)
+                    return NotFound(new { message = result.ErrorMessage });
+
+                return BadRequest(new { message = result.ErrorMessage, validationErrors = result.ValidationErrors });
+            }
+
+            return NoContent();
+        }
+        #endregion Products
+
+        #region Lookups
+
+        [HttpGet]
+        [Route("Categories")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetCategories()
+        {
+            var data = await _productService.GetCategoriesAsync();
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
+        }
+
+        [HttpGet]
+        [Route("Types")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetTypes()
+        {
+            var data = await _productService.GetTypesAsync();
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
+        }
+
+        [HttpGet]
+        [Route("Sizes")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetSizes()
+        {
+            var data = await _productService.GetSizesAsync();
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
+        }
+
+        #endregion Lookups
     }
 }

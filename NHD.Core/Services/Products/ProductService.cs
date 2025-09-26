@@ -53,20 +53,30 @@ namespace NHD.Core.Services.Products
             }
         }
 
-        private ProductViewModel MapToProductDto(Product product)
+
+        public async Task<ServiceResult<ProductViewModel>> GetProductWithDetailsByIdAsync(int id)
         {
-            return new ProductViewModel
+            try
             {
-                Id = product.PrdId,
-                Name = product.NameEn,
-                Category = product.PrdLookupCategory?.NameEn,
-                Type = product.PrdLookupType?.NameEn,
-                Size = product.PrdLookupSize?.NameEn,
-                ImageUrl = product.ImageUrl ?? null,
-                Price = product.Price,
-                IsActive = product.IsActive ?? false,
-                CreatedAt = product.CreatedAt
-            };
+                var product = await _productRepository.GetProductByIdAsync(id);
+                if (product == null)
+                {
+                    return ServiceResult<ProductViewModel>.Failure($"Product with ID {id} not found.");
+                }
+
+                var productDto = MapToProductDto(product);
+                return ServiceResult<ProductViewModel>.Success(productDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving product with ID {id}");
+                return ServiceResult<ProductViewModel>.Failure("An error occurred while retrieving the product");
+            }
+        }
+
+        public async Task<Product> GetProductAsync(int id)
+        {
+            return await _productRepository.GetByIdAsync(id);
         }
 
         public async Task<Product> AddProductAsync(Product product)
@@ -75,8 +85,26 @@ namespace NHD.Core.Services.Products
             return product;
         }
 
-        #endregion Products
+        public async Task<Product> UpdateProductAsync(Product product)
+        {
+            await _productRepository.UpdateAsync(product);
+            return product;
+        }
 
+        public async Task<ServiceResult<bool>> DeleteProductAsync(int productId)
+        {
+            var product = await _productRepository.GetByIdAsync(productId);
+            if (product == null)
+            {
+                return ServiceResult<bool>.Failure($"Product with ID {productId} not found.");
+            }
+
+            await _productRepository.DeleteAsync(product.PrdId);
+            return ServiceResult<bool>.Success(true);
+        }
+
+
+        #endregion Products
 
         #region Lookups
         public async Task<ServiceResult<IEnumerable<LookupItemDto>>> GetCategoriesAsync()
@@ -139,5 +167,29 @@ namespace NHD.Core.Services.Products
             }
         }
         #endregion Lookups
+
+        #region Mappers
+        private ProductViewModel MapToProductDto(Product product)
+        {
+            return new ProductViewModel
+            {
+                Id = product.PrdId,
+                NameEn = product.NameEn,
+                NameSv = product.NameSv,
+                DescriptionEn = product.DescriptionEn,
+                DescriptionSv = product.DescriptionSv,
+                Category = product.PrdLookupCategory?.NameEn,
+                CategoryId = product.PrdLookupCategoryId,
+                TypeId = product.PrdLookupTypeId,
+                SizeId = product.PrdLookupSizeId,
+                Type = product.PrdLookupType?.NameEn,
+                Size = product.PrdLookupSize?.NameEn,
+                ImageUrl = product.ImageUrl ?? null,
+                Price = product.Price,
+                IsActive = product.IsActive ?? false,
+                CreatedAt = product.CreatedAt
+            };
+        }
+        #endregion Mappers
     }
 }

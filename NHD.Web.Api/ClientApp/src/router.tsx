@@ -9,6 +9,7 @@ import SuspenseLoader from 'src/components/SuspenseLoader';
 import Users from './portal/users/Index';
 import Products from './portal/products/Index';
 import AddProduct from './portal/products/Add';
+import EditProduct from './portal/products/Update';
 import Login from './portal/auth/Login';
 
 const Loader = (Component) => (props) =>
@@ -96,6 +97,10 @@ const routes: RouteObject[] = [
       {
         path: '/product/add',
         element: <AddProduct />
+      },
+      {
+        path: '/product/edit/:id',
+        element: <EditProduct />
       }
     ]
   },

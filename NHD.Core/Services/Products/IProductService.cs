@@ -12,9 +12,14 @@ namespace NHD.Core.Services.Products
     public interface IProductService
     {
         Task<PagedServiceResult<IEnumerable<ProductViewModel>>> GetProductsAsync(int page = 1, int limit = 10);
+        Task<ServiceResult<ProductViewModel>> GetProductWithDetailsByIdAsync(int productId);
+        Task<Product> GetProductAsync(int id);
         Task<Product> AddProductAsync(Product product);
+        Task<Product> UpdateProductAsync(Product product);
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetCategoriesAsync();
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetTypesAsync();
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetSizesAsync();
+        Task<ServiceResult<bool>> DeleteProductAsync(int productId);
+
     }
 }

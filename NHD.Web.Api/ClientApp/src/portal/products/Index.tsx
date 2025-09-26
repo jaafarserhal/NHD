@@ -8,12 +8,14 @@ import productService from '../../api/productService';
 import GenericTable from 'src/components/GenericTable/index';
 import PageHeader from '../PageHeader';
 import ConfirmDialog from 'src/components/ConfirmDialog/Index';
+import { useNavigate } from 'react-router-dom';
 
 function Products() {
     const [page, setPage] = useState(0); // 0-based for MUI TablePagination
     const [limit, setLimit] = useState(10);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const navigate = useNavigate();
 
     // Convert 0-based page to 1-based for API
     const { data: products, loading, error, refetch } = useApiCall(
@@ -27,16 +29,16 @@ function Products() {
     };
 
     const handleConfirmDelete = async () => {
-        // if (!selectedProduct) return;
-        // try {
-        //   await productService.deleteProduct(selectedProduct.id);
-        //   setConfirmOpen(false);
-        //   setSelectedProduct(null);
-        //   refetch(); // refresh table
-        // } catch (err) {
-        //   console.error("Delete failed:", err);
-        //   setConfirmOpen(false);
-        // }
+        if (!selectedProduct) return;
+        try {
+            await productService.deleteProduct(selectedProduct.id);
+            setConfirmOpen(false);
+            setSelectedProduct(null);
+            refetch(); // refresh table
+        } catch (err) {
+            console.error("Delete failed:", err);
+            setConfirmOpen(false);
+        }
         setConfirmOpen(false);
     };
 
@@ -68,7 +70,7 @@ function Products() {
             }
         },
         {
-            key: 'name',
+            key: 'nameEn',
             label: 'Name',
         },
         {
@@ -176,7 +178,7 @@ function Products() {
                                 data={products.data}
                                 idKey="id"
                                 columns={columns}
-                                onEdit={(prd) => console.log("Edit", prd)}
+                                onEdit={(prd) => navigate(`/product/edit/${prd.id}`)}
                                 onDelete={(prd) => handleDeleteClick(prd)}
                                 currentPage={page}
                                 pageSize={limit}

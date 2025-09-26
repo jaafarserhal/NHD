@@ -39,5 +39,14 @@ namespace NHD.Core.Repository.Products
                 Limit = limit
             };
         }
+
+        public async Task<Product> GetProductByIdAsync(int productId)
+        {
+            return await _context.Products
+                .Include(p => p.PrdLookupCategory)
+                .Include(p => p.PrdLookupType)
+                .Include(p => p.PrdLookupSize)
+                .FirstOrDefaultAsync(p => p.PrdId == productId);
+        }
     }
 }

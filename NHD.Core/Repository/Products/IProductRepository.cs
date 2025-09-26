@@ -11,5 +11,6 @@ namespace NHD.Core.Repository.Products
     public interface IProductRepository : IRepository<Product>
     {
         Task<PagedResult<Product>> GetProductsAsync(int page, int limit);
+        Task<Product> GetProductByIdAsync(int productId);
     }
 }
