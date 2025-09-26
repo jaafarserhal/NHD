@@ -28,6 +28,10 @@ export default function UpdateProduct() {
         () => productService.getSizes(),
         []
     );
+    const { data: datesFilling, loading: datesFillingLoading } = useApiCall(
+        () => productService.getDatesFilling(),
+        []
+    );
 
     const [form, setForm] = useState<Product>({
         id: 0,
@@ -38,7 +42,7 @@ export default function UpdateProduct() {
         nameSv: "",
         descriptionEn: "",
         descriptionSv: "",
-        price: 0,
+        datesFillingId: undefined,
         isActive: true,
         imageUrl: ""
     });
@@ -72,7 +76,7 @@ export default function UpdateProduct() {
                 nameSv: product.nameSv || "",
                 descriptionEn: product.descriptionEn || "",
                 descriptionSv: product.descriptionSv || "",
-                price: product.price || 0,
+                datesFillingId: product.datesFillingId,
                 isActive: product.isActive,
                 imageUrl: product.imageUrl || ""
             });
@@ -105,7 +109,7 @@ export default function UpdateProduct() {
             [name]:
                 type === "checkbox"
                     ? checked
-                    : name.toLowerCase().includes("id") || name === "price"
+                    : name.toLowerCase().includes("id")
                         ? (value === "" ? undefined : Number(value))
                         : value,
         }));
@@ -192,10 +196,9 @@ export default function UpdateProduct() {
         if (!form.sizeId) {
             validationErrors.push("Size is required");
         }
-        if (!form.price || form.price <= 0) {
-            validationErrors.push("Valid price is required");
+        if (!form.datesFillingId) {
+            validationErrors.push("Gourmet Filling is required");
         }
-
         if (!image && !form.imageUrl) {
             validationErrors.push("Image is required");
         }
@@ -233,7 +236,7 @@ export default function UpdateProduct() {
                 nameSv: form.nameSv,
                 descriptionEn: form.descriptionEn,
                 descriptionSv: form.descriptionSv,
-                price: form.price,
+                datesFillingId: form.datesFillingId,
                 isActive: form.isActive,
                 imageFile: image // Only include if a new image was selected
             };
@@ -368,30 +371,6 @@ export default function UpdateProduct() {
                                                 onChange={(content) => handleEditorChange('descriptionSv', content)}
                                             />
                                         </Box>
-                                        <TextField
-                                            required
-                                            name="price"
-                                            label="Price"
-                                            type="number"
-                                            value={form.price}
-                                            onChange={handleChange}
-                                            variant="standard"
-                                            fullWidth
-                                            inputProps={{ min: 0, step: 0.01 }}
-                                            sx={{
-                                                '& input[type=number]': {
-                                                    '-moz-appearance': 'textfield',
-                                                },
-                                                '& input[type=number]::-webkit-outer-spin-button': {
-                                                    '-webkit-appearance': 'none',
-                                                    margin: 0,
-                                                },
-                                                '& input[type=number]::-webkit-inner-spin-button': {
-                                                    '-webkit-appearance': 'none',
-                                                    margin: 0,
-                                                },
-                                            }}
-                                        />
                                     </Box>
                                 </CardContent>
                             </Card>
@@ -403,6 +382,23 @@ export default function UpdateProduct() {
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
+                                        <TextField
+                                            required
+                                            name="datesFillingId"
+                                            select
+                                            value={form.datesFillingId || ''}
+                                            onChange={handleChange}
+                                            SelectProps={{ native: true }}
+                                            variant="standard"
+                                            disabled={datesFillingLoading}
+                                        >
+                                            <option value="">Select Gourmet Filling</option>
+                                            {datesFilling?.data?.map((option) => (
+                                                <option key={option.id} value={option.id}>
+                                                    {option.nameEn}
+                                                </option>
+                                            ))}
+                                        </TextField>
                                         <TextField
                                             required
                                             name="categoryId"

@@ -79,6 +79,7 @@ CREATE TABLE dbo.product (
     prd_lookup_category_id INT NOT NULL,
     prd_lookup_type_id INT NOT NULL,
     prd_lookup_size_id INT NOT NULL,
+    dates_filling_id INT NOT NULL,
     name_en NVARCHAR(200) NOT NULL,
     name_sv NVARCHAR(200) NULL,
     description_en NVARCHAR(MAX) NULL,
@@ -93,7 +94,11 @@ CREATE TABLE dbo.product (
     CONSTRAINT FK_product_type FOREIGN KEY (prd_lookup_type_id)
         REFERENCES dbo.gen_lookup(lookup_id),
     CONSTRAINT FK_product_size FOREIGN KEY (prd_lookup_size_id)
-        REFERENCES dbo.gen_lookup(lookup_id)
+        REFERENCES dbo.gen_lookup(lookup_id),
+    CONSTRAINT FK_product_dates_filling FOREIGN KEY (dates_filling_id)
+        REFERENCES dbo.dates_gourmet_filling(dates_filling_id)
+        ON DELETE NO ACTION
+        ON UPDATE CASCADE
 );
 
 -- =============================================

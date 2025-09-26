@@ -220,6 +220,11 @@ namespace NHD.Core.Utilities
             }
         }
 
+        public static int AsInt<TEnum>(this TEnum enumValue) where TEnum : Enum
+        {
+            return Convert.ToInt32(enumValue);
+        }
+
         public static T DeepCopy<T>(this T self)
         {
             using (var ms = new MemoryStream())

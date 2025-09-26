@@ -71,9 +71,7 @@ namespace NHD.Web.Api.Controllers
         public async Task<IActionResult> AddProduct([FromForm] ProductBindingModel dto)
         {
             if (dto == null)
-            {
                 return BadRequest("Product data is required");
-            }
 
             if (dto.ImageUrl == null || dto.ImageUrl.Length == 0)
                 return BadRequest("Image is required");
@@ -81,18 +79,22 @@ namespace NHD.Web.Api.Controllers
             // Create unique file name
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
             var folderPath = Path.Combine("wwwroot/uploads", "products");
+
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
 
             var filePath = Path.Combine(folderPath, fileName);
 
+            // Save the uploaded file
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await dto.ImageUrl.CopyToAsync(stream);
             }
 
+            // Create Product entity
             var product = new Product
             {
+                DatesFillingId = dto.DatesFillingId,
                 PrdLookupCategoryId = dto.CategoryId,
                 PrdLookupTypeId = dto.TypeId,
                 PrdLookupSizeId = dto.SizeId,
@@ -100,14 +102,15 @@ namespace NHD.Web.Api.Controllers
                 NameSv = dto.NameSv,
                 DescriptionEn = dto.DescriptionEn,
                 DescriptionSv = dto.DescriptionSv,
-                Price = dto.Price,
+                Price = await _productService.CalculatePriceByFillingIdAndSizeId(dto.DatesFillingId, dto.SizeId),
                 IsActive = dto.IsActive,
                 ImageUrl = fileName
             };
 
             var created = await _productService.AddProductAsync(product);
-            return CreatedAtAction("GetProducts", new { id = created.PrdId }, created);
+            return CreatedAtAction("GetProducts", new { id = created.PrdId });
         }
+
 
         [HttpPut]
         [Route("Update")]
@@ -157,18 +160,19 @@ namespace NHD.Web.Api.Controllers
             existingProduct.PrdLookupCategoryId = dto.CategoryId;
             existingProduct.PrdLookupTypeId = dto.TypeId;
             existingProduct.PrdLookupSizeId = dto.SizeId;
+            existingProduct.DatesFillingId = dto.DatesFillingId;
             existingProduct.NameEn = dto.NameEn;
             existingProduct.NameSv = dto.NameSv;
             existingProduct.DescriptionEn = dto.DescriptionEn;
             existingProduct.DescriptionSv = dto.DescriptionSv;
-            existingProduct.Price = dto.Price;
+            existingProduct.Price = _productService.CalculatePriceByFillingIdAndSizeId(dto.DatesFillingId, dto.SizeId).Result;
             existingProduct.IsActive = dto.IsActive;
             existingProduct.CreatedAt = DateTime.UtcNow;
 
             // Save changes
             var updatedProduct = await _productService.UpdateProductAsync(existingProduct);
 
-            return Ok(updatedProduct);
+            return Ok(updatedProduct.PrdId);
         }
 
         [HttpDelete("Delete/{id}")]
@@ -189,6 +193,16 @@ namespace NHD.Web.Api.Controllers
         #endregion Products
 
         #region Lookups
+
+        [HttpGet]
+        [Route("DatesFilling")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetDatesFilling()
+        {
+            var data = await _productService.GetDatesFillingAsync();
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
+        }
 
         [HttpGet]
         [Route("Categories")]

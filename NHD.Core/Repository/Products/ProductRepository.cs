@@ -22,6 +22,7 @@ namespace NHD.Core.Repository.Products
                 .Include(p => p.PrdLookupCategory)
                 .Include(p => p.PrdLookupType)
                 .Include(p => p.PrdLookupSize)
+                .Include(p => p.DatesFilling)
                 .OrderByDescending(p => p.CreatedAt);
 
             var total = await query.CountAsync();
@@ -46,6 +47,7 @@ namespace NHD.Core.Repository.Products
                 .Include(p => p.PrdLookupCategory)
                 .Include(p => p.PrdLookupType)
                 .Include(p => p.PrdLookupSize)
+                .Include(p => p.DatesFilling)
                 .FirstOrDefaultAsync(p => p.PrdId == productId);
         }
     }

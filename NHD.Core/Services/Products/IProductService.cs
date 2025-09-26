@@ -19,7 +19,9 @@ namespace NHD.Core.Services.Products
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetCategoriesAsync();
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetTypesAsync();
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetSizesAsync();
+        Task<ServiceResult<IEnumerable<LookupItemDto>>> GetDatesFillingAsync();
         Task<ServiceResult<bool>> DeleteProductAsync(int productId);
+        Task<decimal> CalculatePriceByFillingIdAndSizeId(int datesFillingId, int sizeId);
 
     }
 }

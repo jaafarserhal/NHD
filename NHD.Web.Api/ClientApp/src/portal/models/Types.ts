@@ -4,11 +4,11 @@ export interface Product {
     nameSv: string;
     descriptionEn: string;
     descriptionSv: string;
+    datesFillingId: number;
     categoryId: number;
     typeId: number;
     sizeId: number;
     imageUrl: string;
-    price: number;
     isActive: boolean;
 }
 

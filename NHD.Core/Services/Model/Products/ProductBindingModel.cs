@@ -14,11 +14,11 @@ namespace NHD.Core.Services.Model.Products
 
         public string DescriptionEn { get; set; }
         public string DescriptionSv { get; set; }
+        public int DatesFillingId { get; set; }
         public int CategoryId { get; set; }
         public int TypeId { get; set; }
         public int SizeId { get; set; }
         public IFormFile ImageUrl { get; set; }
-        public decimal Price { get; set; }
         public bool IsActive { get; set; }
     }
 }

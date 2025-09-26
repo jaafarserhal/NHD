@@ -14,6 +14,7 @@ class productService extends apiService {
     async addProduct(product) {
         const formData = new FormData();
 
+        formData.append('DatesFillingId', String(product.datesFillingId));
         formData.append('CategoryId', String(product.categoryId));
         formData.append('TypeId', String(product.typeId));
         formData.append('SizeId', String(product.sizeId));
@@ -21,7 +22,6 @@ class productService extends apiService {
         formData.append('NameSv', product.nameSv || '');
         formData.append('DescriptionEn', product.descriptionEn || '');
         formData.append('DescriptionSv', product.descriptionSv || '');
-        formData.append('Price', String(product.price));
         formData.append('IsActive', String(product.isActive));
 
         if (product.imageFile && product.imageFile instanceof File) {
@@ -35,6 +35,7 @@ class productService extends apiService {
         const formData = new FormData();
 
         formData.append('Id', String(product.id));
+        formData.append('DatesFillingId', String(product.datesFillingId));
         formData.append('CategoryId', String(product.categoryId));
         formData.append('TypeId', String(product.typeId));
         formData.append('SizeId', String(product.sizeId));
@@ -42,7 +43,6 @@ class productService extends apiService {
         formData.append('NameSv', product.nameSv || '');
         formData.append('DescriptionEn', product.descriptionEn || '');
         formData.append('DescriptionSv', product.descriptionSv || '');
-        formData.append('Price', String(product.price));
         formData.append('IsActive', String(product.isActive));
 
         if (product.imageFile && product.imageFile instanceof File) {
@@ -54,6 +54,10 @@ class productService extends apiService {
 
     async getProductById(productId) {
         return this.get(`${apiUrls.getProductById}${productId}`);
+    }
+
+    async getDatesFilling() {
+        return this.get(apiUrls.datesFilling);
     }
 
     async deleteProduct(productId) {

@@ -9,4 +9,5 @@ export const apiUrls = {
     categories: '/Categories',
     types: '/Types',
     sizes: '/Sizes',
+    datesFilling: '/DatesFilling',
 };

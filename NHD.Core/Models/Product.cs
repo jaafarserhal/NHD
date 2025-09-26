@@ -29,6 +29,10 @@ public partial class Product
 
     public bool? IsActive { get; set; }
 
+    public int DatesFillingId { get; set; }
+
+    public virtual DatesGourmetFilling DatesFilling { get; set; }
+
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     public virtual GenLookup PrdLookupCategory { get; set; }

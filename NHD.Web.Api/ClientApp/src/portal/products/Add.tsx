@@ -27,6 +27,10 @@ export default function AddProduct() {
         () => productService.getSizes(),
         []
     );
+    const { data: datesFilling, loading: datesFillingLoading } = useApiCall(
+        () => productService.getDatesFilling(),
+        []
+    );
 
     const [form, setForm] = useState<Omit<Product, "id" | "imageUrl">>({
         categoryId: undefined,
@@ -36,7 +40,7 @@ export default function AddProduct() {
         nameSv: "",
         descriptionEn: "",
         descriptionSv: "",
-        price: 0,
+        datesFillingId: undefined,
         isActive: true,
     });
 
@@ -55,7 +59,7 @@ export default function AddProduct() {
             [name]:
                 type === "checkbox"
                     ? checked
-                    : name.toLowerCase().includes("id") || name === "price"
+                    : name.toLowerCase().includes("id")
                         ? (value === "" ? undefined : Number(value))
                         : value,
         }));
@@ -141,8 +145,8 @@ export default function AddProduct() {
         if (!form.sizeId) {
             validationErrors.push("Size is required");
         }
-        if (!form.price || form.price <= 0) {
-            validationErrors.push("Valid price is required");
+        if (!form.datesFillingId) {
+            validationErrors.push("Gourmet Filling is required");
         }
         if (!image) {
             validationErrors.push("Image is required");
@@ -190,7 +194,7 @@ export default function AddProduct() {
                 nameSv: "",
                 descriptionEn: "",
                 descriptionSv: "",
-                price: 0,
+                datesFillingId: undefined,
                 isActive: true,
             });
             setImage(null);
@@ -298,30 +302,6 @@ export default function AddProduct() {
                                                 onChange={(content) => handleEditorChange('descriptionSv', content)}
                                             />
                                         </Box>
-                                        <TextField
-                                            required
-                                            name="price"
-                                            label="Price"
-                                            type="number"
-                                            value={form.price}
-                                            onChange={handleChange}
-                                            variant="standard"
-                                            fullWidth
-                                            inputProps={{ min: 0, step: 0.01 }}
-                                            sx={{
-                                                '& input[type=number]': {
-                                                    '-moz-appearance': 'textfield',
-                                                },
-                                                '& input[type=number]::-webkit-outer-spin-button': {
-                                                    '-webkit-appearance': 'none',
-                                                    margin: 0,
-                                                },
-                                                '& input[type=number]::-webkit-inner-spin-button': {
-                                                    '-webkit-appearance': 'none',
-                                                    margin: 0,
-                                                },
-                                            }}
-                                        />
                                     </Box>
                                 </CardContent>
                             </Card>
@@ -333,6 +313,23 @@ export default function AddProduct() {
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
+                                        <TextField
+                                            required
+                                            name="datesFillingId"
+                                            select
+                                            value={form.datesFillingId || ''}
+                                            onChange={handleChange}
+                                            SelectProps={{ native: true }}
+                                            variant="standard"
+                                            disabled={datesFillingLoading}
+                                        >
+                                            <option value="">Select Gourmet Filling</option>
+                                            {datesFilling?.data?.map((option) => (
+                                                <option key={option.id} value={option.id}>
+                                                    {option.nameEn}
+                                                </option>
+                                            ))}
+                                        </TextField>
                                         <TextField
                                             required
                                             name="categoryId"

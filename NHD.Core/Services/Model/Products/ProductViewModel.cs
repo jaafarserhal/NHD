@@ -14,6 +14,8 @@ namespace NHD.Core.Services.Model.Products
         public string DescriptionSv { get; set; }
         public string Category { get; set; }
         public int CategoryId { get; set; }
+        public int DatesFillingId { get; set; }
+        public string DatesFilling { get; set; }
         public string Type { get; set; }
         public int TypeId { get; set; }
         public string Size { get; set; }

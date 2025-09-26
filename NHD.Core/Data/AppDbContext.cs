@@ -20,6 +20,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Customer> Customers { get; set; }
 
+    public virtual DbSet<DatesGourmetFilling> DatesGourmetFillings { get; set; }
+
     public virtual DbSet<GenLookup> GenLookups { get; set; }
 
     public virtual DbSet<GenLookupType> GenLookupTypes { get; set; }
@@ -36,9 +38,7 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-
-        => optionsBuilder.UseSqlServer($"Name=ConnectionStrings:{Utilities.AppConstants.CONNECTION_NAME}");
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer($"Name=ConnectionStrings:{Utilities.AppConstants.CONNECTION_NAME}");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -114,6 +114,31 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");
+        });
+
+        modelBuilder.Entity<DatesGourmetFilling>(entity =>
+        {
+            entity.HasKey(e => e.DatesFillingId).HasName("PK__dates_go__CA7200EB6FA4498E");
+
+            entity.ToTable("dates_gourmet_filling");
+
+            entity.Property(e => e.DatesFillingId).HasColumnName("dates_filling_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.NameEn)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnName("name_en");
+            entity.Property(e => e.NameSv)
+                .HasMaxLength(200)
+                .HasColumnName("name_sv");
+            entity.Property(e => e.Price)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("price");
         });
 
         modelBuilder.Entity<GenLookup>(entity =>
@@ -321,6 +346,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
+            entity.Property(e => e.DatesFillingId).HasColumnName("dates_filling_id");
             entity.Property(e => e.DescriptionEn).HasColumnName("description_en");
             entity.Property(e => e.DescriptionSv).HasColumnName("description_sv");
             entity.Property(e => e.ImageUrl)
@@ -342,6 +368,11 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Price)
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("price");
+
+            entity.HasOne(d => d.DatesFilling).WithMany(p => p.Products)
+                .HasForeignKey(d => d.DatesFillingId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_product_dates_filling");
 
             entity.HasOne(d => d.PrdLookupCategory).WithMany(p => p.ProductPrdLookupCategories)
                 .HasForeignKey(d => d.PrdLookupCategoryId)
