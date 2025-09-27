@@ -28,12 +28,13 @@ namespace NHD.Core.Utilities
         Pieces_20 = 301,
         Pieces_35 = 302,
         Grams_250 = 303,
-        Grams_400 = 305,
-        Grams_450 = 311,
         Grams_500 = 304,
-        Pieces_3 = 308,
-        Piece_1 = 309,
-        Milliliters_400 = 310
+        Grams_400 = 305,
+        Pieces_3 = 306,
+        Piece_1 = 307,
+        Milliliters_400 = 308,
+        Grams_450 = 309,
+
     }
 
     public enum HttpStatusCodeEnum

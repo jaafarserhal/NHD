@@ -11,6 +11,7 @@ import Editor from "src/components/Editor/Index";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
+import { SetCategoryEnum, SetSizeEnum, SetTypeEnum } from "src/common/Enums";
 
 export default function AddProduct() {
 
@@ -328,7 +329,7 @@ export default function AddProduct() {
 
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Categories" />
+                                <CardHeader title="Set Categories" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -352,38 +353,64 @@ export default function AddProduct() {
 
                                         <TextField
                                             required
-                                            name="typeId"
-                                            select
-                                            value={form.typeId || ''}
-                                            onChange={handleChange}
-                                            SelectProps={{ native: true }}
-                                            variant="standard"
-                                            disabled={typesLoading}
-                                        >
-                                            <option value="">Select Type</option>
-                                            {types?.data?.map((option) => (
-                                                <option key={option.id} value={option.id}>
-                                                    {option.nameEn}
-                                                </option>
-                                            ))}
-                                        </TextField>
-
-                                        <TextField
-                                            required
                                             name="sizeId"
                                             select
                                             value={form.sizeId || ''}
                                             onChange={handleChange}
                                             SelectProps={{ native: true }}
                                             variant="standard"
-                                            disabled={sizesLoading}
+                                            disabled={sizesLoading || !form.categoryId}
                                         >
                                             <option value="">Select Size</option>
-                                            {sizes?.data?.map((option) => (
-                                                <option key={option.id} value={option.id}>
-                                                    {option.nameEn}
-                                                </option>
-                                            ))}
+                                            {sizes?.data
+                                                ?.filter(size => {
+                                                    if (form.categoryId === SetCategoryEnum.DateSweetners) {
+                                                        return (
+                                                            size.id === SetSizeEnum.Milliliters400 ||
+                                                            size.id === SetSizeEnum.Grams450
+                                                        );
+                                                    } else {
+                                                        return (
+                                                            size.id != SetSizeEnum.Milliliters400 &&
+                                                            size.id != SetSizeEnum.Grams450
+                                                        );
+                                                    }
+                                                })
+                                                .map(option => (
+                                                    <option key={option.id} value={option.id}>
+                                                        {option.nameEn}
+                                                    </option>
+                                                ))}
+                                        </TextField>
+
+                                        <TextField
+                                            required
+                                            name="typeId"
+                                            select
+                                            value={form.typeId || ''}
+                                            onChange={handleChange}
+                                            SelectProps={{ native: true }}
+                                            variant="standard"
+                                            disabled={typesLoading || !form.categoryId}
+                                        >
+                                            <option value="">Select Type</option>
+                                            {types?.data
+                                                ?.filter(type => {
+                                                    if (form.categoryId === SetCategoryEnum.DateSweetners) {
+                                                        return (
+                                                            type.id === SetTypeEnum.PlainDate
+                                                        );
+                                                    } else {
+                                                        return (
+                                                            type.id != SetTypeEnum.PlainDate
+                                                        );
+                                                    }
+                                                })
+                                                .map(option => (
+                                                    <option key={option.id} value={option.id}>
+                                                        {option.nameEn}
+                                                    </option>
+                                                ))}
                                         </TextField>
                                     </Box>
                                 </CardContent>
