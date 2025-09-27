@@ -12,6 +12,15 @@ export interface Product {
     isActive: boolean;
 }
 
+export interface Date {
+    id?: number;
+    nameEn: string;
+    nameSv: string;
+    quality: boolean;
+    price: number;
+    isActive: boolean;
+}
+
 export interface LookupItem {
     id: number;
     nameEn: string;

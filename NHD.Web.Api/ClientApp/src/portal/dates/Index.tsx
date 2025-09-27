@@ -4,37 +4,37 @@ import { Grid, Container, Typography, Chip, Box } from '@mui/material';
 import Footer from 'src/components/Footer';
 import { useState } from 'react';
 import { useApiCall } from '../../api/hooks/useApi';
-import productService from '../../api/productService';
+import dateService from '../../api/dateService';
 import GenericTable from 'src/components/GenericTable/index';
 import PageHeader from '../PageHeader';
 import ConfirmDialog from 'src/components/ConfirmDialog/Index';
 import { useNavigate } from 'react-router-dom';
 import { RouterUrls } from 'src/common/RouterUrls';
 
-function Products() {
+function Dates() {
     const [page, setPage] = useState(0); // 0-based for MUI TablePagination
     const [limit, setLimit] = useState(10);
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(null);
     const navigate = useNavigate();
 
     // Convert 0-based page to 1-based for API
-    const { data: products, loading, error, refetch } = useApiCall(
-        () => productService.getProducts(page + 1, limit),
+    const { data: dates, loading, error, refetch } = useApiCall(
+        () => dateService.getDates(page + 1, limit),
         [page, limit] // Dependencies to refetch when page/limit changes
     );
 
-    const handleDeleteClick = (product) => {
-        setSelectedProduct(product);
+    const handleDeleteClick = (date) => {
+        setSelectedDate(date);
         setConfirmOpen(true);
     };
 
     const handleConfirmDelete = async () => {
-        if (!selectedProduct) return;
+        if (!selectedDate) return;
         try {
-            await productService.deleteProduct(selectedProduct.id);
+            await dateService.deleteDate(selectedDate.id);
             setConfirmOpen(false);
-            setSelectedProduct(null);
+            setSelectedDate(null);
             refetch(); // refresh table
         } catch (err) {
             console.error("Delete failed:", err);
@@ -45,7 +45,7 @@ function Products() {
 
     const handleCancelDelete = () => {
         setConfirmOpen(false);
-        setSelectedProduct(null);
+        setSelectedDate(null);
     };
 
     const columns = [
@@ -75,35 +75,14 @@ function Products() {
             label: 'Name',
         },
         {
-            key: 'category',
-            label: 'Category'
-        },
-        {
-            key: 'type',
-            label: 'Type'
-        },
-        {
-            key: 'size',
-            label: 'Size'
-        },
-        {
-            key: 'fromPrice',
+            key: 'price',
             label: 'Price'
         },
         {
-            key: 'imageUrl',
-            label: 'Image',
-            render: (prd) => (
-                <img
-                    src={prd.imageUrl ? `/uploads/products/${prd.imageUrl}` : "/uploads/placeholder-image.png"}
-                    alt={prd.name}
-                    style={{
-                        width: '50px',
-                        height: '50px',
-                        objectFit: 'cover',
-                        borderRadius: '4px'
-                    }}
-                />
+            key: 'quality',
+            label: 'Quality',
+            render: (date) => (
+                <label>{date.quality ? 'Premium' : 'Regular'}</label>
             )
         },
         {
@@ -132,7 +111,7 @@ function Products() {
     if (error) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-                <Typography color="error">Error loading Boxes: {error.message}</Typography>
+                <Typography color="error">Error loading products: {error.message}</Typography>
             </Box>
         );
     }
@@ -145,11 +124,11 @@ function Products() {
             overflow="hidden"
         >
             <Helmet>
-                <title>Boxes - Applications</title>
+                <title>Dates - Applications</title>
             </Helmet>
 
             <PageTitleWrapper>
-                <PageHeader sectionTitle="Boxes" href={RouterUrls.boxAdd} />
+                <PageHeader sectionTitle="Dates" href={RouterUrls.dateAdd} />
             </PageTitleWrapper>
 
             <Container
@@ -161,9 +140,9 @@ function Products() {
                     justifyContent: "center",
                 }}
             >
-                {!products || !products.data || products.data.length === 0 ? (
+                {!dates || !dates.data || dates.data.length === 0 ? (
                     <Typography variant="h6" color="textSecondary" align="center">
-                        No Boxes found.
+                        No dates found.
                     </Typography>
                 ) : (
                     <Grid
@@ -176,14 +155,14 @@ function Products() {
                     >
                         <Grid item xs={12}>
                             <GenericTable
-                                data={products.data}
+                                data={dates.data}
                                 idKey="id"
                                 columns={columns}
-                                onEdit={(prd) => navigate(`/boxes/edit/${prd.id}`)}
-                                onDelete={(prd) => handleDeleteClick(prd)}
+                                onEdit={(date) => navigate(`/dates/edit/${date.id}`)}
+                                onDelete={(date) => handleDeleteClick(date)}
                                 currentPage={page}
                                 pageSize={limit}
-                                totalCount={products.total || products.data.length}
+                                totalCount={dates.total || dates.data.length}
                                 onPageChange={handlePageChange}
                                 onPageSizeChange={handleLimitChange}
                                 disableInternalPagination={true}
@@ -198,7 +177,7 @@ function Products() {
                 open={confirmOpen}
                 onClose={handleCancelDelete}
                 onConfirm={handleConfirmDelete}
-                title="Delete Box"
+                title="Delete Date"
                 message={`Are you sure you want to delete this item? This action cannot be undone.`}
                 confirmText="Delete"
                 cancelText="Cancel"
@@ -208,4 +187,4 @@ function Products() {
     );
 }
 
-export default Products;
+export default Dates;

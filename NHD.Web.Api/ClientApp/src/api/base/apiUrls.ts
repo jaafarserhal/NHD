@@ -9,5 +9,9 @@ export const apiUrls = {
     categories: '/Categories',
     types: '/Types',
     sizes: '/Sizes',
-    datesFilling: '/DatesFilling',
+    dates: '/Dates',
+    addDate: '/Add',
+    updateDate: '/Update',
+    getDateById: '/GetById/',
+    deleteDate: '/Delete/',
 };

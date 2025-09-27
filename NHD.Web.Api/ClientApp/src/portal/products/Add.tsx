@@ -226,13 +226,13 @@ export default function AddProduct() {
         <>
             <PortalToastContainer />
             <Helmet>
-                <title>Add Set - Application</title>
+                <title>Add Box - Application</title>
             </Helmet>
             <PageTitleWrapper>
                 <PageTitle
-                    heading="Add Date Set"
-                    subHeading="Add a new date set to your catalog"
-                    backUrl="/dates-set"
+                    heading="Add Box"
+                    subHeading="Add a new box to your catalog"
+                    backUrl="/boxes"
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
@@ -263,7 +263,7 @@ export default function AddProduct() {
                     >
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Set Details" />
+                                <CardHeader title="Box Details" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -329,7 +329,7 @@ export default function AddProduct() {
 
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Set Categories" />
+                                <CardHeader title="Box Categories" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -473,12 +473,12 @@ export default function AddProduct() {
                             disabled={loading}
                             size="large"
                         >
-                            {loading ? "Saving..." : "Save Set"}
+                            {loading ? "Submitting..." : "Submit"}
                         </Button>
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => navigate('/dates-set')}
+                            onClick={() => navigate('/boxes')}
                             size="large"
                             sx={{ ml: 2 }}
                         >

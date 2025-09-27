@@ -10,7 +10,11 @@ import Users from './portal/users/Index';
 import Products from './portal/products/Index';
 import AddProduct from './portal/products/Add';
 import EditProduct from './portal/products/Update';
+import Dates from './portal/dates/Index';
+import AddDate from './portal/dates/Add';
+import EditDate from './portal/dates/Update';
 import Login from './portal/auth/Login';
+import { RouterUrls } from './common/RouterUrls';
 
 const Loader = (Component) => (props) =>
 (
@@ -91,16 +95,28 @@ const routes: RouteObject[] = [
         element: <Products />
       },
       {
-        path: 'dates-set',
+        path: RouterUrls.boxesList,
         element: <Navigate to="/" replace />
       },
       {
-        path: '/dates-set/add',
+        path: RouterUrls.boxAdd,
         element: <AddProduct />
       },
       {
-        path: '/dates-set/edit/:id',
+        path: RouterUrls.boxEdit,
         element: <EditProduct />
+      },
+      {
+        path: RouterUrls.datesList,
+        element: <Dates />
+      },
+      {
+        path: RouterUrls.dateAdd,
+        element: <AddDate />
+      },
+      {
+        path: RouterUrls.dateEdit,
+        element: <EditDate />
       }
     ]
   },

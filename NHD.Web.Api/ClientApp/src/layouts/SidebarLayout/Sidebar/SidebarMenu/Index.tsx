@@ -7,7 +7,8 @@ import {
   List,
   styled,
   Button,
-  ListItem
+  ListItem,
+  Divider
 } from '@mui/material';
 import { NavLink as RouterLink } from 'react-router-dom';
 import { SidebarContext } from 'src/contexts/SidebarContext';
@@ -190,9 +191,20 @@ function SidebarMenu() {
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/"
+                  startIcon={<CheckBoxTwoToneIcon />}
+                >
+                  Boxes
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/dates"
                   startIcon={<EmergencyShareIcon />}
                 >
-                  Dates Set
+                  Dates
                 </Button>
               </ListItem>
             </List>

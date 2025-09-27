@@ -10,6 +10,8 @@ using NHD.Core.Common.Models;
 using NHD.Core.Repository.Lookup;
 using NHD.Core.Repository.Products;
 using NHD.Core.Services.Products;
+using NHD.Core.Repository.Dates;
+using NHD.Core.Services.Dates;
 
 namespace NHD.Web.Api
 {
@@ -146,9 +148,11 @@ namespace NHD.Web.Api
             services.AddScoped<ILookupRepository, LookupRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IDatesRepository, DatesRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IDatesService, DatesService>();
         }
     }
 }

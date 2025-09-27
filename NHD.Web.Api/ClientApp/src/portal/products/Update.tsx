@@ -246,14 +246,14 @@ export default function UpdateProduct() {
             // navigate('/products');
         } catch (error: any) {
             console.error(error);
-            setErrors([error.message || 'Failed to update product']);
+            setErrors([error.message || 'Failed to update Box']);
         } finally {
             setLoading(false);
         }
     };
 
     const notifySuccess = () => {
-        toast.success('Product updated successfully!', {
+        toast.success('Box updated successfully!', {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -269,13 +269,13 @@ export default function UpdateProduct() {
         return (
             <>
                 <Helmet>
-                    <title>Update Set - Application</title>
+                    <title>Update Box - Application</title>
                 </Helmet>
                 <PageTitleWrapper>
                     <PageTitle
-                        heading="Update Set"
-                        subHeading="Loading set details..."
-                        backUrl="/dates-set"
+                        heading="Update Box"
+                        subHeading="Loading Box details..."
+                        backUrl="/boxes"
                     />
                 </PageTitleWrapper>
                 <Container maxWidth="lg">
@@ -292,13 +292,13 @@ export default function UpdateProduct() {
         <>
             <PortalToastContainer />
             <Helmet>
-                <title>Update Set - Application</title>
+                <title>Update Box - Application</title>
             </Helmet>
             <PageTitleWrapper>
                 <PageTitle
-                    heading="Update Set"
-                    subHeading="Update existing dates set information"
-                    backUrl="/dates-set"
+                    heading="Update Box"
+                    subHeading="Update existing Box set information"
+                    backUrl="/boxes"
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
@@ -329,7 +329,7 @@ export default function UpdateProduct() {
                     >
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Set Details" />
+                                <CardHeader title="Box Details" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -395,7 +395,7 @@ export default function UpdateProduct() {
 
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Set Categories" />
+                                <CardHeader title="Box Categories" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -539,7 +539,7 @@ export default function UpdateProduct() {
                             disabled={loading}
                             size="large"
                         >
-                            {loading ? "Updating..." : "Update Set"}
+                            {loading ? "Submitting..." : "Submit"}
                         </Button>
                         <Button
                             type="button"
