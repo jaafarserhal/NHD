@@ -4,7 +4,7 @@ export interface Product {
     nameSv: string;
     descriptionEn: string;
     descriptionSv: string;
-    datesFillingId: number;
+    fromPrice: number;
     categoryId: number;
     typeId: number;
     sizeId: number;

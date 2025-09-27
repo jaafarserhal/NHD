@@ -20,7 +20,9 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Customer> Customers { get; set; }
 
-    public virtual DbSet<DatesGourmetFilling> DatesGourmetFillings { get; set; }
+    public virtual DbSet<Date> Dates { get; set; }
+
+    public virtual DbSet<DatesProduct> DatesProducts { get; set; }
 
     public virtual DbSet<GenLookup> GenLookups { get; set; }
 
@@ -44,7 +46,7 @@ public partial class AppDbContext : DbContext
     {
         modelBuilder.Entity<Address>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__address__CAA247C8CAACAF00");
+            entity.HasKey(e => e.AddressId).HasName("PK__address__CAA247C8C3DB21CC");
 
             entity.ToTable("address");
 
@@ -80,13 +82,13 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.HasKey(e => e.CustomerId).HasName("PK__customer__CD65CB85FE27E894");
+            entity.HasKey(e => e.CustomerId).HasName("PK__customer__CD65CB85FBF460DD");
 
             entity.ToTable("customer");
 
             entity.HasIndex(e => e.EmailAddress, "IX_customer_email");
 
-            entity.HasIndex(e => e.EmailAddress, "UQ__customer__20C6DFF55DD95942").IsUnique();
+            entity.HasIndex(e => e.EmailAddress, "UQ__customer__20C6DFF54D84F4FD").IsUnique();
 
             entity.Property(e => e.CustomerId).HasColumnName("customer_id");
             entity.Property(e => e.CreatedAt)
@@ -116,13 +118,13 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("password");
         });
 
-        modelBuilder.Entity<DatesGourmetFilling>(entity =>
+        modelBuilder.Entity<Date>(entity =>
         {
-            entity.HasKey(e => e.DatesFillingId).HasName("PK__dates_go__CA7200EB6FA4498E");
+            entity.HasKey(e => e.DateId).HasName("PK__dates__51FC486528DF0C81");
 
-            entity.ToTable("dates_gourmet_filling");
+            entity.ToTable("dates");
 
-            entity.Property(e => e.DatesFillingId).HasColumnName("dates_filling_id");
+            entity.Property(e => e.DateId).HasColumnName("date_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
@@ -131,19 +133,45 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("is_active");
             entity.Property(e => e.NameEn)
                 .IsRequired()
-                .HasMaxLength(200)
+                .HasMaxLength(100)
                 .HasColumnName("name_en");
             entity.Property(e => e.NameSv)
-                .HasMaxLength(200)
+                .HasMaxLength(100)
                 .HasColumnName("name_sv");
             entity.Property(e => e.Price)
-                .HasColumnType("decimal(18, 2)")
+                .HasColumnType("decimal(10, 2)")
                 .HasColumnName("price");
+            entity.Property(e => e.Quality).HasColumnName("quality");
+        });
+
+        modelBuilder.Entity<DatesProduct>(entity =>
+        {
+            entity.HasKey(e => e.DpId).HasName("PK__dates_pr__B5B1AAFCA8DE0292");
+
+            entity.ToTable("dates_product");
+
+            entity.HasIndex(e => new { e.PrdId, e.DateId }, "UQ_dates_product").IsUnique();
+
+            entity.Property(e => e.DpId).HasColumnName("dp_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.DateId).HasColumnName("date_id");
+            entity.Property(e => e.IsFilled).HasColumnName("is_filled");
+            entity.Property(e => e.PrdId).HasColumnName("prd_id");
+
+            entity.HasOne(d => d.Date).WithMany(p => p.DatesProducts)
+                .HasForeignKey(d => d.DateId)
+                .HasConstraintName("FK_dates_product_dates");
+
+            entity.HasOne(d => d.Prd).WithMany(p => p.DatesProducts)
+                .HasForeignKey(d => d.PrdId)
+                .HasConstraintName("FK_dates_product_product");
         });
 
         modelBuilder.Entity<GenLookup>(entity =>
         {
-            entity.HasKey(e => e.LookupId).HasName("PK__gen_look__E492CAE4107FEF87");
+            entity.HasKey(e => e.LookupId).HasName("PK__gen_look__E492CAE4F093F4E4");
 
             entity.ToTable("gen_lookup");
 
@@ -173,7 +201,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<GenLookupType>(entity =>
         {
-            entity.HasKey(e => e.LookupTypeId).HasName("PK__gen_look__6999207B31E1B707");
+            entity.HasKey(e => e.LookupTypeId).HasName("PK__gen_look__6999207B27EA8685");
 
             entity.ToTable("gen_lookup_type");
 
@@ -197,7 +225,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Order>(entity =>
         {
-            entity.HasKey(e => e.OrderId).HasName("PK__order__465962294889C3A8");
+            entity.HasKey(e => e.OrderId).HasName("PK__order__4659622906867E95");
 
             entity.ToTable("order");
 
@@ -238,7 +266,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<OrderItem>(entity =>
         {
-            entity.HasKey(e => e.OrderItemId).HasName("PK__order_it__3764B6BC03D2A7D1");
+            entity.HasKey(e => e.OrderItemId).HasName("PK__order_it__3764B6BCECC10D7B");
 
             entity.ToTable("order_item");
 
@@ -270,7 +298,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<PaymentGateway>(entity =>
         {
-            entity.HasKey(e => e.PaymentGatewayId).HasName("PK__payment___E4C06EF64847EF42");
+            entity.HasKey(e => e.PaymentGatewayId).HasName("PK__payment___E4C06EF689627D73");
 
             entity.ToTable("payment_gateway");
 
@@ -293,7 +321,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<PaymentTransaction>(entity =>
         {
-            entity.HasKey(e => e.PaymentTransactionId).HasName("PK__payment___3DE9AF96145D5D4E");
+            entity.HasKey(e => e.PaymentTransactionId).HasName("PK__payment___3DE9AF960FB87AC6");
 
             entity.ToTable("payment_transaction");
 
@@ -330,7 +358,7 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Product>(entity =>
         {
-            entity.HasKey(e => e.PrdId).HasName("PK__product__CE5CB948BFDEEF9C");
+            entity.HasKey(e => e.PrdId).HasName("PK__product__CE5CB94899484F7D");
 
             entity.ToTable("product");
 
@@ -346,9 +374,11 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
-            entity.Property(e => e.DatesFillingId).HasColumnName("dates_filling_id");
             entity.Property(e => e.DescriptionEn).HasColumnName("description_en");
             entity.Property(e => e.DescriptionSv).HasColumnName("description_sv");
+            entity.Property(e => e.FromPrice)
+                .HasColumnType("decimal(18, 2)")
+                .HasColumnName("from_price");
             entity.Property(e => e.ImageUrl)
                 .HasMaxLength(500)
                 .HasColumnName("image_url");
@@ -365,14 +395,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PrdLookupCategoryId).HasColumnName("prd_lookup_category_id");
             entity.Property(e => e.PrdLookupSizeId).HasColumnName("prd_lookup_size_id");
             entity.Property(e => e.PrdLookupTypeId).HasColumnName("prd_lookup_type_id");
-            entity.Property(e => e.Price)
-                .HasColumnType("decimal(18, 2)")
-                .HasColumnName("price");
-
-            entity.HasOne(d => d.DatesFilling).WithMany(p => p.Products)
-                .HasForeignKey(d => d.DatesFillingId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_product_dates_filling");
 
             entity.HasOne(d => d.PrdLookupCategory).WithMany(p => p.ProductPrdLookupCategories)
                 .HasForeignKey(d => d.PrdLookupCategoryId)
@@ -392,13 +414,13 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__user__B9BE370F04E99464");
+            entity.HasKey(e => e.UserId).HasName("PK__user__B9BE370FB0180710");
 
             entity.ToTable("user");
 
             entity.HasIndex(e => e.EmailAddress, "IX_user_email");
 
-            entity.HasIndex(e => e.EmailAddress, "UQ__user__20C6DFF5F614E2CB").IsUnique();
+            entity.HasIndex(e => e.EmailAddress, "UQ__user__20C6DFF51B048AF4").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.CreatedAt)

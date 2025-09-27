@@ -21,23 +21,9 @@ VALUES
 (104, 100, N'Date Snacks', N'Dadelmellanmål',SYSUTCDATETIME(), 1),
 (105, 100, N'Date Sweetners', N'Dadelsötning',SYSUTCDATETIME(), 1),
  -- Product Types (200 series)
-(200, 200, 'Rectangular Box', 'Rektangulär låda', SYSUTCDATETIME(), 1),
-(201, 200, 'Square Box', 'Fyrkantig låda', SYSUTCDATETIME(), 1),
-(202, 200, 'Ajwa Dates', 'Ajwa-dadlar', SYSUTCDATETIME(), 1),
-(203, 200, 'Khudri Dates', 'Khudri-dadlar', SYSUTCDATETIME(), 1),
-(204, 200, 'Safawi Dates', 'Safawi-dadlar', SYSUTCDATETIME(), 1),
-(205, 200, 'Majdool Dates', 'Majdool-dadlar', SYSUTCDATETIME(), 1),
-(206, 200, 'Sagi Dates', 'Sagi-dadlar', SYSUTCDATETIME(), 1),
-(207, 200, 'Dates with peeled Orange', 'Dadlar med skalad apelsin', SYSUTCDATETIME(), 1),
-(208, 200, 'Dates with Pistachio', 'Dadlar med pistage', SYSUTCDATETIME(), 1),
-(209, 200, 'Sagai Date Pouch', 'Sagai-dadelpåse', SYSUTCDATETIME(), 1),
-(210, 200, 'Khidri Date Pouch', 'Khidri-dadelpåse', SYSUTCDATETIME(), 1),
-(211, 200, 'Ajwa Date Pouch', 'Ajwa-dadelpåse', SYSUTCDATETIME(), 1),
-(212, 200, 'Madjool Dates Pouch', 'Madjool-dadelpåse', SYSUTCDATETIME(), 1),
-(213, 200, 'Assorted Dates Pouch', 'Blandad dadelpåse', SYSUTCDATETIME(), 1),
-(214, 200, 'Nawa Snack', 'Nawa-snack', SYSUTCDATETIME(), 1),
-(215, 200, 'Date Syrup', 'Dadelsirap', SYSUTCDATETIME(), 1),
-(216, 200, 'Date Sugar', 'Dadel­socker', SYSUTCDATETIME(), 1),
+(200, 200,'Plain Date', 'Naturell Dadel',SYSUTCDATETIME(), 1),
+(201, 200,'Assorted Date', 'Blandade Dadlar',SYSUTCDATETIME(), 1),
+(202, 200,'Filled Date', 'Fyllda Dadlar',SYSUTCDATETIME(), 1),
  -- Product Sizes (300 series)
 (300, 300, '8 pieces', '8 stycken', SYSUTCDATETIME(), 1),
 (301, 300, '20 pieces', '20 stycken', SYSUTCDATETIME(), 1),
@@ -58,11 +44,7 @@ VALUES
 (405, 400, 'Cancelled', 'Avbruten', SYSUTCDATETIME(), 1);
 
 
-INSERT INTO dbo.dates_gourmet_filling (name_en, name_sv, price, created_at, is_active)
-VALUES
-    ('Plain Date', 'Naturell Dadel', 5.00, SYSUTCDATETIME(), 1),
-    ('Assorted Date', 'Blandade Dadlar', 7.50, SYSUTCDATETIME(), 1),
-    ('Filled Date', 'Fyllda Dadlar', 9.00, SYSUTCDATETIME(), 1);
+
 
 	
 	

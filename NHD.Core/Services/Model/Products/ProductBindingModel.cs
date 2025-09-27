@@ -11,6 +11,7 @@ namespace NHD.Core.Services.Model.Products
         public int Id { get; set; }
         public string NameEn { get; set; }
         public string NameSv { get; set; }
+        public decimal FromPrice { get; set; }
 
         public string DescriptionEn { get; set; }
         public string DescriptionSv { get; set; }

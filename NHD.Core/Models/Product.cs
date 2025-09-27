@@ -23,15 +23,13 @@ public partial class Product
 
     public string ImageUrl { get; set; }
 
-    public decimal Price { get; set; }
-
-    public DateTime CreatedAt { get; set; }
+    public decimal? FromPrice { get; set; }
 
     public bool? IsActive { get; set; }
 
-    public int DatesFillingId { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public virtual DatesGourmetFilling DatesFilling { get; set; }
+    public virtual ICollection<DatesProduct> DatesProducts { get; set; } = new List<DatesProduct>();
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 

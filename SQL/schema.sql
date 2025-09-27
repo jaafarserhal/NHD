@@ -79,42 +79,54 @@ CREATE TABLE dbo.product (
     prd_lookup_category_id INT NOT NULL,
     prd_lookup_type_id INT NOT NULL,
     prd_lookup_size_id INT NOT NULL,
-    dates_filling_id INT NOT NULL,
     name_en NVARCHAR(200) NOT NULL,
     name_sv NVARCHAR(200) NULL,
     description_en NVARCHAR(MAX) NULL,
     description_sv NVARCHAR(MAX) NULL,
     image_url NVARCHAR(500) NULL,
-    price DECIMAL(18,2) NOT NULL CHECK (price >= 0),
+    from_price DECIMAL(18,2) NULL,
     created_at DATETIME2 NOT NULL 
-        CONSTRAINT DF_product_created DEFAULT SYSUTCDATETIME(),
+        CONSTRAINT DF_date_product_created DEFAULT SYSUTCDATETIME(),
     is_active BIT NULL DEFAULT 1,
     CONSTRAINT FK_product_category FOREIGN KEY (prd_lookup_category_id)
         REFERENCES dbo.gen_lookup(lookup_id),
     CONSTRAINT FK_product_type FOREIGN KEY (prd_lookup_type_id)
         REFERENCES dbo.gen_lookup(lookup_id),
     CONSTRAINT FK_product_size FOREIGN KEY (prd_lookup_size_id)
-        REFERENCES dbo.gen_lookup(lookup_id),
-    CONSTRAINT FK_product_dates_filling FOREIGN KEY (dates_filling_id)
-        REFERENCES dbo.dates_gourmet_filling(dates_filling_id)
-        ON DELETE NO ACTION
-        ON UPDATE CASCADE
+        REFERENCES dbo.gen_lookup(lookup_id)
 );
 
 -- =============================================
--- Dates Gourmet Filling
+-- Dates
 -- =============================================
-CREATE TABLE dbo.dates_gourmet_filling (
-    dates_filling_id INT IDENTITY(1,1) PRIMARY KEY,
-    name_en NVARCHAR(200) NOT NULL,
-    name_sv NVARCHAR(200) NULL,
-    price DECIMAL(18,2) NOT NULL CHECK (price >= 0),
+CREATE TABLE dbo.[dates] (
+    date_id INT IDENTITY(1,1) PRIMARY KEY,
+    name_en NVARCHAR(100) NOT NULL,
+    name_sv NVARCHAR(100),
+    quality BIT NOT NULL DEFAULT 0,
+    price DECIMAL(10, 2),
     created_at DATETIME2 NOT NULL 
-        CONSTRAINT DF_dates_gourmet_filling_created DEFAULT SYSUTCDATETIME(),
-    is_active BIT NULL DEFAULT 1
+        CONSTRAINT DF_product_created DEFAULT SYSUTCDATETIME(),
+    is_active BIT NOT NULL DEFAULT 1
 );
 
 
+-- =============================================
+-- Dates Products
+-- =============================================
+CREATE TABLE dbo.dates_product (
+    dp_id INT IDENTITY(1,1) PRIMARY KEY,
+    prd_id INT NOT NULL,
+    date_id INT NOT NULL,
+    is_filled BIT NOT NULL DEFAULT 0,
+    created_at DATETIME2 NOT NULL 
+        CONSTRAINT DF_dates_product_created DEFAULT SYSUTCDATETIME(),
+    CONSTRAINT FK_dates_product_product FOREIGN KEY (prd_id)
+        REFERENCES dbo.product(prd_id) ON DELETE CASCADE,
+    CONSTRAINT FK_dates_product_dates FOREIGN KEY (date_id)
+        REFERENCES dbo.dates(date_id) ON DELETE CASCADE,
+    CONSTRAINT UQ_dates_product UNIQUE (prd_id, date_id)
+);
 
 -- =============================================
 -- CUSTOMER (with is_guest)
@@ -234,3 +246,4 @@ CREATE INDEX IX_orderitem_product ON dbo.order_item(prd_id);
 CREATE INDEX IX_payment_transaction_order ON dbo.payment_transaction(order_id);
 CREATE INDEX IX_customer_email ON dbo.customer(email_address);
 CREATE INDEX IX_user_email ON dbo.[user](email_address);
+CREATE INDEX IX_dates_product_prd_filled ON dbo.dates_product (prd_id, filled);

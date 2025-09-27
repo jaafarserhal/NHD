@@ -86,11 +86,7 @@ function Products() {
             label: 'Size'
         },
         {
-            key: 'datesFilling',
-            label: 'Gourmet Filling'
-        },
-        {
-            key: 'price',
+            key: 'fromPrice',
             label: 'Price'
         },
         {

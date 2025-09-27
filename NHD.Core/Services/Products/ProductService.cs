@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NHD.Core.Common.Models;
 using NHD.Core.Models;
-using NHD.Core.Repository.DatesFilling;
 using NHD.Core.Repository.Lookup;
 using NHD.Core.Repository.Products;
 using NHD.Core.Services.Model;
@@ -19,14 +18,12 @@ namespace NHD.Core.Services.Products
         private readonly IProductRepository _productRepository;
         private readonly ILookupRepository _lookupRepository;
 
-        private readonly IDatesFillingRepository _datesFillingRepository;
         private readonly ILogger<ProductService> _logger;
 
-        public ProductService(IProductRepository productRepository, ILookupRepository lookupRepository, IDatesFillingRepository datesFillingRepository, ILogger<ProductService> logger)
+        public ProductService(IProductRepository productRepository, ILookupRepository lookupRepository, ILogger<ProductService> logger)
         {
             _productRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));
             _lookupRepository = lookupRepository ?? throw new ArgumentNullException(nameof(lookupRepository));
-            _datesFillingRepository = datesFillingRepository ?? throw new ArgumentNullException(nameof(datesFillingRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -108,50 +105,6 @@ namespace NHD.Core.Services.Products
             return ServiceResult<bool>.Success(true);
         }
 
-        public async Task<ServiceResult<IEnumerable<LookupItemDto>>> GetDatesFillingAsync()
-        {
-            try
-            {
-                var datesFilling = await _datesFillingRepository.GetAllAsync();
-                var datesFillingDtos = datesFilling.Select(d => new LookupItemDto
-                {
-                    Id = d.DatesFillingId,
-                    NameEn = d.NameEn,
-                    NameSv = d.NameSv
-                });
-                return ServiceResult<IEnumerable<LookupItemDto>>.Success(datesFillingDtos);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving dates filling");
-                return ServiceResult<IEnumerable<LookupItemDto>>.Failure("An error occurred while retrieving dates filling");
-            }
-        }
-
-        public async Task<decimal> CalculatePriceByFillingIdAndSizeId(int datesFillingId, int sizeId)
-        {
-            try
-            {
-                var data = await _datesFillingRepository.GetByIdAsync(datesFillingId);
-
-                if (data == null)
-                    return 0;
-
-                decimal price = data.Price;
-                return sizeId switch
-                {
-                    (int)ProductSizeEnum.Pieces_8 => 8 * price,
-                    (int)ProductSizeEnum.Pieces_20 => 20 * price,
-                    (int)ProductSizeEnum.Pieces_35 => 35 * price,
-                    _ => 0
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error calculating price");
-                return 0;
-            }
-        }
         #endregion Products
 
         #region Lookups
@@ -228,14 +181,12 @@ namespace NHD.Core.Services.Products
                 DescriptionSv = product.DescriptionSv,
                 Category = product.PrdLookupCategory?.NameEn,
                 CategoryId = product.PrdLookupCategoryId,
-                DatesFilling = product.DatesFilling?.NameEn,
-                DatesFillingId = product.DatesFillingId,
                 TypeId = product.PrdLookupTypeId,
                 SizeId = product.PrdLookupSizeId,
                 Type = product.PrdLookupType?.NameEn,
                 Size = product.PrdLookupSize?.NameEn,
                 ImageUrl = product.ImageUrl ?? null,
-                Price = product.Price,
+                FromPrice = product.FromPrice ?? 0,
                 IsActive = product.IsActive ?? false,
                 CreatedAt = product.CreatedAt
             };
