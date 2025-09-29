@@ -10,11 +10,8 @@ public partial class AppDbContext : DbContext
     public AppDbContext()
     {
     }
-
-    public AppDbContext(DbContextOptions<AppDbContext> options)
-        : base(options)
-    {
-    }
+    public bool InMemoryDatabase { get; }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { InMemoryDatabase = options.Extensions.Any(item => item.GetType().Name == "InMemoryOptionsExtension"); }
 
     public virtual DbSet<Address> Addresses { get; set; }
 
@@ -159,6 +156,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.DateId).HasColumnName("date_id");
             entity.Property(e => e.IsFilled).HasColumnName("is_filled");
             entity.Property(e => e.PrdId).HasColumnName("prd_id");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
 
             entity.HasOne(d => d.Date).WithMany(p => p.DatesProducts)
                 .HasForeignKey(d => d.DateId)

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card, CardContent, Button, Box, CardHeader, Container, Divider, FormControlLabel, Grid, Switch, TextField } from "@mui/material";
-import { Product } from "../models/Types";
+import { Product, DatesProduct } from "../models/Types";
 import { useApiCall } from '../../api/hooks/useApi';
 import productService from '../../api/productService';
 import { Helmet } from "react-helmet-async";
@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 import { SetCategoryEnum, SetSizeEnum, SetTypeEnum } from "src/common/Enums";
+import DatesTable from "src/components/DataTable/Index";
 
 export default function AddProduct() {
 
@@ -29,6 +30,11 @@ export default function AddProduct() {
         []
     );
 
+    const { data: allDates, loading: allDatesLoading } = useApiCall(
+        () => productService.getAllDates(),
+        []
+    );
+
     const [form, setForm] = useState<Omit<Product, "id" | "imageUrl">>({
         categoryId: undefined,
         typeId: undefined,
@@ -39,6 +45,7 @@ export default function AddProduct() {
         descriptionSv: "",
         fromPrice: 0,
         isActive: true,
+        dates: []
     });
 
     const [image, setImage] = useState<File | null>(null);
@@ -69,13 +76,13 @@ export default function AddProduct() {
         }
     };
 
-
     const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm((prev) => ({
             ...prev,
             isActive: e.target.checked,
         }));
     };
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
 
@@ -125,6 +132,19 @@ export default function AddProduct() {
         if (errors.length > 0) {
             setErrors([]);
         }
+    };
+
+    // Handle date selection changes - convert number[] to DatesProduct[]
+    const handleDatesChange = (updatedDates: DatesProduct[]) => {
+        setForm((prev) => ({
+            ...prev,
+            dates: updatedDates,
+        }));
+    };
+
+    // Extract date IDs for the MultiSelector component
+    const getSelectedDateIds = (): number[] => {
+        return form.dates.map(dateProduct => dateProduct.dateId);
     };
 
     const validateForm = () => {
@@ -193,6 +213,7 @@ export default function AddProduct() {
                 descriptionSv: "",
                 fromPrice: 0,
                 isActive: true,
+                dates: []
             });
             setImage(null);
             setPreview(null);
@@ -402,7 +423,7 @@ export default function AddProduct() {
                                                         );
                                                     } else {
                                                         return (
-                                                            type.id != SetTypeEnum.PlainDate
+                                                            type.id
                                                         );
                                                     }
                                                 })
@@ -441,6 +462,22 @@ export default function AddProduct() {
                                             />
                                         </Box>
                                     )}
+                                </CardContent>
+                            </Card>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Box Availability Dates" />
+                                <Divider />
+                                <CardContent>
+                                    <DatesTable
+                                        dates={(allDates?.data) || []}
+                                        value={form.dates}
+                                        onChange={handleDatesChange}
+                                        loading={allDatesLoading}
+                                        productId={0} // or actual product ID if known
+                                    />
                                 </CardContent>
                             </Card>
                         </Grid>

@@ -119,6 +119,7 @@ CREATE TABLE dbo.dates_product (
     prd_id INT NOT NULL,
     date_id INT NOT NULL,
     is_filled BIT NOT NULL DEFAULT 0,
+	quantity INT NOT NULL,
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_dates_product_created DEFAULT SYSUTCDATETIME(),
     CONSTRAINT FK_dates_product_product FOREIGN KEY (prd_id)

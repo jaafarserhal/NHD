@@ -1,3 +1,4 @@
+import { all } from "axios";
 
 
 export const apiUrls = {
@@ -10,6 +11,7 @@ export const apiUrls = {
     types: '/Types',
     sizes: '/Sizes',
     dates: '/Dates',
+    allDates: '/AllDates',
     addDate: '/Add',
     updateDate: '/Update',
     getDateById: '/GetById/',

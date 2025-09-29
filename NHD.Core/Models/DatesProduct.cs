@@ -15,6 +15,8 @@ public partial class DatesProduct
 
     public DateTime CreatedAt { get; set; }
 
+    public int? Quantity { get; set; }
+
     public virtual Date Date { get; set; }
 
     public virtual Product Prd { get; set; }

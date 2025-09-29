@@ -24,6 +24,17 @@ class productService extends apiService {
         formData.append('DescriptionSv', product.descriptionSv || '');
         formData.append('IsActive', String(product.isActive));
 
+        // Handle dates array properly
+        if (product.dates && product.dates.length > 0) {
+            product.dates.forEach((date, index) => {
+                formData.append(`Dates[${index}].Id`, String(date.id || 0));
+                formData.append(`Dates[${index}].PrdId`, String(date.prdId || 0));
+                formData.append(`Dates[${index}].DateId`, String(date.dateId));
+                formData.append(`Dates[${index}].IsFilled`, String(date.isFilled));
+                formData.append(`Dates[${index}].Quantity`, String(date.quantity));
+            });
+        }
+
         if (product.imageFile && product.imageFile instanceof File) {
             formData.append('ImageUrl', product.imageFile, product.imageFile.name);
         }
@@ -71,6 +82,9 @@ class productService extends apiService {
     // Get product sizes
     async getSizes() {
         return this.get(apiUrls.sizes);
+    }
+    async getAllDates() {
+        return this.get(apiUrls.allDates);
     }
 }
 

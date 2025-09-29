@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using NHD.Core.Common.Models;
 using NHD.Core.Models;
 using NHD.Core.Services.Model;
+using NHD.Core.Services.Model.Dates;
 using NHD.Core.Services.Model.Products;
 using NHD.Core.Services.Products;
 
@@ -108,13 +109,29 @@ namespace NHD.Web.Api.Controllers
                     ImageUrl = fileName
                 };
 
-                var created = await _productService.AddProductAsync(product);
+                // Use the transactional method instead of separate calls
+                var created = await _productService.SaveProductWithDatesAsync(product, dto.Dates);
+
                 return CreatedAtAction("GetProducts", new { id = created.PrdId });
             }
             catch (System.Exception ex)
             {
-                // TODO: Handle exception   
                 _logger.LogError(ex, "Error adding product");
+
+                // Clean up uploaded file if database operation failed
+                try
+                {
+                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
+                    var folderPath = Path.Combine("wwwroot/uploads", "products");
+                    var filePath = Path.Combine(folderPath, fileName);
+                    if (System.IO.File.Exists(filePath))
+                        System.IO.File.Delete(filePath);
+                }
+                catch (Exception cleanupEx)
+                {
+                    _logger.LogWarning(cleanupEx, "Failed to clean up uploaded file after database error");
+                }
+
                 return StatusCode(500, "An error occurred while adding the product.");
             }
         }
@@ -196,6 +213,16 @@ namespace NHD.Web.Api.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpGet]
+        [Route("AllDates")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<DateViewModel>>>> GetAllDates()
+        {
+            var data = await _productService.GetAllDatesAsync();
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
         }
         #endregion Products
 

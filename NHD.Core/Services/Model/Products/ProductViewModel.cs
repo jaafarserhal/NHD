@@ -20,6 +20,8 @@ namespace NHD.Core.Services.Model.Products
         public int SizeId { get; set; }
         public string ImageUrl { get; set; }
         public decimal FromPrice { get; set; }
+
+        public List<DatesProductBindingModel> Dates { get; set; } = new List<DatesProductBindingModel>();
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
     }

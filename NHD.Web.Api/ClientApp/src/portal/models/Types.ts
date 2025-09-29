@@ -10,6 +10,7 @@ export interface Product {
     sizeId: number;
     imageUrl: string;
     isActive: boolean;
+    dates: DatesProduct[];
 }
 
 export interface Date {
@@ -19,6 +20,14 @@ export interface Date {
     quality: boolean;
     price: number;
     isActive: boolean;
+}
+
+export interface DatesProduct {
+    id?: number;
+    prdId: number;
+    dateId: number;
+    quantity: number;
+    isFilled: boolean;
 }
 
 export interface LookupItem {

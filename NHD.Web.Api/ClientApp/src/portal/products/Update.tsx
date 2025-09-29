@@ -41,7 +41,8 @@ export default function UpdateProduct() {
         descriptionSv: "",
         fromPrice: 0,
         isActive: true,
-        imageUrl: ""
+        imageUrl: "",
+        dates: []
     });
 
     const [image, setImage] = useState<File | null>(null);
@@ -75,7 +76,8 @@ export default function UpdateProduct() {
                 descriptionSv: product.descriptionSv || "",
                 fromPrice: product.fromPrice || 0,
                 isActive: product.isActive,
-                imageUrl: product.imageUrl || ""
+                imageUrl: product.imageUrl || "",
+                dates: product.dates || []
             });
 
             // Set preview to existing image if available
@@ -466,7 +468,7 @@ export default function UpdateProduct() {
                                                         );
                                                     } else {
                                                         return (
-                                                            type.id != SetTypeEnum.PlainDate
+                                                            type.id
                                                         );
                                                     }
                                                 })
