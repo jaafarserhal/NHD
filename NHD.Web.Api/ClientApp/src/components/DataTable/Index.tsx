@@ -11,6 +11,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Date as DateType, DatesProduct } from "../../portal/models/Types";
+import { SetTypeEnum } from "src/common/Enums";
 
 interface DatesTableProps {
   dates: DateType[]; // from API
@@ -18,7 +19,9 @@ interface DatesTableProps {
   onChange: (updated: DatesProduct[]) => void;
   loading?: boolean;
   productId?: number;
+  typeId: number;
 }
+
 
 export default function DatesTable({
   dates,
@@ -26,11 +29,21 @@ export default function DatesTable({
   onChange,
   loading = false,
   productId,
+  typeId,
 }: DatesTableProps) {
   const [rows, setRows] = useState<DatesProduct[]>([]);
 
-  // ✅ Build initial state based on available dates + existing values
+  // Determine checkbox visibility and default value based on typeId
+  const shouldShowCheckbox = typeId === SetTypeEnum.AssortedDate;
+  const getDefaultIsFilled = () => {
+    if (typeId === SetTypeEnum.PlainDate) return false;
+    if (typeId === SetTypeEnum.FilledDate) return true;
+    return false; // Default for AssortedDate
+  };
+
+
   useEffect(() => {
+    const defaultIsFilled = getDefaultIsFilled();
     const initial: DatesProduct[] = dates.map((d) => {
       const existing = value.find((v) => v.dateId === d.id);
       return (
@@ -38,12 +51,12 @@ export default function DatesTable({
           prdId: productId || 0,
           dateId: d.id as number,
           quantity: 0,
-          isFilled: false,
+          isFilled: defaultIsFilled,
         }
       );
     });
     setRows(initial);
-  }, [dates, value, productId]);
+  }, [dates, value, productId, typeId]);
 
   const updateRow = (
     index: number,
@@ -75,7 +88,7 @@ export default function DatesTable({
         <TableRow>
           <TableCell>Date Type</TableCell>
           <TableCell>Quantity</TableCell>
-          <TableCell>Filled</TableCell>
+          {shouldShowCheckbox && <TableCell>Filled</TableCell>}
         </TableRow>
       </TableHead>
       <TableBody>
@@ -88,25 +101,37 @@ export default function DatesTable({
                 <TextField
                   type="number"
                   variant="standard"
-                  value={row.quantity || ""}
-                  onChange={(e) =>
-                    updateRow(
-                      index,
-                      "quantity",
-                      parseInt(e.target.value, 10) || 0
-                    )
-                  }
-                  inputProps={{ min: 0 }}
+                  value={row.quantity}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10);
+                    updateRow(index, "quantity", isNaN(val) ? 0 : val);
+                  }}
+                  sx={{
+                    '& input[type=number]': {
+                      '-moz-appearance': 'textfield',
+                    },
+                    '& input[type=number]::-webkit-outer-spin-button': {
+                      '-webkit-appearance': 'none',
+                      margin: 0,
+                    },
+                    '& input[type=number]::-webkit-inner-spin-button': {
+                      '-webkit-appearance': 'none',
+                      margin: 0,
+                    },
+                  }}
                 />
               </TableCell>
-              <TableCell>
-                <Checkbox
-                  checked={row.isFilled}
-                  onChange={(e) =>
-                    updateRow(index, "isFilled", e.target.checked)
-                  }
-                />
-              </TableCell>
+              {shouldShowCheckbox && (
+                <TableCell>
+                  <Checkbox
+                    checked={row.isFilled}
+                    disabled={row.quantity === 0}
+                    onChange={(e) =>
+                      updateRow(index, "isFilled", e.target.checked)
+                    }
+                  />
+                </TableCell>
+              )}
             </TableRow>
           );
         })}

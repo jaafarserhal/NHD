@@ -58,17 +58,43 @@ export default function AddProduct() {
         const { name, value, type } = e.target;
         const checked = (e.target as HTMLInputElement).checked;
 
-        setForm((prev) => ({
-            ...prev,
-            [name]:
-                type === "checkbox"
-                    ? checked
-                    : name === "fromPrice"
-                        ? (value === "" ? 0 : parseFloat(value)) // ✅ convert to number
-                        : name.toLowerCase().includes("id")
-                            ? (value === "" ? undefined : Number(value))
-                            : value,
-        }));
+        setForm((prev) => {
+            const updatedForm = {
+                ...prev,
+                [name]:
+                    type === "checkbox"
+                        ? checked
+                        : name === "fromPrice"
+                            ? (value === "" ? 0 : parseFloat(value))
+                            : name.toLowerCase().includes("id")
+                                ? (value === "" ? undefined : Number(value))
+                                : value,
+            };
+
+            // When typeId changes, update isFilled values in dates based on new type
+            if (name === "typeId" && value !== "") {
+                const newTypeId = Number(value);
+
+                // Determine the new isFilled value based on typeId
+                let newIsFilled = false;
+                if (newTypeId === SetTypeEnum.PlainDate) {
+                    newIsFilled = false;
+                } else if (newTypeId === SetTypeEnum.FilledDate) {
+                    newIsFilled = true;
+                } else if (newTypeId === SetTypeEnum.AssortedDate) {
+                    newIsFilled = false;
+                }
+
+                // Update all dates with new isFilled values
+                updatedForm.dates = prev.dates.map(date => ({
+                    ...date,
+                    isFilled: newIsFilled,
+                    quantity: 0
+                }));
+            }
+
+            return updatedForm;
+        });
 
         // Clear errors when user starts typing/selecting
         if (errors.length > 0) {
@@ -320,29 +346,6 @@ export default function AddProduct() {
                                                 onChange={(content) => handleEditorChange('descriptionSv', content)}
                                             />
                                         </Box>
-                                        <TextField
-                                            name="fromPrice"
-                                            label="From Price"
-                                            type="number"
-                                            value={form.fromPrice || ''}
-                                            onChange={handleChange}
-                                            variant="standard"
-                                            inputProps={{ min: 0, step: 0.01 }}
-                                            fullWidth
-                                            sx={{
-                                                '& input[type=number]': {
-                                                    '-moz-appearance': 'textfield',
-                                                },
-                                                '& input[type=number]::-webkit-outer-spin-button': {
-                                                    '-webkit-appearance': 'none',
-                                                    margin: 0,
-                                                },
-                                                '& input[type=number]::-webkit-inner-spin-button': {
-                                                    '-webkit-appearance': 'none',
-                                                    margin: 0,
-                                                },
-                                            }}
-                                        />
                                     </Box>
                                 </CardContent>
                             </Card>
@@ -437,6 +440,48 @@ export default function AddProduct() {
                                 </CardContent>
                             </Card>
                         </Grid>
+                        {form.typeId && (<Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Price" />
+                                <Divider />
+                                <CardContent>
+                                    {form.categoryId !== SetCategoryEnum.DateSweetners && (
+                                        <DatesTable
+                                            dates={(allDates?.data) || []}
+                                            value={form.dates}
+                                            onChange={handleDatesChange}
+                                            loading={allDatesLoading}
+                                            productId={0}
+                                            typeId={form.typeId}
+                                        />)}
+                                    <TextField
+                                        name="fromPrice"
+                                        label="Total Price"
+                                        type="number"
+                                        value={form.fromPrice || ''}
+                                        onChange={handleChange}
+                                        InputProps={{
+                                            readOnly: form.categoryId !== SetCategoryEnum.DateSweetners,
+                                        }}
+                                        variant="standard"
+                                        fullWidth
+                                        sx={{
+                                            '& input[type=number]': {
+                                                '-moz-appearance': 'textfield',
+                                            },
+                                            '& input[type=number]::-webkit-outer-spin-button': {
+                                                '-webkit-appearance': 'none',
+                                                margin: 0,
+                                            },
+                                            '& input[type=number]::-webkit-inner-spin-button': {
+                                                '-webkit-appearance': 'none',
+                                                margin: 0,
+                                            },
+                                        }}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </Grid>)}
 
                         <Grid item xs={12}>
                             <Card>
@@ -462,22 +507,6 @@ export default function AddProduct() {
                                             />
                                         </Box>
                                     )}
-                                </CardContent>
-                            </Card>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <Card>
-                                <CardHeader title="Box Availability Dates" />
-                                <Divider />
-                                <CardContent>
-                                    <DatesTable
-                                        dates={(allDates?.data) || []}
-                                        value={form.dates}
-                                        onChange={handleDatesChange}
-                                        loading={allDatesLoading}
-                                        productId={0} // or actual product ID if known
-                                    />
                                 </CardContent>
                             </Card>
                         </Grid>

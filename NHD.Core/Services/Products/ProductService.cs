@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using NHD.Core.Common.Models;
@@ -222,11 +223,22 @@ namespace NHD.Core.Services.Products
 
             try
             {
-                // 1️⃣ Add product
-                await context.Products.AddAsync(product);
-                await SaveChangesAsync(); // Need this to get product.PrdId
+                bool isNewProduct = product.PrdId == 0;
 
-                // 2️⃣ Add dates if provided
+                if (isNewProduct)
+                {
+                    // Add new product
+                    await context.Products.AddAsync(product);
+                    await SaveChangesAsync(); // Need this to get product.PrdId
+                }
+                else
+                {
+                    // Update existing product
+                    context.Products.Update(product);
+                    await SaveChangesAsync();
+                }
+
+                // Add/Update dates if provided
                 if (datesProducts != null && datesProducts.Any())
                 {
                     foreach (var dp in datesProducts)
@@ -235,17 +247,16 @@ namespace NHD.Core.Services.Products
                     }
 
                     await SaveDatesProductsAsync(datesProducts);
-                    // Save changes for dates within the transaction
-                    await SaveChangesAsync();
                 }
 
                 await CommitTransactionAsync();
                 return product;
             }
-            catch
+            catch (Exception ex)
             {
                 await RollbackTransactionAsync();
-                throw;
+                _logger.LogError(ex, "Error saving product with dates");
+                return null;
             }
         }
 

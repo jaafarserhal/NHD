@@ -56,12 +56,24 @@ class productService extends apiService {
         formData.append('DescriptionSv', product.descriptionSv || '');
         formData.append('IsActive', String(product.isActive));
 
+        // ✅ Add proper handling for dates array (same as addProduct)
+        if (product.dates && product.dates.length > 0) {
+            product.dates.forEach((date, index) => {
+                formData.append(`Dates[${index}].Id`, String(date.id || 0));
+                formData.append(`Dates[${index}].PrdId`, String(date.prdId));
+                formData.append(`Dates[${index}].DateId`, String(date.dateId));
+                formData.append(`Dates[${index}].IsFilled`, String(date.isFilled || false));
+                formData.append(`Dates[${index}].Quantity`, String(date.quantity || 0));
+            });
+        }
+
         if (product.imageFile && product.imageFile instanceof File) {
             formData.append('ImageUrl', product.imageFile, product.imageFile.name);
         }
 
         return this.put(formData, apiUrls.updateProduct);
     }
+
 
     async getProductById(productId) {
         return this.get(`${apiUrls.getProductById}${productId}`);

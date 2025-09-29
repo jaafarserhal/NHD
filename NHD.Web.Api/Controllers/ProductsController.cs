@@ -141,67 +141,113 @@ namespace NHD.Web.Api.Controllers
         [Route("Update")]
         public async Task<IActionResult> UpdateProduct([FromForm] ProductBindingModel dto)
         {
-            if (dto == null || dto.Id <= 0)
+            try
             {
-                return BadRequest("Valid product data is required.");
-            }
-
-            var existingProduct = await _productService.GetProductAsync(dto.Id);
-            if (existingProduct == null)
-            {
-                return NotFound("Product not found.");
-            }
-
-            // Handle new image upload if provided
-            if (dto.ImageUrl != null && dto.ImageUrl.Length > 0)
-            {
-                // Optional: delete old image file
-                var imagePath = existingProduct.ImageUrl;
-                if (!string.IsNullOrEmpty(imagePath))
+                if (dto == null || dto.Id <= 0)
                 {
-                    var oldImagePath = Path.Combine("wwwroot/uploads/products", imagePath);
-                    if (System.IO.File.Exists(oldImagePath))
+                    return BadRequest("Valid product data is required.");
+                }
+
+                var existingProduct = await _productService.GetProductAsync(dto.Id);
+                if (existingProduct == null)
+                {
+                    return NotFound("Product not found.");
+                }
+
+                string oldImagePath = existingProduct.ImageUrl;
+
+                // Handle new image upload if provided
+                if (dto.ImageUrl != null && dto.ImageUrl.Length > 0)
+                {
+                    // Create unique file name
+                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
+                    var folderPath = Path.Combine("wwwroot/uploads", "products");
+
+                    if (!Directory.Exists(folderPath))
+                        Directory.CreateDirectory(folderPath);
+
+                    var filePath = Path.Combine(folderPath, fileName);
+
+                    // Save the uploaded file
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        System.IO.File.Delete(oldImagePath);
+                        await dto.ImageUrl.CopyToAsync(stream);
+                    }
+
+                    existingProduct.ImageUrl = fileName;
+                }
+
+                // Update product properties
+                existingProduct.PrdLookupCategoryId = dto.CategoryId;
+                existingProduct.PrdLookupTypeId = dto.TypeId;
+                existingProduct.PrdLookupSizeId = dto.SizeId;
+                existingProduct.NameEn = dto.NameEn;
+                existingProduct.NameSv = dto.NameSv;
+                existingProduct.DescriptionEn = dto.DescriptionEn;
+                existingProduct.DescriptionSv = dto.DescriptionSv;
+                existingProduct.FromPrice = dto.FromPrice;
+                existingProduct.IsActive = dto.IsActive;
+                existingProduct.CreatedAt = DateTime.UtcNow;
+
+                // Use the transactional method to update product and dates
+                var updated = await _productService.SaveProductWithDatesAsync(existingProduct, dto.Dates);
+
+                // Delete old image file only after successful database update
+                if (dto.ImageUrl != null && dto.ImageUrl.Length > 0 && !string.IsNullOrEmpty(oldImagePath))
+                {
+                    var oldFilePath = Path.Combine("wwwroot/uploads/products", oldImagePath);
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Failed to delete old image file: {FilePath}", oldFilePath);
+                            // Continue execution - this is not critical
+                        }
                     }
                 }
 
-                // Save new image
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
-                var folderPath = Path.Combine("wwwroot/uploads", "products");
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
+                return Ok(updated.PrdId);
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex, "Error updating product");
 
-                var filePath = Path.Combine(folderPath, fileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                // Clean up newly uploaded file if database operation failed
+                if (dto.ImageUrl != null && dto.ImageUrl.Length > 0)
                 {
-                    await dto.ImageUrl.CopyToAsync(stream);
+                    try
+                    {
+                        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
+                        var folderPath = Path.Combine("wwwroot/uploads", "products");
+                        var filePath = Path.Combine(folderPath, fileName);
+                        if (System.IO.File.Exists(filePath))
+                            System.IO.File.Delete(filePath);
+                    }
+                    catch (Exception cleanupEx)
+                    {
+                        _logger.LogWarning(cleanupEx, "Failed to clean up uploaded file after database error");
+                    }
                 }
 
-                existingProduct.ImageUrl = fileName;
+                return StatusCode(500, "An error occurred while updating the product.");
             }
-
-            // Update product properties
-            existingProduct.PrdLookupCategoryId = dto.CategoryId;
-            existingProduct.PrdLookupTypeId = dto.TypeId;
-            existingProduct.PrdLookupSizeId = dto.SizeId;
-            existingProduct.NameEn = dto.NameEn;
-            existingProduct.NameSv = dto.NameSv;
-            existingProduct.DescriptionEn = dto.DescriptionEn;
-            existingProduct.DescriptionSv = dto.DescriptionSv;
-            existingProduct.FromPrice = dto.FromPrice;
-            existingProduct.IsActive = dto.IsActive;
-            existingProduct.CreatedAt = DateTime.UtcNow;
-
-            // Save changes
-            var updatedProduct = await _productService.UpdateProductAsync(existingProduct);
-
-            return Ok(updatedProduct.PrdId);
         }
 
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
+            // First, try to get the product so we know the image name
+            var product = await _productService.GetProductAsync(id);
+            if (product == null)
+            {
+                return NotFound(new { message = "Product not found." });
+            }
+
+            // Attempt to delete from DB
             var result = await _productService.DeleteProductAsync(id);
 
             if (!result.IsSuccess)
@@ -212,8 +258,28 @@ namespace NHD.Web.Api.Controllers
                 return BadRequest(new { message = result.ErrorMessage, validationErrors = result.ValidationErrors });
             }
 
+            // ✅ Delete image file if it exists
+            try
+            {
+                if (!string.IsNullOrEmpty(product.ImageUrl))
+                {
+                    var imagePath = Path.Combine("wwwroot/uploads/products", product.ImageUrl);
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
+                        _logger.LogInformation("Deleted image: {ImagePath}", imagePath);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to delete product image for product ID {Id}", id);
+                // We won't fail the API here because the DB deletion already succeeded
+            }
+
             return NoContent();
         }
+
 
         [HttpGet]
         [Route("AllDates")]

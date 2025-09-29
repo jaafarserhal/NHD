@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, Button, Box, CardHeader, Container, Divider, FormControlLabel, Grid, Switch, TextField, Backdrop, CircularProgress } from "@mui/material";
-import { Product } from "../models/Types";
+import { Product, DatesProduct } from "../models/Types";
 import { useApiCall } from '../../api/hooks/useApi';
 import productService from '../../api/productService';
 import { Helmet } from "react-helmet-async";
@@ -12,6 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 import { SetCategoryEnum, SetSizeEnum, SetTypeEnum } from "src/common/Enums";
+import DatesTable from "src/components/DataTable/Index";
 
 export default function UpdateProduct() {
     const navigate = useNavigate();
@@ -27,6 +28,11 @@ export default function UpdateProduct() {
     );
     const { data: sizes, loading: sizesLoading } = useApiCall(
         () => productService.getSizes(),
+        []
+    );
+
+    const { data: allDates, loading: allDatesLoading } = useApiCall(
+        () => productService.getAllDates(),
         []
     );
 
@@ -103,15 +109,43 @@ export default function UpdateProduct() {
         const { name, value, type } = e.target;
         const checked = (e.target as HTMLInputElement).checked;
 
-        setForm((prev) => ({
-            ...prev,
-            [name]:
-                type === "checkbox"
-                    ? checked
-                    : name.toLowerCase().includes("id")
-                        ? (value === "" ? undefined : Number(value))
-                        : value,
-        }));
+        setForm((prev) => {
+            const updatedForm = {
+                ...prev,
+                [name]:
+                    type === "checkbox"
+                        ? checked
+                        : name === "fromPrice"
+                            ? (value === "" ? 0 : parseFloat(value))
+                            : name.toLowerCase().includes("id")
+                                ? (value === "" ? undefined : Number(value))
+                                : value,
+            };
+
+            // When typeId changes, update isFilled values in dates based on new type
+            if (name === "typeId" && value !== "") {
+                const newTypeId = Number(value);
+
+                // Determine the new isFilled value based on typeId
+                let newIsFilled = false;
+                if (newTypeId === SetTypeEnum.PlainDate) {
+                    newIsFilled = false;
+                } else if (newTypeId === SetTypeEnum.FilledDate) {
+                    newIsFilled = true;
+                } else if (newTypeId === SetTypeEnum.AssortedDate) {
+                    newIsFilled = false;
+                }
+
+                // Update all dates with new isFilled values
+                updatedForm.dates = prev.dates.map(date => ({
+                    ...date,
+                    isFilled: newIsFilled,
+                    quantity: 0
+                }));
+            }
+
+            return updatedForm;
+        });
 
         // Clear errors when user starts typing/selecting
         if (errors.length > 0) {
@@ -177,6 +211,14 @@ export default function UpdateProduct() {
         }
     };
 
+    // Handle date selection changes
+    const handleDatesChange = (updatedDates: DatesProduct[]) => {
+        setForm((prev) => ({
+            ...prev,
+            dates: updatedDates,
+        }));
+    };
+
     const validateForm = () => {
         const validationErrors: string[] = [];
 
@@ -234,6 +276,7 @@ export default function UpdateProduct() {
                 descriptionSv: form.descriptionSv,
                 fromPrice: form.fromPrice,
                 isActive: form.isActive,
+                dates: form.dates,
                 imageFile: image // Only include if a new image was selected
             };
 
@@ -245,7 +288,7 @@ export default function UpdateProduct() {
             await loadProduct();
 
             // Navigate back to products list after successful update
-            // navigate('/products');
+            // navigate('/boxes');
         } catch (error: any) {
             console.error(error);
             setErrors([error.message || 'Failed to update Box']);
@@ -367,29 +410,6 @@ export default function UpdateProduct() {
                                                 onChange={(content) => handleEditorChange('descriptionSv', content)}
                                             />
                                         </Box>
-                                        <TextField
-                                            name="fromPrice"
-                                            label="From Price"
-                                            type="number"
-                                            value={form.fromPrice}
-                                            onChange={handleChange}
-                                            variant="standard"
-                                            fullWidth
-                                            inputProps={{ min: 0, step: "0.01" }}
-                                            sx={{
-                                                '& input[type=number]': {
-                                                    '-moz-appearance': 'textfield',
-                                                },
-                                                '& input[type=number]::-webkit-outer-spin-button': {
-                                                    '-webkit-appearance': 'none',
-                                                    margin: 0,
-                                                },
-                                                '& input[type=number]::-webkit-inner-spin-button': {
-                                                    '-webkit-appearance': 'none',
-                                                    margin: 0,
-                                                },
-                                            }}
-                                        />
                                     </Box>
                                 </CardContent>
                             </Card>
@@ -418,6 +438,7 @@ export default function UpdateProduct() {
                                                 </option>
                                             ))}
                                         </TextField>
+
                                         <TextField
                                             required
                                             name="sizeId"
@@ -449,6 +470,7 @@ export default function UpdateProduct() {
                                                     </option>
                                                 ))}
                                         </TextField>
+
                                         <TextField
                                             required
                                             name="typeId"
@@ -488,22 +510,20 @@ export default function UpdateProduct() {
                                 <CardHeader title="Image Upload" />
                                 <Divider />
                                 <CardContent>
-                                    <Box sx={{ mb: 2 }}>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleFileChange}
-                                            style={{ marginBottom: '1rem' }}
-                                            required
-                                        />
-                                        {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
-                                            * Image is required (max size: 1MB)
-                                        </Box>}
-                                    </Box>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        style={{ marginBottom: '1rem' }}
+                                        required
+                                    />
+                                    {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
+                                        * Image is required (max size: 1MB)
+                                    </Box>}
                                     {preview && (
                                         <Box sx={{ mt: 2 }}>
                                             <img
-                                                src={'/uploads/products/' + preview}
+                                                src={preview.startsWith('blob:') ? preview : '/uploads/products/' + preview}
                                                 alt="Preview"
                                                 style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
                                             />
@@ -512,6 +532,48 @@ export default function UpdateProduct() {
                                 </CardContent>
                             </Card>
                         </Grid>
+                        {form.typeId && (<Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Price" />
+                                <Divider />
+                                <CardContent>
+                                    {form.categoryId !== SetCategoryEnum.DateSweetners && (
+                                        <DatesTable
+                                            dates={(allDates?.data) || []}
+                                            value={form.dates}
+                                            onChange={handleDatesChange}
+                                            loading={allDatesLoading}
+                                            productId={0}
+                                            typeId={form.typeId}
+                                        />)}
+                                    <TextField
+                                        name="fromPrice"
+                                        label="Total Price"
+                                        type="number"
+                                        value={form.fromPrice || ''}
+                                        onChange={handleChange}
+                                        InputProps={{
+                                            readOnly: form.categoryId !== SetCategoryEnum.DateSweetners,
+                                        }}
+                                        variant="standard"
+                                        fullWidth
+                                        sx={{
+                                            '& input[type=number]': {
+                                                '-moz-appearance': 'textfield',
+                                            },
+                                            '& input[type=number]::-webkit-outer-spin-button': {
+                                                '-webkit-appearance': 'none',
+                                                margin: 0,
+                                            },
+                                            '& input[type=number]::-webkit-inner-spin-button': {
+                                                '-webkit-appearance': 'none',
+                                                margin: 0,
+                                            },
+                                        }}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </Grid>)}
 
                         <Grid item xs={12}>
                             <Card>
@@ -546,7 +608,7 @@ export default function UpdateProduct() {
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => navigate('/dates-set')}
+                            onClick={() => navigate('/boxes')}
                             size="large"
                             sx={{ ml: 2 }}
                         >
