@@ -7,7 +7,6 @@ import Footer from "src/components/Footer";
 import PageTitle from "src/components/PageTitle";
 import PageTitleWrapper from "src/components/PageTitleWrapper";
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 
 export default function AddDate() {
@@ -19,7 +18,7 @@ export default function AddDate() {
         nameEn: "",
         nameSv: "",
         quality: false,
-        price: 0,
+        price: undefined,
         isActive: true,
     });
 
@@ -77,10 +76,7 @@ export default function AddDate() {
             validationErrors.push("Swedish name is required");
         }
         if (form.price === undefined || form.price < 0) {
-            validationErrors.push("Price must be a positive number");
-        }
-        if (form.quality === undefined) {
-            validationErrors.push("Quality selection is required");
+            validationErrors.push("Valid price is required");
         }
 
         setErrors(validationErrors);
@@ -118,14 +114,14 @@ export default function AddDate() {
             };
             await dateService.addDate(dateData);
 
-            notifySuccess();
+            navigate('/dates');
 
             // Reset form
             setForm({
                 nameEn: "",
                 nameSv: "",
                 quality: false,
-                price: 0,
+                price: undefined,
                 isActive: true,
             });
 
@@ -137,19 +133,6 @@ export default function AddDate() {
         }
     };
 
-    const label = { inputProps: { 'aria-label': 'Switch demo' } };
-    const notifySuccess = () => {
-        toast.success('Date added successfully!', {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-        });
-    };
 
     return (
         <>
@@ -223,8 +206,8 @@ export default function AddDate() {
                                             value={form.price || ''}
                                             onChange={handleChange}
                                             variant="standard"
-                                            inputProps={{ min: 0, step: 0.01 }}
                                             fullWidth
+                                            required
                                             sx={{
                                                 '& input[type=number]': {
                                                     '-moz-appearance': 'textfield',

@@ -11,8 +11,9 @@ import Editor from "src/components/Editor/Index";
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
-import { SetCategoryEnum, SetSizeEnum, SetTypeEnum } from "src/common/Enums";
+import { BoxCategoryEnum, BoxSizeEnum, BoxTypeEnum } from "src/common/Enums";
 import DatesTable from "src/components/DataTable/Index";
+import ConfirmDialog from "src/components/ConfirmDialog/Index";
 
 export default function UpdateProduct() {
     const navigate = useNavigate();
@@ -35,6 +36,35 @@ export default function UpdateProduct() {
         () => productService.getAllDates(),
         []
     );
+
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [pendingCategoryChange, setPendingCategoryChange] = useState<number | undefined>(undefined);
+
+
+    const handleConfirmChange = async () => {
+        setConfirmOpen(false);
+
+        if (pendingCategoryChange !== undefined) {
+            // Apply the category change
+            setForm((prev) => ({
+                ...prev,
+                categoryId: pendingCategoryChange,
+                sizeId: undefined,
+                typeId: undefined,
+                dates: [], // Clear all dates
+                fromPrice: 0 // Reset price
+            }));
+
+            setPendingCategoryChange(undefined);
+        }
+    };
+
+    const handleCancelChange = () => {
+        setConfirmOpen(false);
+        setPendingCategoryChange(undefined);
+        // Category change is cancelled, no action needed
+    };
 
     const [form, setForm] = useState<Product>({
         id: 0,
@@ -109,6 +139,14 @@ export default function UpdateProduct() {
         const { name, value, type } = e.target;
         const checked = (e.target as HTMLInputElement).checked;
 
+        // Special handling for category change to DateSweetners
+        if (name === "categoryId" && value !== "" && Number(value) === BoxCategoryEnum.DateSweetners) {
+            // Store the pending change and open confirmation dialog
+            setPendingCategoryChange(Number(value));
+            setConfirmOpen(true);
+            return;
+        }
+
         setForm((prev) => {
             const updatedForm = {
                 ...prev,
@@ -122,17 +160,22 @@ export default function UpdateProduct() {
                                 : value,
             };
 
+            if (name === "categoryId") {
+                updatedForm.sizeId = undefined;
+                updatedForm.typeId = undefined;
+            }
+
             // When typeId changes, update isFilled values in dates based on new type
             if (name === "typeId" && value !== "") {
                 const newTypeId = Number(value);
 
                 // Determine the new isFilled value based on typeId
                 let newIsFilled = false;
-                if (newTypeId === SetTypeEnum.PlainDate) {
+                if (newTypeId === BoxTypeEnum.PlainDate) {
                     newIsFilled = false;
-                } else if (newTypeId === SetTypeEnum.FilledDate) {
+                } else if (newTypeId === BoxTypeEnum.FilledDate) {
                     newIsFilled = true;
-                } else if (newTypeId === SetTypeEnum.AssortedDate) {
+                } else if (newTypeId === BoxTypeEnum.AssortedDate) {
                     newIsFilled = false;
                 }
 
@@ -282,13 +325,11 @@ export default function UpdateProduct() {
 
             await productService.updateProduct(productData);
 
-            notifySuccess();
 
-            // Fetch updated product data after successful update
-            await loadProduct();
+            await loadProduct().then(() => {
+                notifySuccess();
+            });
 
-            // Navigate back to products list after successful update
-            // navigate('/boxes');
         } catch (error: any) {
             console.error(error);
             setErrors([error.message || 'Failed to update Box']);
@@ -309,6 +350,15 @@ export default function UpdateProduct() {
             theme: "colored",
         });
     };
+
+    useEffect(() => {
+        if (form.categoryId !== BoxCategoryEnum.DateSweetners) {
+            setForm((prev) => ({
+                ...prev,
+                fromPrice: totalPrice
+            }));
+        }
+    }, [totalPrice, form.categoryId]);
 
     if (loadingProduct) {
         return (
@@ -452,15 +502,15 @@ export default function UpdateProduct() {
                                             <option value="">Select Size</option>
                                             {sizes?.data
                                                 ?.filter(size => {
-                                                    if (form.categoryId === SetCategoryEnum.DateSweetners) {
+                                                    if (form.categoryId === BoxCategoryEnum.DateSweetners) {
                                                         return (
-                                                            size.id === SetSizeEnum.Milliliters400 ||
-                                                            size.id === SetSizeEnum.Grams450
+                                                            size.id === BoxSizeEnum.Milliliters400 ||
+                                                            size.id === BoxSizeEnum.Grams450
                                                         );
                                                     } else {
                                                         return (
-                                                            size.id != SetSizeEnum.Milliliters400 &&
-                                                            size.id != SetSizeEnum.Grams450
+                                                            size.id != BoxSizeEnum.Milliliters400 &&
+                                                            size.id != BoxSizeEnum.Grams450
                                                         );
                                                     }
                                                 })
@@ -484,9 +534,9 @@ export default function UpdateProduct() {
                                             <option value="">Select Type</option>
                                             {types?.data
                                                 ?.filter(type => {
-                                                    if (form.categoryId === SetCategoryEnum.DateSweetners) {
+                                                    if (form.categoryId === BoxCategoryEnum.DateSweetners) {
                                                         return (
-                                                            type.id === SetTypeEnum.PlainDate
+                                                            type.id === BoxTypeEnum.PlainDate
                                                         );
                                                     } else {
                                                         return (
@@ -537,11 +587,12 @@ export default function UpdateProduct() {
                                 <CardHeader title="Price" />
                                 <Divider />
                                 <CardContent>
-                                    {form.categoryId !== SetCategoryEnum.DateSweetners && (
+                                    {form.categoryId !== BoxCategoryEnum.DateSweetners && (
                                         <DatesTable
                                             dates={(allDates?.data) || []}
                                             value={form.dates}
                                             onChange={handleDatesChange}
+                                            onPriceChange={setTotalPrice}
                                             loading={allDatesLoading}
                                             productId={0}
                                             typeId={form.typeId}
@@ -550,10 +601,10 @@ export default function UpdateProduct() {
                                         name="fromPrice"
                                         label="Total Price"
                                         type="number"
-                                        value={form.fromPrice || ''}
+                                        value={form.categoryId !== BoxCategoryEnum.DateSweetners ? totalPrice : (form.fromPrice || 0)}
                                         onChange={handleChange}
                                         InputProps={{
-                                            readOnly: form.categoryId !== SetCategoryEnum.DateSweetners,
+                                            readOnly: form.categoryId !== BoxCategoryEnum.DateSweetners,
                                         }}
                                         variant="standard"
                                         fullWidth
@@ -618,6 +669,16 @@ export default function UpdateProduct() {
                 </form>
             </Container>
             <Footer />
+            <ConfirmDialog
+                open={confirmOpen}
+                onClose={handleCancelChange}
+                onConfirm={handleConfirmChange}
+                title="Change Category"
+                message={`Are you sure you want to change the category of this Box? Your about to remove all selected dates and reset the price. This action cannot be undone.`}
+                confirmText="Change"
+                cancelText="Cancel"
+                confirmVariant="danger"
+            />
         </>
     );
 }

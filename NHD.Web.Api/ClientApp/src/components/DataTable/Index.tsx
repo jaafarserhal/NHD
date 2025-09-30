@@ -11,12 +11,13 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Date as DateType, DatesProduct } from "../../portal/models/Types";
-import { SetTypeEnum } from "src/common/Enums";
+import { BoxTypeEnum } from "src/common/Enums";
 
 interface DatesTableProps {
   dates: DateType[]; // from API
   value: DatesProduct[]; // current form state
   onChange: (updated: DatesProduct[]) => void;
+  onPriceChange?: (totalPrice: number) => void;
   loading?: boolean;
   productId?: number;
   typeId: number;
@@ -27,6 +28,7 @@ export default function DatesTable({
   dates,
   value,
   onChange,
+  onPriceChange,
   loading = false,
   productId,
   typeId,
@@ -34,10 +36,10 @@ export default function DatesTable({
   const [rows, setRows] = useState<DatesProduct[]>([]);
 
   // Determine checkbox visibility and default value based on typeId
-  const shouldShowCheckbox = typeId === SetTypeEnum.AssortedDate;
+  const shouldShowCheckbox = typeId === BoxTypeEnum.AssortedDate;
   const getDefaultIsFilled = () => {
-    if (typeId === SetTypeEnum.PlainDate) return false;
-    if (typeId === SetTypeEnum.FilledDate) return true;
+    if (typeId === BoxTypeEnum.PlainDate) return false;
+    if (typeId === BoxTypeEnum.FilledDate) return true;
     return false; // Default for AssortedDate
   };
 
@@ -68,7 +70,27 @@ export default function DatesTable({
     );
     setRows(updated);
     onChange(updated);
+
+    // Calculate and emit total price
+    if (field === "quantity" && onPriceChange) {
+      const totalPrice = updated.reduce((sum, row) => {
+        const dateInfo = dates.find((d) => d.id === row.dateId);
+        return sum + (row.quantity * (dateInfo?.price || 0));
+      }, 0);
+      onPriceChange(totalPrice);
+    }
   };
+
+  // Calculate initial price on mount/update
+  useEffect(() => {
+    if (onPriceChange && rows.length > 0) {
+      const totalPrice = rows.reduce((sum, row) => {
+        const dateInfo = dates.find((d) => d.id === row.dateId);
+        return sum + (row.quantity * (dateInfo?.price || 0));
+      }, 0);
+      onPriceChange(totalPrice);
+    }
+  }, [rows, dates, onPriceChange]);
 
   if (loading) {
     return (

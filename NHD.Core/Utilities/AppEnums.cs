@@ -34,7 +34,16 @@ namespace NHD.Core.Utilities
         Piece_1 = 307,
         Milliliters_400 = 308,
         Grams_450 = 309,
+    }
 
+    public enum BoxCategoryEnum
+    {
+        SignatureDateGifts = 100,
+        SignatureDates = 101,
+        SignatureFilledDates = 102,
+        ClassicDatePouches = 103,
+        DateSnacks = 104,
+        DateSweetners = 105
     }
 
     public enum HttpStatusCodeEnum

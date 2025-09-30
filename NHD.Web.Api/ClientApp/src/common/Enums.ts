@@ -1,5 +1,5 @@
 
-export const enum SetCategoryEnum {
+export const enum BoxCategoryEnum {
     SignatureDateGifts = 100,
     SignatureDates = 101,
     SignatureFilledDates = 102,
@@ -8,13 +8,13 @@ export const enum SetCategoryEnum {
     DateSweetners = 105
 }
 
-export const enum SetTypeEnum {
+export const enum BoxTypeEnum {
     PlainDate = 200,
     AssortedDate = 201,
     FilledDate = 202
 }
 
-export const enum SetSizeEnum {
+export const enum BoxSizeEnum {
     Pieces8 = 300,
     Pieces20 = 301,
     Pieces35 = 302,

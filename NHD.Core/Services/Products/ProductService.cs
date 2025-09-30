@@ -15,6 +15,7 @@ using NHD.Core.Repository.Products;
 using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Dates;
 using NHD.Core.Services.Model.Products;
+using NHD.Core.Utilities;
 
 namespace NHD.Core.Services.Products
 {
@@ -129,7 +130,9 @@ namespace NHD.Core.Services.Products
                 {
                     Id = d.DateId,
                     NameEn = d.NameEn,
-                    NameSv = d.NameSv
+                    NameSv = d.NameSv,
+                    Price = d.Price ?? 0,
+
                 });
                 return ServiceResult<IEnumerable<DateViewModel>>.Success(dateViewModels);
             }
@@ -217,6 +220,7 @@ namespace NHD.Core.Services.Products
 
             return resultList;
         }
+
         public async Task<Product> SaveProductWithDatesAsync(Product product, List<DatesProductBindingModel> datesProducts)
         {
             await BeginTransactionAsync();
@@ -236,8 +240,19 @@ namespace NHD.Core.Services.Products
                     // Update existing product
                     context.Products.Update(product);
                     await SaveChangesAsync();
-                }
 
+                    // Remove all datesProducts entries if category is not DateSweetners (ID=105)
+                    if (product.PrdLookupCategoryId == (int)BoxCategoryEnum.DateSweetners)
+                    {
+                        var existingDatesProducts = await _dateProductsRepository.GetByProductIdAsync(product.PrdId);
+                        if (existingDatesProducts.Any())
+                        {
+                            context.DatesProducts.RemoveRange(existingDatesProducts);
+                            await SaveChangesAsync();
+                        }
+                        datesProducts = new List<DatesProductBindingModel>();
+                    }
+                }
                 // Add/Update dates if provided
                 if (datesProducts != null && datesProducts.Any())
                 {
@@ -259,7 +274,6 @@ namespace NHD.Core.Services.Products
                 return null;
             }
         }
-
 
         #endregion Products
 

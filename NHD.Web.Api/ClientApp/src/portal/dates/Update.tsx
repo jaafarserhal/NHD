@@ -20,7 +20,7 @@ export default function UpdateDate() {
         nameEn: "",
         nameSv: "",
         quality: false,
-        price: 0,
+        price: undefined,
         isActive: true
     });
 
@@ -74,9 +74,11 @@ export default function UpdateDate() {
             [name]:
                 type === "checkbox"
                     ? checked
-                    : name.toLowerCase().includes("id")
-                        ? (value === "" ? undefined : Number(value))
-                        : value,
+                    : name === "price"
+                        ? (value === "" ? 0 : parseFloat(value)) // ✅ convert to number
+                        : name.toLowerCase().includes("id")
+                            ? (value === "" ? undefined : Number(value))
+                            : value,
         }));
 
         // Clear errors when user starts typing/selecting
@@ -84,7 +86,6 @@ export default function UpdateDate() {
             setErrors([]);
         }
     };
-
     const handleActiveSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm((prev) => ({
             ...prev,
@@ -109,7 +110,7 @@ export default function UpdateDate() {
         if (!form.nameSv.trim()) {
             validationErrors.push("Swedish name is required");
         }
-        if (form.price === null || form.price === undefined || isNaN(form.price) || form.price < 0) {
+        if (form.price === undefined || form.price <= 0) {
             validationErrors.push("Valid price is required");
         }
 
@@ -149,7 +150,6 @@ export default function UpdateDate() {
             await dateService.updateDate(productData);
 
             notifySuccess();
-            navigate('/dates');
         } catch (error: any) {
             console.error(error);
             setErrors([error.message || 'Failed to update date']);
@@ -263,11 +263,11 @@ export default function UpdateDate() {
                                             name="price"
                                             label="Price"
                                             type="number"
-                                            value={form.price}
+                                            value={form.price || ''}
                                             onChange={handleChange}
                                             variant="standard"
                                             fullWidth
-                                            inputProps={{ min: 0, step: "0.01" }}
+                                            required
                                             sx={{
                                                 '& input[type=number]': {
                                                     '-moz-appearance': 'textfield',
