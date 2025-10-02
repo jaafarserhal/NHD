@@ -151,67 +151,37 @@ namespace NHD.Core.Services.Products
 
             var prdId = datesProducts.First().PrdId;
 
-            // 1. Get existing records for this product
+            // 1. Remove ALL existing date products for this product
             var existingRecords = await _dateProductsRepository.GetByProductIdAsync(prdId);
+            if (existingRecords.Any())
+            {
+                context.DatesProducts.RemoveRange(existingRecords);
+            }
 
             var resultList = new List<DatesProduct>();
+            var processedDateIds = new HashSet<int>();
 
-            // 2. Process Add, Update, or Delete
+            // 2. Add only new records with quantity > 0
             foreach (var item in datesProducts)
             {
-                DatesProduct entity;
-
-                if (item.Id != 0) // Existing record → Update or Delete
+                // Only process items with quantity > 0
+                if (item.Quantity > 0)
                 {
-                    entity = existingRecords.FirstOrDefault(x => x.DpId == item.Id);
-                    if (entity != null)
+                    // Skip if we already processed this DateId in current batch
+                    if (processedDateIds.Contains(item.DateId))
+                        continue;
+
+                    var entity = new DatesProduct
                     {
-                        if (item.Quantity == 0)
-                        {
-                            // Delete record if quantity is 0
-                            context.DatesProducts.Remove(entity);
-                        }
-                        else
-                        {
-                            // Update existing record
-                            entity.PrdId = item.PrdId;
-                            entity.DateId = item.DateId;
-                            entity.IsFilled = item.IsFilled;
-                            entity.Quantity = item.Quantity;
+                        PrdId = item.PrdId,
+                        DateId = item.DateId,
+                        IsFilled = item.IsFilled,
+                        Quantity = item.Quantity
+                    };
 
-                            context.DatesProducts.Update(entity);
-                            resultList.Add(entity);
-                        }
-                    }
-                }
-                else // New record → Add if quantity > 0
-                {
-                    if (item.Quantity > 0)
-                    {
-                        // Check if a record already exists for same PrdId & DateId
-                        entity = existingRecords.FirstOrDefault(x => x.PrdId == item.PrdId && x.DateId == item.DateId);
-
-                        if (entity != null)
-                        {
-                            // Update existing record's quantity
-                            entity.Quantity = item.Quantity;
-                            entity.IsFilled = item.IsFilled;
-                            context.DatesProducts.Update(entity);
-                        }
-                        else
-                        {
-                            entity = new DatesProduct
-                            {
-                                PrdId = item.PrdId,
-                                DateId = item.DateId,
-                                IsFilled = item.IsFilled,
-                                Quantity = item.Quantity
-                            };
-                            await context.DatesProducts.AddAsync(entity);
-                        }
-
-                        resultList.Add(entity);
-                    }
+                    await context.DatesProducts.AddAsync(entity);
+                    resultList.Add(entity);
+                    processedDateIds.Add(item.DateId);
                 }
             }
 
@@ -237,11 +207,18 @@ namespace NHD.Core.Services.Products
                 }
                 else
                 {
-                    // Update existing product
+                    // Get the existing product from DB
+                    var existingProduct = await context.Products
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(p => p.PrdId == product.PrdId);
+
+                    if (existingProduct == null)
+                        throw new Exception("Product not found");
+
+                    // Update the product
                     context.Products.Update(product);
                     await SaveChangesAsync();
 
-                    // Remove all datesProducts entries if category is not DateSweetners (ID=105)
                     if (product.PrdLookupCategoryId == (int)BoxCategoryEnum.DateSweetners)
                     {
                         var existingDatesProducts = await _dateProductsRepository.GetByProductIdAsync(product.PrdId);
@@ -253,7 +230,9 @@ namespace NHD.Core.Services.Products
                         datesProducts = new List<DatesProductBindingModel>();
                     }
                 }
+
                 // Add/Update dates if provided
+                // The SaveDatesProductsAsync method now handles removing existing dates
                 if (datesProducts != null && datesProducts.Any())
                 {
                     foreach (var dp in datesProducts)
@@ -274,7 +253,6 @@ namespace NHD.Core.Services.Products
                 return null;
             }
         }
-
         #endregion Products
 
         #region Lookups

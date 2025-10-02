@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, Button, Box, CardHeader, Container, Divider, FormControlLabel, Grid, Switch, TextField, Backdrop, CircularProgress } from "@mui/material";
 import { Product, DatesProduct } from "../models/Types";
 import { useApiCall } from '../../api/hooks/useApi';
@@ -141,45 +141,46 @@ export default function UpdateProduct() {
 
         // Special handling for category change to DateSweetners
         if (name === "categoryId" && value !== "" && Number(value) === BoxCategoryEnum.DateSweetners) {
-            // Store the pending change and open confirmation dialog
             setPendingCategoryChange(Number(value));
             setConfirmOpen(true);
             return;
         }
 
         setForm((prev) => {
+            let newValue: any;
+
+            if (type === "checkbox") {
+                newValue = checked;
+            } else if (name === "fromPrice") {
+                const cleaned = value.replace(/^0+(?=\d)/, "");
+                newValue = cleaned;
+            } else if (name.toLowerCase().includes("id")) {
+                newValue = value === "" ? undefined : Number(value);
+            } else {
+                newValue = value;
+            }
+
             const updatedForm = {
                 ...prev,
-                [name]:
-                    type === "checkbox"
-                        ? checked
-                        : name === "fromPrice"
-                            ? (value === "" ? 0 : parseFloat(value))
-                            : name.toLowerCase().includes("id")
-                                ? (value === "" ? undefined : Number(value))
-                                : value,
+                [name]: newValue,
             };
 
             if (name === "categoryId") {
                 updatedForm.sizeId = undefined;
                 updatedForm.typeId = undefined;
+                updatedForm.fromPrice = 0;
+                setTotalPrice(0);
             }
 
             // When typeId changes, update isFilled values in dates based on new type
             if (name === "typeId" && value !== "") {
                 const newTypeId = Number(value);
-
-                // Determine the new isFilled value based on typeId
                 let newIsFilled = false;
-                if (newTypeId === BoxTypeEnum.PlainDate) {
-                    newIsFilled = false;
-                } else if (newTypeId === BoxTypeEnum.FilledDate) {
-                    newIsFilled = true;
-                } else if (newTypeId === BoxTypeEnum.AssortedDate) {
-                    newIsFilled = false;
-                }
 
-                // Update all dates with new isFilled values
+                if (newTypeId === BoxTypeEnum.PlainDate) newIsFilled = false;
+                else if (newTypeId === BoxTypeEnum.FilledDate) newIsFilled = true;
+                else if (newTypeId === BoxTypeEnum.AssortedDate) newIsFilled = false;
+
                 updatedForm.dates = prev.dates.map(date => ({
                     ...date,
                     isFilled: newIsFilled,
@@ -195,6 +196,7 @@ export default function UpdateProduct() {
             setErrors([]);
         }
     };
+
 
     const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm((prev) => ({
@@ -256,9 +258,21 @@ export default function UpdateProduct() {
 
     // Handle date selection changes
     const handleDatesChange = (updatedDates: DatesProduct[]) => {
+        console.log("Updated Dates:", updatedDates);
+
+        // Calculate price directly here
+        const calculatedPrice = updatedDates.reduce((sum, item) => {
+            const dateInfo = allDates?.data?.find((d) => d.id === item.dateId);
+            return sum + item.quantity * (dateInfo?.price || 0);
+        }, 0);
+
+        setTotalPrice(calculatedPrice);
+
         setForm((prev) => ({
             ...prev,
             dates: updatedDates,
+            // Update fromPrice with calculatedPrice when dates change (but not for DateSweetners)
+            fromPrice: prev.categoryId !== BoxCategoryEnum.DateSweetners ? calculatedPrice : prev.fromPrice
         }));
     };
 
@@ -325,7 +339,6 @@ export default function UpdateProduct() {
 
             await productService.updateProduct(productData);
 
-
             await loadProduct().then(() => {
                 notifySuccess();
             });
@@ -350,15 +363,6 @@ export default function UpdateProduct() {
             theme: "colored",
         });
     };
-
-    useEffect(() => {
-        if (form.categoryId !== BoxCategoryEnum.DateSweetners) {
-            setForm((prev) => ({
-                ...prev,
-                fromPrice: totalPrice
-            }));
-        }
-    }, [totalPrice, form.categoryId]);
 
     if (loadingProduct) {
         return (
@@ -554,6 +558,48 @@ export default function UpdateProduct() {
                                 </CardContent>
                             </Card>
                         </Grid>
+                        {form.typeId && (<Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Price" />
+                                <Divider />
+                                <CardContent>
+                                    {form.categoryId !== BoxCategoryEnum.DateSweetners && (
+                                        <DatesTable
+                                            dates={(allDates?.data) || []}
+                                            value={form.dates}
+                                            onChange={handleDatesChange}
+                                            loading={allDatesLoading}
+                                            productId={0}
+                                            typeId={form.typeId}
+                                        />)}
+                                    <TextField
+                                        name="fromPrice"
+                                        label="Total Price"
+                                        type="number"
+                                        value={form.fromPrice || 0}
+                                        onChange={handleChange}
+                                        InputProps={{
+                                            readOnly: form.categoryId !== BoxCategoryEnum.DateSweetners,
+                                        }}
+                                        variant="standard"
+                                        fullWidth
+                                        sx={{
+                                            '& input[type=number]': {
+                                                '-moz-appearance': 'textfield',
+                                            },
+                                            '& input[type=number]::-webkit-outer-spin-button': {
+                                                '-webkit-appearance': 'none',
+                                                margin: 0,
+                                            },
+                                            '& input[type=number]::-webkit-inner-spin-button': {
+                                                '-webkit-appearance': 'none',
+                                                margin: 0,
+                                            },
+                                        }}
+                                    />
+                                </CardContent>
+                            </Card>
+                        </Grid>)}
 
                         <Grid item xs={12}>
                             <Card>
@@ -582,49 +628,6 @@ export default function UpdateProduct() {
                                 </CardContent>
                             </Card>
                         </Grid>
-                        {form.typeId && (<Grid item xs={12}>
-                            <Card>
-                                <CardHeader title="Price" />
-                                <Divider />
-                                <CardContent>
-                                    {form.categoryId !== BoxCategoryEnum.DateSweetners && (
-                                        <DatesTable
-                                            dates={(allDates?.data) || []}
-                                            value={form.dates}
-                                            onChange={handleDatesChange}
-                                            onPriceChange={setTotalPrice}
-                                            loading={allDatesLoading}
-                                            productId={0}
-                                            typeId={form.typeId}
-                                        />)}
-                                    <TextField
-                                        name="fromPrice"
-                                        label="Total Price"
-                                        type="number"
-                                        value={form.categoryId !== BoxCategoryEnum.DateSweetners ? totalPrice : (form.fromPrice || 0)}
-                                        onChange={handleChange}
-                                        InputProps={{
-                                            readOnly: form.categoryId !== BoxCategoryEnum.DateSweetners,
-                                        }}
-                                        variant="standard"
-                                        fullWidth
-                                        sx={{
-                                            '& input[type=number]': {
-                                                '-moz-appearance': 'textfield',
-                                            },
-                                            '& input[type=number]::-webkit-outer-spin-button': {
-                                                '-webkit-appearance': 'none',
-                                                margin: 0,
-                                            },
-                                            '& input[type=number]::-webkit-inner-spin-button': {
-                                                '-webkit-appearance': 'none',
-                                                margin: 0,
-                                            },
-                                        }}
-                                    />
-                                </CardContent>
-                            </Card>
-                        </Grid>)}
 
                         <Grid item xs={12}>
                             <Card>

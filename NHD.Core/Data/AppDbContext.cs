@@ -38,7 +38,6 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer($"Name=ConnectionStrings:{Utilities.AppConstants.CONNECTION_NAME}");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Address>(entity =>
@@ -147,7 +146,7 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("dates_product");
 
-            entity.HasIndex(e => new { e.PrdId, e.DateId }, "UQ_dates_product").IsUnique();
+            entity.HasIndex(e => new { e.PrdId, e.DateId, e.IsFilled }, "UQ_dates_product").IsUnique();
 
             entity.Property(e => e.DpId).HasColumnName("dp_id");
             entity.Property(e => e.CreatedAt)

@@ -126,7 +126,7 @@ CREATE TABLE dbo.dates_product (
         REFERENCES dbo.product(prd_id) ON DELETE CASCADE,
     CONSTRAINT FK_dates_product_dates FOREIGN KEY (date_id)
         REFERENCES dbo.dates(date_id) ON DELETE CASCADE,
-    CONSTRAINT UQ_dates_product UNIQUE (prd_id, date_id)
+    CONSTRAINT UQ_dates_product UNIQUE (prd_id, date_id, is_filled)
 );
 
 -- =============================================

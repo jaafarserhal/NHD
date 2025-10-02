@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, Button, Box, CardHeader, Container, Divider, FormControlLabel, Grid, Switch, TextField } from "@mui/material";
 import { Product, DatesProduct } from "../models/Types";
 import { useApiCall } from '../../api/hooks/useApi';
@@ -61,38 +61,39 @@ export default function AddProduct() {
         const checked = (e.target as HTMLInputElement).checked;
 
         setForm((prev) => {
+            let newValue: any;
+
+            if (type === "checkbox") {
+                newValue = checked;
+            } else if (name === "fromPrice") {
+                const cleaned = value.replace(/^0+(?=\d)/, "");
+                newValue = cleaned;
+            } else if (name.toLowerCase().includes("id")) {
+                newValue = value === "" ? undefined : Number(value);
+            } else {
+                newValue = value;
+            }
+
             const updatedForm = {
                 ...prev,
-                [name]:
-                    type === "checkbox"
-                        ? checked
-                        : name === "fromPrice"
-                            ? (value === "" ? 0 : parseFloat(value))
-                            : name.toLowerCase().includes("id")
-                                ? (value === "" ? undefined : Number(value))
-                                : value,
+                [name]: newValue,
             };
 
             if (name === "categoryId") {
                 updatedForm.sizeId = undefined;
                 updatedForm.typeId = undefined;
+                updatedForm.fromPrice = 0;
+                setTotalPrice(0);
             }
 
-            // When typeId changes, update isFilled values in dates based on new type
             if (name === "typeId" && value !== "") {
                 const newTypeId = Number(value);
-
-                // Determine the new isFilled value based on typeId
                 let newIsFilled = false;
-                if (newTypeId === BoxTypeEnum.PlainDate) {
-                    newIsFilled = false;
-                } else if (newTypeId === BoxTypeEnum.FilledDate) {
-                    newIsFilled = true;
-                } else if (newTypeId === BoxTypeEnum.AssortedDate) {
-                    newIsFilled = false;
-                }
 
-                // Update all dates with new isFilled values
+                if (newTypeId === BoxTypeEnum.PlainDate) newIsFilled = false;
+                else if (newTypeId === BoxTypeEnum.FilledDate) newIsFilled = true;
+                else if (newTypeId === BoxTypeEnum.AssortedDate) newIsFilled = false;
+
                 updatedForm.dates = prev.dates.map(date => ({
                     ...date,
                     isFilled: newIsFilled,
@@ -103,7 +104,6 @@ export default function AddProduct() {
             return updatedForm;
         });
 
-        // Clear errors when user starts typing/selecting
         if (errors.length > 0) {
             setErrors([]);
         }
@@ -169,9 +169,19 @@ export default function AddProduct() {
 
     // Handle date selection changes - convert number[] to DatesProduct[]
     const handleDatesChange = (updatedDates: DatesProduct[]) => {
+        // Calculate price directly here
+        const calculatedPrice = updatedDates.reduce((sum, item) => {
+            const dateInfo = allDates?.data?.find((d) => d.id === item.dateId);
+            return sum + item.quantity * (dateInfo?.price || 0);
+        }, 0);
+
+        setTotalPrice(calculatedPrice);
+
         setForm((prev) => ({
             ...prev,
             dates: updatedDates,
+            // Update fromPrice with calculatedPrice when dates change (but not for DateSweetners)
+            fromPrice: prev.categoryId !== BoxCategoryEnum.DateSweetners ? calculatedPrice : prev.fromPrice
         }));
     };
 
@@ -262,14 +272,6 @@ export default function AddProduct() {
         }
     };
 
-    useEffect(() => {
-        if (form.categoryId !== BoxCategoryEnum.DateSweetners) {
-            setForm((prev) => ({
-                ...prev,
-                fromPrice: totalPrice
-            }));
-        }
-    }, [totalPrice, form.categoryId]);
 
     return (
         <>
@@ -452,7 +454,6 @@ export default function AddProduct() {
                                             dates={(allDates?.data) || []}
                                             value={form.dates}
                                             onChange={handleDatesChange}
-                                            onPriceChange={setTotalPrice}
                                             loading={allDatesLoading}
                                             productId={0}
                                             typeId={form.typeId}
@@ -461,7 +462,7 @@ export default function AddProduct() {
                                         name="fromPrice"
                                         label="Total Price"
                                         type="number"
-                                        value={form.categoryId !== BoxCategoryEnum.DateSweetners ? totalPrice : (form.fromPrice || 0)}
+                                        value={form.fromPrice || 0}
                                         onChange={handleChange}
                                         InputProps={{
                                             readOnly: form.categoryId !== BoxCategoryEnum.DateSweetners,
