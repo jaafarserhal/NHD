@@ -1,39 +1,46 @@
 import axios from 'axios';
 
-
 const apiClient = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
-  timeout: 60000
+  timeout: 60000,
 });
 
-// Request interceptor for adding auth tokens, logging, etc.
+// Request interceptor: Add auth token or redirect if missing
 apiClient.interceptors.request.use(
   (config) => {
-    // Add auth token if available
     const token = localStorage.getItem('authToken');
+
+    // ✅ Allow login request without token
+    const isLoginRequest = config.url?.includes('/users/login');
+    const isAuthRoute = window.location.pathname.includes('/auth/login');
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    } else if (!isLoginRequest) {
+      // No token and not a login request → redirect
+      if (!isAuthRoute) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        window.location.href = '/auth/login';
+      }
+
+      // ❌ Do NOT reject login requests here — only reject protected ones
+      return Promise.reject(new Error('No auth token found'));
     }
 
-    // Log requests in development
     if (process.env.NODE_ENV === 'development') {
       console.log('API Request:', config.method?.toUpperCase(), config.url);
     }
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor for handling common responses/errors
+// Response interceptor: Handle common errors
 apiClient.interceptors.response.use(
-  (response) => {
-    return response.data;
-  },
+  (response) => response.data,
   (error) => {
-    // Handle common error scenarios
     if (error.response?.status === 401 && !error.config.url?.includes('/users/login')) {
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
