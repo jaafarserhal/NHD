@@ -186,6 +186,13 @@ export default function UpdateProduct() {
                     isFilled: newIsFilled,
                     quantity: 0
                 }));
+
+                updatedForm.fromPrice = 0;
+                setTotalPrice(0);
+            }
+
+            if (name === "sizeId" && value !== "") {
+                updatedForm.typeId = undefined;
             }
 
             return updatedForm;
@@ -671,7 +678,6 @@ export default function UpdateProduct() {
                     </Box>
                 </form>
             </Container>
-            <Footer />
             <ConfirmDialog
                 open={confirmOpen}
                 onClose={handleCancelChange}

@@ -159,7 +159,7 @@ namespace NHD.Core.Services.Products
             }
 
             var resultList = new List<DatesProduct>();
-            var processedDateIds = new HashSet<int>();
+            var processedDateIds = new HashSet<(int, bool)>();
 
             // 2. Add only new records with quantity > 0
             foreach (var item in datesProducts)
@@ -168,7 +168,7 @@ namespace NHD.Core.Services.Products
                 if (item.Quantity > 0)
                 {
                     // Skip if we already processed this DateId in current batch
-                    if (processedDateIds.Contains(item.DateId))
+                    if (processedDateIds.Contains((item.DateId, item.IsFilled)))
                         continue;
 
                     var entity = new DatesProduct
@@ -181,7 +181,7 @@ namespace NHD.Core.Services.Products
 
                     await context.DatesProducts.AddAsync(entity);
                     resultList.Add(entity);
-                    processedDateIds.Add(item.DateId);
+                    processedDateIds.Add((item.DateId, item.IsFilled));
                 }
             }
 

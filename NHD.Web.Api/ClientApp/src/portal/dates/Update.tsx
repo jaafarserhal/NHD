@@ -348,7 +348,6 @@ export default function UpdateDate() {
                     </Box>
                 </form>
             </Container>
-            <Footer />
         </>
     );
 }

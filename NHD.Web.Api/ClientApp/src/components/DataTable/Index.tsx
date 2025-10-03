@@ -19,7 +19,7 @@ interface DatesTableProps {
 
   loading?: boolean;
   productId?: number;
-  typeId: number; // ✅ Restored
+  typeId: number;
 }
 
 interface RowState {
@@ -110,6 +110,11 @@ export default function DatesTable({
   const showPlain = typeId !== BoxTypeEnum.FilledDate;
   const showFilled = typeId !== BoxTypeEnum.PlainDate;
 
+  // Calculate totals
+  const totalPlain = rows.reduce((sum, row) => sum + row.plainQuantity, 0);
+  const totalFilled = rows.reduce((sum, row) => sum + row.filledQuantity, 0);
+  const grandTotal = totalPlain + totalFilled;
+
   return (
     <Table size="small">
       <TableHead>
@@ -188,6 +193,41 @@ export default function DatesTable({
             </TableRow>
           );
         })}
+
+        {/* Total Row */}
+        <TableRow sx={{ borderTop: 2, borderColor: "divider" }}>
+          <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
+            Total Quantity
+          </TableCell>
+          {showPlain && (
+            <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
+              {totalPlain}
+            </TableCell>
+          )}
+          {showFilled && (
+            <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>
+              {totalFilled}
+            </TableCell>
+          )}
+        </TableRow>
+
+        {/* Grand Total Row (only if both columns are shown) */}
+        {showPlain && showFilled && (
+          <TableRow>
+            <TableCell
+              colSpan={3}
+              align="right"
+              sx={{
+                fontWeight: "bold",
+                fontSize: "1.1rem",
+                bgcolor: "action.hover",
+                py: 1.5
+              }}
+            >
+              Grand Total: {grandTotal}
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     </Table>
   );

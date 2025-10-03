@@ -192,8 +192,6 @@ function Products() {
                     </Grid>
                 )}
             </Container>
-
-            <Footer />
             <ConfirmDialog
                 open={confirmOpen}
                 onClose={handleCancelDelete}

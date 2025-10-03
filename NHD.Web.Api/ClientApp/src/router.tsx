@@ -6,14 +6,15 @@ import SidebarLayout from 'src/layouts/SidebarLayout';
 import BaseLayout from 'src/layouts/BaseLayout';
 
 import SuspenseLoader from 'src/components/SuspenseLoader';
-import Users from './portal/users/Index';
-import Products from './portal/products/Index';
 import AddProduct from './portal/products/Add';
 import EditProduct from './portal/products/Update';
-import Dates from './portal/dates/Index';
 import AddDate from './portal/dates/Add';
 import EditDate from './portal/dates/Update';
 import Login from './portal/auth/Login';
+
+
+
+
 import { RouterUrls } from './common/RouterUrls';
 
 const Loader = (Component) => (props) =>
@@ -23,67 +24,28 @@ const Loader = (Component) => (props) =>
   </Suspense>
 );
 
-// Pages
-
-const Overview = Loader(lazy(() => import('src/content/overview')));
-
-// Dashboards
-
-const Crypto = Loader(lazy(() => import('src/content/dashboards/Crypto')));
-
 // Applications
 
-const Messenger = Loader(
-  lazy(() => import('src/content/applications/Messenger'))
+const Products = Loader(
+  lazy(() => import('src/portal/products/Index'))
 );
 const Transactions = Loader(
-  lazy(() => import('src/content/applications/Transactions'))
+  lazy(() => import('src/portal/transactions/Index'))
 );
-const UserProfile = Loader(
-  lazy(() => import('src/content/applications/Users/profile'))
+const Dates = Loader(
+  lazy(() => import('src/portal/dates/Index'))
 );
-const UserSettings = Loader(
-  lazy(() => import('src/content/applications/Users/settings'))
+const Orders = Loader(
+  lazy(() => import('src/portal/orders/Index'))
 );
 
-// Components
+const Customers = Loader(
+  lazy(() => import('src/portal/customers/Index'))
+);
+const Addresses = Loader(
+  lazy(() => import('src/portal/addresses/Index'))
+);
 
-const Buttons = Loader(
-  lazy(() => import('src/content/pages/Components/Buttons'))
-);
-const Modals = Loader(
-  lazy(() => import('src/content/pages/Components/Modals'))
-);
-const Accordions = Loader(
-  lazy(() => import('src/content/pages/Components/Accordions'))
-);
-const Tabs = Loader(lazy(() => import('src/content/pages/Components/Tabs')));
-const Badges = Loader(
-  lazy(() => import('src/content/pages/Components/Badges'))
-);
-const Tooltips = Loader(
-  lazy(() => import('src/content/pages/Components/Tooltips'))
-);
-const Avatars = Loader(
-  lazy(() => import('src/content/pages/Components/Avatars'))
-);
-const Cards = Loader(lazy(() => import('src/content/pages/Components/Cards')));
-const Forms = Loader(lazy(() => import('src/content/pages/Components/Forms')));
-
-// Status
-
-const Status404 = Loader(
-  lazy(() => import('src/content/pages/Status/Status404'))
-);
-const Status500 = Loader(
-  lazy(() => import('src/content/pages/Status/Status500'))
-);
-const StatusComingSoon = Loader(
-  lazy(() => import('src/content/pages/Status/ComingSoon'))
-);
-const StatusMaintenance = Loader(
-  lazy(() => import('src/content/pages/Status/Maintenance'))
-);
 
 const routes: RouteObject[] = [
   {
@@ -117,6 +79,22 @@ const routes: RouteObject[] = [
       {
         path: RouterUrls.dateEdit,
         element: <EditDate />
+      },
+      {
+        path: RouterUrls.ordersList,
+        element: <Orders />
+      },
+      {
+        path: RouterUrls.customersList,
+        element: <Customers />
+      },
+      {
+        path: RouterUrls.addressesList,
+        element: <Addresses />
+      },
+      {
+        path: RouterUrls.transactionsList,
+        element: <Transactions />
       }
     ]
   },

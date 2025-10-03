@@ -19,7 +19,7 @@ function HeaderButtons() {
     <Box sx={{ mr: 1 }}>
       <Button color="primary" fullWidth onClick={handleSignOut}>
         <LockOpenTwoToneIcon sx={{ mr: 1 }} />
-        Sign out
+        Logout
       </Button>
     </Box>
   );

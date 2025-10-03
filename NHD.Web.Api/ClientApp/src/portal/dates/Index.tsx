@@ -172,7 +172,6 @@ function Dates() {
                 )}
             </Container>
 
-            <Footer />
             <ConfirmDialog
                 open={confirmOpen}
                 onClose={handleCancelDelete}

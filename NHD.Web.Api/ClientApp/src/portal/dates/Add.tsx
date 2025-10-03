@@ -201,7 +201,7 @@ export default function AddDate() {
 
                                         <TextField
                                             name="price"
-                                            label="From Price"
+                                            label="Price"
                                             type="number"
                                             value={form.price || ''}
                                             onChange={handleChange}
@@ -288,7 +288,6 @@ export default function AddDate() {
                     </Box>
                 </form>
             </Container>
-            <Footer />
         </>
     );
 }

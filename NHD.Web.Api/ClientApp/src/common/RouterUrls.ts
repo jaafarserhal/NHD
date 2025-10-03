@@ -4,5 +4,9 @@ export const RouterUrls = {
     boxEdit: '/boxes/edit/:id',
     datesList: '/dates',
     dateAdd: '/dates/add',
-    dateEdit: '/dates/edit/:id'
+    dateEdit: '/dates/edit/:id',
+    customersList: '/customers',
+    addressesList: '/addresses',
+    ordersList: '/orders',
+    transactionsList: '/transactions',
 };

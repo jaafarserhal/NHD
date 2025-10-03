@@ -99,6 +99,12 @@ export default function AddProduct() {
                     isFilled: newIsFilled,
                     quantity: 0
                 }));
+                updatedForm.fromPrice = 0;
+                setTotalPrice(0);
+            }
+
+            if (name === "sizeId" && value !== "") {
+                updatedForm.typeId = undefined;
             }
 
             return updatedForm;
@@ -446,7 +452,7 @@ export default function AddProduct() {
                         </Grid>
                         {form.typeId && (<Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Price" />
+                                <CardHeader title="Dates" />
                                 <Divider />
                                 <CardContent>
                                     {form.categoryId !== BoxCategoryEnum.DateSweetners && (
@@ -458,6 +464,15 @@ export default function AddProduct() {
                                             productId={0}
                                             typeId={form.typeId}
                                         />)}
+                                </CardContent>
+                            </Card>
+                        </Grid>)}
+
+                        {form.typeId && (<Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Price" />
+                                <Divider />
+                                <CardContent>
                                     <TextField
                                         name="fromPrice"
                                         label="Total Price"
@@ -486,6 +501,7 @@ export default function AddProduct() {
                                 </CardContent>
                             </Card>
                         </Grid>)}
+
 
                         <Grid item xs={12}>
                             <Card>
@@ -557,7 +573,6 @@ export default function AddProduct() {
                     </Box>
                 </form>
             </Container>
-            <Footer />
         </>
     );
 }

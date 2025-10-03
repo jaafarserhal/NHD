@@ -12,11 +12,13 @@ import {
   Button,
   lighten,
   darken,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@mui/material';
 
 import SidebarMenu from './SidebarMenu/Index'
 import Logo from 'src/components/LogoSign';
+
 
 const SidebarWrapper = styled(Box)(
   ({ theme }) => `
@@ -26,7 +28,7 @@ const SidebarWrapper = styled(Box)(
         position: relative;
         z-index: 7;
         height: 100%;
-        padding-bottom: 68px;
+        padding-bottom: 100px;
 `
 );
 
@@ -54,6 +56,25 @@ function Sidebar() {
             theme.palette.mode === 'dark' ? theme.sidebar.boxShadow : 'none'
         }}
       >
+        <h3
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            width: '100%',
+            height: '50px', // adjust as needed
+            margin: 0,
+            padding: '10px',
+            fontSize: '1.2rem',
+            fontWeight: 600,
+            letterSpacing: '1px',
+            color: '#fff',
+            paddingTop: '40px',
+          }}
+        >
+          NAWA HOME OF DATES
+        </h3>
         <Scrollbar>
           <Box mt={3}>
             <Box
@@ -80,17 +101,7 @@ function Sidebar() {
           }}
         />
         <Box p={2}>
-          {/* <Button
-            href="https://bloomui.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="contained"
-            color="warning"
-            size="small"
-            fullWidth
-          >
-            Upgrade to PRO
-          </Button> */}
+          <p style={{ fontSize: '12px', margin: 0 }}>  © 2025 Nawa Home. All rights reserved.</p>
         </Box>
       </SidebarWrapper>
       <Drawer
