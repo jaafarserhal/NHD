@@ -13,7 +13,7 @@ import EditDate from './portal/dates/Update';
 import Login from './portal/auth/Login';
 
 import { RouterUrls } from './common/RouterUrls';
-import ProtectedRoute from './ProtectedRoutes/Index';
+import ProtectedRoute from './protectedRoutes/Index';
 
 const Loader = (Component) => (props) => (
   <Suspense fallback={<SuspenseLoader />}>
