@@ -28,28 +28,28 @@ namespace NHD.Web.UI
         // Register services
         public void ConfigureServices(IServiceCollection services)
         {
-            // Bind JwtSettings from config
-            var jwtSettingsSection = Configuration.GetSection("JwtSettings");
-            services.Configure<JwtSettings>(jwtSettingsSection);
-            var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
+            var keycloakDomain = Configuration["Keycloak:Url"];
+            var keycloakRealm = Configuration["Keycloak:Realm"];
+            var keycloakClientId = Configuration["Keycloak:ClientId"];
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
-                    ValidateIssuer = false,
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ValidAudience = jwtSettings.Audience,
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
+                    options.Authority = $"{keycloakDomain}/realms/{keycloakRealm}";
+                    options.Audience = keycloakClientId; // optional, but recommended
+                    options.RequireHttpsMetadata = false; // set true in production
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.FromSeconds(30)
+                    };
+                });
 
             services.AddAuthorization();
+
             services.AddControllers();
             services.AddEndpointsApiExplorer();
 
@@ -58,25 +58,23 @@ namespace NHD.Web.UI
                 options.AddPolicy("AllowReactApp", policy =>
                 {
                     policy.WithOrigins(
-                        "http://localhost:3000",           // Development
-                        "https://www.nawahomeofdates.com"  // Production
+                        "http://localhost:3000",
+                        "https://www.nawahomeofdates.com"
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .AllowCredentials(); // Add this if you're using cookies/credentials
+                    .AllowCredentials();
                 });
             });
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString(AppConstants.CONNECTION_NAME)));
 
-            // Add SPA services
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "wwwroot";
             });
 
-            // Register repositories and builders
             RegisterServices(services);
         }
 
