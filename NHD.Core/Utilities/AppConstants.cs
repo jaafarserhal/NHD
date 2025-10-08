@@ -5,7 +5,7 @@ namespace NHD.Core.Utilities
 {
     public class AppConstants
     {
-        public const string ApiBaseUrl = "http://portal.nawahomeofdates.com/";
+        public const string ApiBaseUrl = "https://portal.nawahomeofdates.com/";
         public const string CONNECTION_NAME = "DefaultConnection";
         public const string DefaultDateFormat = "yyyy-MM-dd";
         public const int MaxRetryAttempts = 3;
