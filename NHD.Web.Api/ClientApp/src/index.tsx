@@ -10,7 +10,7 @@ import * as serviceWorker from 'src/serviceWorker';
 ReactDOM.render(
   <HelmetProvider>
     <SidebarProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={process.env.NODE_ENV === 'production' ? '/portal' : '/'}>
         <App />
       </BrowserRouter>
     </SidebarProvider>

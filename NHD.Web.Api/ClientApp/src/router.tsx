@@ -31,15 +31,14 @@ const Addresses = Loader(lazy(() => import('src/portal/addresses/Index')));
 
 const routes: RouteObject[] = [
   {
-    path: '',
+    path: '/', // base route for the app
     element: (
       <ProtectedRoute>
         <SidebarLayout />
       </ProtectedRoute>
-    ), // 👈 protect all children under SidebarLayout
+    ),
     children: [
-      { path: '/', element: <Products /> },
-      { path: RouterUrls.boxesList, element: <Navigate to="/" replace /> },
+      { path: '', element: <Products /> },
       { path: RouterUrls.boxAdd, element: <AddProduct /> },
       { path: RouterUrls.boxEdit, element: <EditProduct /> },
       { path: RouterUrls.datesList, element: <Dates /> },
@@ -56,9 +55,10 @@ const routes: RouteObject[] = [
     element: <BaseLayout />,
     children: [
       { path: 'login', element: <Login /> },
-      { path: '', element: <Navigate to="login" replace /> }
+      { path: '', element: <Navigate to="/auth/login" replace /> }
     ]
-  }
+  },
+  { path: '*', element: <Navigate to="/" replace /> }
 ];
 
 export default routes;

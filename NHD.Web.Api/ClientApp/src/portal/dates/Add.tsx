@@ -8,6 +8,7 @@ import PageTitle from "src/components/PageTitle";
 import PageTitleWrapper from "src/components/PageTitleWrapper";
 import { useNavigate } from 'react-router-dom';
 import { PortalToastContainer } from "src/components/Toaster/Index";
+import { RouterUrls } from "src/common/RouterUrls";
 
 export default function AddDate() {
 
@@ -144,7 +145,7 @@ export default function AddDate() {
                 <PageTitle
                     heading="Add Date"
                     subHeading="Add a new date to your catalog"
-                    backUrl="/dates"
+                    backUrl={RouterUrls.datesList}
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
@@ -279,7 +280,7 @@ export default function AddDate() {
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => navigate('/dates')}
+                            onClick={() => navigate(RouterUrls.datesList)}
                             size="large"
                             sx={{ ml: 2 }}
                         >

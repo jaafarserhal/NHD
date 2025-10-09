@@ -14,6 +14,8 @@ import { PortalToastContainer } from "src/components/Toaster/Index";
 import { BoxCategoryEnum, BoxSizeEnum, BoxTypeEnum } from "src/common/Enums";
 import DatesTable from "src/components/DataTable/Index";
 import ConfirmDialog from "src/components/ConfirmDialog/Index";
+import { RouterUrls } from "src/common/RouterUrls";
+import { getImageSrc } from "src/common/getImageSrc";
 
 export default function UpdateProduct() {
     const navigate = useNavigate();
@@ -381,7 +383,7 @@ export default function UpdateProduct() {
                     <PageTitle
                         heading="Update Box"
                         subHeading="Loading Box details..."
-                        backUrl="/boxes"
+                        backUrl={RouterUrls.boxesList}
                     />
                 </PageTitleWrapper>
                 <Container maxWidth="lg">
@@ -626,7 +628,7 @@ export default function UpdateProduct() {
                                     {preview && (
                                         <Box sx={{ mt: 2 }}>
                                             <img
-                                                src={preview.startsWith('blob:') ? preview : '/uploads/products/' + preview}
+                                                src={getImageSrc(preview)}
                                                 alt="Preview"
                                                 style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
                                             />
@@ -669,7 +671,7 @@ export default function UpdateProduct() {
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => navigate('/boxes')}
+                            onClick={() => navigate(RouterUrls.boxesList)}
                             size="large"
                             sx={{ ml: 2 }}
                         >

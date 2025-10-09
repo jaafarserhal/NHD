@@ -10,6 +10,7 @@ import PageHeader from '../PageHeader';
 import ConfirmDialog from 'src/components/ConfirmDialog/Index';
 import { useNavigate } from 'react-router-dom';
 import { RouterUrls } from 'src/common/RouterUrls';
+import { getImageSrc } from 'src/common/getImageSrc';
 
 function Products() {
     const [page, setPage] = useState(0); // 0-based for MUI TablePagination
@@ -95,7 +96,7 @@ function Products() {
             label: 'Image',
             render: (prd) => (
                 <img
-                    src={prd.imageUrl ? `/uploads/products/${prd.imageUrl}` : "/uploads/placeholder-image.png"}
+                    src={getImageSrc(prd.imageUrl)}
                     alt={prd.name}
                     style={{
                         width: '50px',

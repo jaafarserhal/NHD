@@ -10,6 +10,7 @@ import Editor from "src/components/Editor/Index";
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
+import { RouterUrls } from "src/common/RouterUrls";
 
 export default function UpdateDate() {
     const navigate = useNavigate();
@@ -204,7 +205,7 @@ export default function UpdateDate() {
                 <PageTitle
                     heading="Update Date"
                     subHeading="Update existing date information"
-                    backUrl="/dates"
+                    backUrl={RouterUrls.datesList}
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
@@ -339,7 +340,7 @@ export default function UpdateDate() {
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => navigate('/dates')}
+                            onClick={() => navigate(RouterUrls.datesList)}
                             size="large"
                             sx={{ ml: 2 }}
                         >

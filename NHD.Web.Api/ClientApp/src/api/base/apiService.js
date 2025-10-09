@@ -8,7 +8,7 @@ class apiService {
   // GET request
   async get(endpoint = '', params = {}) {
     try {
-      const url = endpoint ? `${this.baseEndpoint}/${endpoint}` : this.baseEndpoint;
+      const url = endpoint ? `${this.baseEndpoint}${endpoint}` : this.baseEndpoint;
       const response = await apiClient.get(url, { params });
       return response;
     } catch (error) {
@@ -19,7 +19,7 @@ class apiService {
   // POST request
   async post(data, endpoint = '') {
     try {
-      const url = endpoint ? `${this.baseEndpoint}/${endpoint}` : this.baseEndpoint;
+      const url = endpoint ? `${this.baseEndpoint}${endpoint}` : this.baseEndpoint;
 
       const config = {};
 
@@ -42,7 +42,7 @@ class apiService {
   // PUT request
   async put(data, endpoint = '') {
     try {
-      const url = endpoint ? `${this.baseEndpoint}/${endpoint}` : this.baseEndpoint;
+      const url = endpoint ? `${this.baseEndpoint}${endpoint}` : this.baseEndpoint;
       const response = await apiClient.put(url, data);
       return response;
     } catch (error) {
@@ -53,7 +53,7 @@ class apiService {
   // DELETE request
   async delete(endpoint = '') {
     try {
-      const url = endpoint ? `${this.baseEndpoint}/${endpoint}` : this.baseEndpoint;
+      const url = endpoint ? `${this.baseEndpoint}${endpoint}` : this.baseEndpoint;
       const response = await apiClient.delete(url);
       return response;
     } catch (error) {
@@ -64,7 +64,7 @@ class apiService {
   // PATCH request
   async patch(data, endpoint = '') {
     try {
-      const url = endpoint ? `${this.baseEndpoint}/${endpoint}` : this.baseEndpoint;
+      const url = endpoint ? `${this.baseEndpoint}${endpoint}` : this.baseEndpoint;
       const response = await apiClient.patch(url, data);
       return response;
     } catch (error) {
@@ -75,7 +75,7 @@ class apiService {
   // Generic request method
   async request(method, endpoint = '', data = null, config = {}) {
     try {
-      const url = endpoint ? `${this.baseEndpoint}/${endpoint}` : this.baseEndpoint;
+      const url = endpoint ? `${this.baseEndpoint}${endpoint}` : this.baseEndpoint;
       const response = await apiClient.request({
         method,
         url,

@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 import { BoxCategoryEnum, BoxSizeEnum, BoxTypeEnum } from "src/common/Enums";
 import DatesTable from "src/components/DataTable/Index";
+import { RouterUrls } from "src/common/RouterUrls";
 
 export default function AddProduct() {
 
@@ -289,7 +290,7 @@ export default function AddProduct() {
                 <PageTitle
                     heading="Add Box"
                     subHeading="Add a new box to your catalog"
-                    backUrl="/boxes"
+                    backUrl={RouterUrls.boxesList}
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
@@ -564,7 +565,7 @@ export default function AddProduct() {
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => navigate('/boxes')}
+                            onClick={() => navigate(RouterUrls.boxesList)}
                             size="large"
                             sx={{ ml: 2 }}
                         >

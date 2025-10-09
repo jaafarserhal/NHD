@@ -1,7 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Grid, Container, Typography, Chip, Box } from '@mui/material';
-import Footer from 'src/components/Footer';
 import { useState } from 'react';
 import { useApiCall } from '../../api/hooks/useApi';
 import dateService from '../../api/dateService';

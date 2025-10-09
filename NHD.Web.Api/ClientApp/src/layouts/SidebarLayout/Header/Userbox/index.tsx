@@ -54,7 +54,7 @@ function HeaderUserbox() {
     name: storedUser.fullName,
     phoneNumber: storedUser.phoneNumber,
     email: storedUser.email,
-    avatar: '/static/images/avatars/admin.png',
+    avatar: '/portal/static/images/avatars/admin.png',
   };
 
 
