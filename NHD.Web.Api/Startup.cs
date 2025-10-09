@@ -59,7 +59,8 @@ namespace NHD.Web.Api
                 {
                     policy.WithOrigins(
                         "http://localhost:3000",           // Development
-                        "https://www.nawahomeofdates.com/portal"  // Production
+                        "https://www.nawahomeofdates.com",     // Production (with www)
+                        "https://nawahomeofdates.com"          // Production (without www)
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
