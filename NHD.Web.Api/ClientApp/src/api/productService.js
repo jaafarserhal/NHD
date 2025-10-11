@@ -98,6 +98,22 @@ class productService extends apiService {
     async getAllDates() {
         return this.get(apiUrls.allDates);
     }
+    async getProductGalleries(productId, page = 1, limit = 10) {
+        return this.get(`${apiUrls.productsGallery}${productId}`, { page, limit });
+    }
+    async addProductGallery(gallery) {
+        const formData = new FormData();
+        formData.append('PrdId', String(gallery.prdId));
+        formData.append('AltText', gallery.altText || '');
+        formData.append('SortOrder', String(gallery.sortOrder || 0));
+        if (gallery.imageFile && gallery.imageFile instanceof File) {
+            formData.append('ImageUrl', gallery.imageFile, gallery.imageFile.name);
+        }
+        return this.post(formData, apiUrls.addProductGallery);
+    }
+    async deleteProductGallery(galleryId) {
+        return this.delete(`${apiUrls.deleteProductGallery}${galleryId}`);
+    }
 }
 
 export default new productService();

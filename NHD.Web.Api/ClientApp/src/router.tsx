@@ -28,6 +28,7 @@ const Dates = Loader(lazy(() => import('src/portal/dates/Index')));
 const Orders = Loader(lazy(() => import('src/portal/orders/Index')));
 const Customers = Loader(lazy(() => import('src/portal/customers/Index')));
 const Addresses = Loader(lazy(() => import('src/portal/addresses/Index')));
+const Galleries = Loader(lazy(() => import('src/portal/galleries/Index')));
 
 const routes: RouteObject[] = [
   {
@@ -47,7 +48,8 @@ const routes: RouteObject[] = [
       { path: RouterUrls.ordersList, element: <Orders /> },
       { path: RouterUrls.customersList, element: <Customers /> },
       { path: RouterUrls.addressesList, element: <Addresses /> },
-      { path: RouterUrls.transactionsList, element: <Transactions /> }
+      { path: RouterUrls.transactionsList, element: <Transactions /> },
+      { path: RouterUrls.boxGallery, element: <Galleries /> }
     ]
   },
   {

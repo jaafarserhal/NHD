@@ -97,6 +97,27 @@ CREATE TABLE dbo.product (
 );
 
 -- =============================================
+-- Product Gallery
+-- =============================================
+
+CREATE TABLE dbo.product_gallery (
+    gallery_id INT IDENTITY(1,1) PRIMARY KEY,
+    prd_id INT NOT NULL,
+    image_url NVARCHAR(500) NOT NULL,
+    alt_text NVARCHAR(255) NULL,            -- SEO: alternative text for accessibility/search
+    mime_type NVARCHAR(100) NULL,           -- e.g., image/jpeg, image/png
+    file_size_kb INT NULL,                  -- Approx file size in KB              -- Optional: image height in pixels
+    is_primary BIT NOT NULL DEFAULT 0,      -- Marks main image
+    sort_order INT NULL,                    -- Controls display order
+    created_at DATETIME2 NOT NULL 
+        CONSTRAINT DF_date_product_gallery_created DEFAULT SYSUTCDATETIME(),
+    CONSTRAINT FK_product_gallery_product FOREIGN KEY (prd_id)
+        REFERENCES dbo.product(prd_id)
+        ON DELETE CASCADE
+);
+
+
+-- =============================================
 -- Dates
 -- =============================================
 CREATE TABLE dbo.[dates] (

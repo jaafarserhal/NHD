@@ -16,4 +16,7 @@ export const apiUrls = {
     updateDate: '/Update',
     getDateById: '/GetById/',
     deleteDate: '/Delete/',
+    productsGallery: '/AllProductGalleries/',
+    addProductGallery: '/AddProductGallery',
+    deleteProductGallery: '/DeleteProductGallery/'
 };

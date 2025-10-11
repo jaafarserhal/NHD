@@ -17,6 +17,7 @@ import {
   Backdrop
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { LinkIcon } from 'lucide-react';
 
 type ColumnDefinition<T> = {
   key: keyof T | string;
@@ -31,6 +32,7 @@ type GenericTableProps<T> = {
   columns: ColumnDefinition<T>[];
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  onManage?: (item: T) => void;
   currentPage?: number;
   pageSize?: number;
   totalCount?: number;
@@ -46,6 +48,7 @@ function GenericTable<T extends Record<string, any>>({
   columns,
   onEdit,
   onDelete,
+  onManage,
   currentPage: externalPage,
   pageSize: externalPageSize,
   totalCount: externalTotalCount,
@@ -168,6 +171,13 @@ function GenericTable<T extends Record<string, any>>({
                           <Tooltip title="Delete" arrow>
                             <IconButton onClick={() => onDelete(row)} color="error">
                               <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {onManage && (
+                          <Tooltip title="Manage" arrow>
+                            <IconButton onClick={() => onManage(row)} color="default">
+                              <LinkIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         )}

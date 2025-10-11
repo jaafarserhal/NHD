@@ -290,6 +290,106 @@ namespace NHD.Web.Api.Controllers
                 return Ok(data);
             return BadRequest(data);
         }
+
+        [HttpGet]
+        [Route("AllProductGalleries/{productId}")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<ProductGalleryViewModel>>>> GetAllProductGalleries(int productId)
+        {
+            var data = await _productService.GetProductGalleriesAsync(productId);
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
+        }
+
+        [HttpPost]
+        [Route("AddProductGallery")]
+        public async Task<IActionResult> AddProductGallery([FromForm] ProductGalleryBindingModel dto)
+        {
+            try
+            {
+                if (dto == null)
+                    return BadRequest("Product data is required");
+
+                if (dto.ImageUrl == null || dto.ImageUrl.Length == 0)
+                    return BadRequest("Image is required");
+                // Create unique file name
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
+                var folderPath = Path.Combine("wwwroot/uploads", "products");
+
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                var filePath = Path.Combine(folderPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ImageUrl.CopyToAsync(stream);
+                }
+
+                // Create Product entity
+                var gallery = new ProductGallery
+                {
+                    PrdId = dto.PrdId,
+                    ImageUrl = fileName,
+                    SortOrder = dto.SortOrder,
+                    AltText = dto.AltText,
+                    MimeType = dto.ImageUrl.ContentType,
+                    FileSizeKb = (int)(dto.ImageUrl.Length / 1024),
+                    IsPrimary = false
+                };
+                var created = await _productService.AddProductGalleryAsync(gallery);
+                return CreatedAtAction("GetAllProductGalleries", new { id = created.GalleryId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while adding product gallery");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+
+        [HttpDelete("DeleteProductGallery/{galleryId}")]
+        public async Task<IActionResult> DeleteProductGallery(int galleryId)
+        {
+            // First, try to get the product so we know the image name
+            var gallery = await _productService.GetGalleryAsync(galleryId);
+            if (gallery == null)
+            {
+                return NotFound(new { message = "Gallery not found." });
+            }
+
+            // Attempt to delete from DB
+            var result = await _productService.DeleteProductGalleryAsync(galleryId);
+
+            if (!result.IsSuccess)
+            {
+                if (result.ErrorMessage?.Contains("not found", StringComparison.OrdinalIgnoreCase) == true)
+                    return NotFound(new { message = result.ErrorMessage });
+
+                return BadRequest(new { message = result.ErrorMessage, validationErrors = result.ValidationErrors });
+            }
+
+            // ✅ Delete image file if it exists
+            try
+            {
+                if (!string.IsNullOrEmpty(gallery.ImageUrl))
+                {
+                    var imagePath = Path.Combine("wwwroot/uploads/products", gallery.ImageUrl);
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
+                        _logger.LogInformation("Deleted image: {ImagePath}", imagePath);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to delete product image for gallery ID {Id}", galleryId);
+                // We won't fail the API here because the DB deletion already succeeded
+            }
+
+            return NoContent();
+        }
         #endregion Products
 
         #region Lookups

@@ -9,4 +9,6 @@ export const RouterUrls = {
     addressesList: '/addresses',
     ordersList: '/orders',
     transactionsList: '/transactions',
+    boxGallery: '/boxes/gallery/:prdId',
+    galleryAdd: '/boxes/gallery/add',
 };

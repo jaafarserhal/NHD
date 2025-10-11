@@ -1,0 +1,400 @@
+import { Helmet } from 'react-helmet-async';
+import PageTitleWrapper from 'src/components/PageTitleWrapper';
+import {
+    Grid,
+    Container,
+    Typography,
+    Box,
+    Card,
+    CardHeader,
+    CardContent,
+    Divider,
+    TextField,
+    Button
+} from '@mui/material';
+import { useState, useRef } from 'react';
+import { useApiCall } from '../../api/hooks/useApi';
+import productService from '../../api/productService';
+import GenericTable from 'src/components/GenericTable/index';
+import PageHeader from '../PageHeader';
+import ConfirmDialog from 'src/components/ConfirmDialog/Index';
+import { useNavigate, useParams } from 'react-router-dom';
+import { RouterUrls } from 'src/common/RouterUrls';
+import { getImageSrc } from 'src/common/getImageSrc';
+import { ProductGallery } from '../models/Types';
+import { PortalToastContainer } from 'src/components/Toaster/Index';
+import PageTitle from 'src/components/PageTitle';
+
+
+function ProductsGallery() {
+    const { prdId } = useParams<{ prdId: string }>();
+    const navigate = useNavigate();
+
+    // List states
+    const [page, setPage] = useState(0);
+    const [limit, setLimit] = useState(10);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [selectedGallery, setSelectedGallery] = useState(null);
+
+    // Form states
+    const [form, setForm] = useState<Omit<ProductGallery, "id" | "imageUrl">>({
+        sortOrder: 0,
+        altText: ""
+    });
+    const [image, setImage] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const [errors, setErrors] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
+    const errorBoxRef = useRef<HTMLDivElement>(null);
+
+    // Fetch products
+    const { data: products, loading: productsLoading, error, refetch } = useApiCall(
+        () => productService.getProductGalleries(prdId, page + 1, limit),
+        [page, limit]
+    );
+
+    // Delete handlers
+    const handleDeleteClick = (gallery) => {
+        setSelectedGallery(gallery);
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!selectedGallery) return;
+        try {
+            await productService.deleteProductGallery(selectedGallery.id);
+            setConfirmOpen(false);
+            setSelectedGallery(null);
+            refetch();
+        } catch (err) {
+            console.error("Delete failed:", err);
+        } finally {
+            setConfirmOpen(false);
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setConfirmOpen(false);
+        setSelectedGallery(null);
+    };
+
+    // File upload handler
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+
+        if (file) {
+            const maxSize = 1024 * 1024; // 1MB
+            if (file.size > maxSize) {
+                setErrors([`Image size must be less than 1MB. Selected file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`]);
+                e.target.value = '';
+                setImage(null);
+                setPreview(null);
+
+                setTimeout(() => {
+                    errorBoxRef.current?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }, 100);
+                return;
+            }
+
+            setImage(file);
+            setPreview(URL.createObjectURL(file));
+        } else {
+            setImage(null);
+            setPreview(null);
+        }
+
+        if (errors.length > 0) {
+            setErrors([]);
+        }
+    };
+
+    // Form validation
+    const validateForm = () => {
+        const validationErrors: string[] = [];
+
+        if (!form.altText.trim()) {
+            validationErrors.push("Alt text is required");
+        }
+        if (form.sortOrder === undefined || form.sortOrder === null) {
+            validationErrors.push("Sort order is required");
+        }
+        if (!image) {
+            validationErrors.push("Image is required");
+        }
+
+        setErrors(validationErrors);
+
+        if (validationErrors.length > 0) {
+            setTimeout(() => {
+                errorBoxRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 100);
+        }
+
+        return validationErrors.length === 0;
+    };
+
+    // Form submission
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setErrors([]);
+
+        if (!validateForm()) return;
+
+        setLoading(true);
+
+        try {
+            if (!image) throw new Error("Please select an image.");
+
+            const galleryData = {
+                ...form,
+                imageFile: image,
+                prdId: Number(prdId)
+            };
+
+            await productService.addProductGallery(galleryData);
+
+            // Reset form
+            setForm({
+                sortOrder: 0,
+                altText: "",
+            });
+            setImage(null);
+            setPreview(null);
+
+            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+            if (fileInput) fileInput.value = '';
+
+            // Refresh the gallery list
+            refetch();
+        } catch (error: any) {
+            console.error(error);
+            setErrors([error.message || 'Failed to add product']);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Table columns
+    const columns = [
+        {
+            key: 'createdAt',
+            label: 'Date',
+            render: (prd) => (
+                <span>
+                    {new Date(prd.createdAt).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "numeric",
+                        day: "numeric",
+                    })}{" "}
+                    -{" "}
+                    {new Date(prd.createdAt).toLocaleTimeString(undefined, {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: false,
+                    })}
+                </span>
+            )
+        },
+        {
+            key: 'imageUrl',
+            label: 'Image',
+            render: (prd) => (
+                <img
+                    src={getImageSrc(prd.imageUrl)}
+                    alt={prd.name}
+                    style={{
+                        width: '50px',
+                        height: '50px',
+                        objectFit: 'cover',
+                        borderRadius: '4px'
+                    }}
+                />
+            )
+        },
+        {
+            key: 'altText',
+            label: 'Alt Text'
+        },
+        {
+            key: 'sortOrder',
+            label: 'Sort Order'
+        }
+    ];
+
+    // Pagination handlers
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    const handleLimitChange = (newLimit) => {
+        setLimit(newLimit);
+        setPage(0);
+    };
+
+    if (error) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+                <Typography color="error">Error loading Galleries: {error.message}</Typography>
+            </Box>
+        );
+    }
+
+    return (
+        <>
+            <PortalToastContainer />
+            <Box display="flex" flexDirection="column" minHeight="100vh" overflow="hidden">
+                <Helmet>
+                    <title>Product Gallery - Applications</title>
+                </Helmet>
+
+                <PageTitleWrapper>
+                    <PageTitle
+                        heading="Product Gallery"
+                        subHeading="Manage product images"
+                        backUrl={`${RouterUrls.boxesList}/${prdId}`}
+                    />
+                </PageTitleWrapper>
+
+                <Container maxWidth="lg" sx={{ flex: 1, py: 3 }}>
+                    {/* Add Image Form */}
+                    <Box sx={{ mb: 4 }}>
+                        {errors.length > 0 && (
+                            <Box
+                                ref={errorBoxRef}
+                                sx={{ mb: 2, p: 2, bgcolor: 'error.light', color: 'error.contrastText', borderRadius: 1 }}
+                            >
+                                {errors.length === 1 ? (
+                                    errors[0]
+                                ) : (
+                                    <Box component="ul" sx={{ m: 0, pl: 2 }}>
+                                        {errors.map((error, index) => (
+                                            <li key={index}>{error}</li>
+                                        ))}
+                                    </Box>
+                                )}
+                            </Box>
+                        )}
+
+                        <form onSubmit={handleSubmit} noValidate>
+                            <Card>
+                                <CardHeader title="Add New Image" />
+                                <Divider />
+                                <CardContent>
+                                    <Grid container spacing={3}>
+                                        <Grid item xs={12} md={6}>
+                                            <TextField
+                                                required
+                                                name="altText"
+                                                label="Alt Text"
+                                                value={form.altText}
+                                                onChange={(e) => setForm({ ...form, altText: e.target.value })}
+                                                variant="outlined"
+                                                fullWidth
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} md={6}>
+                                            <TextField
+                                                required
+                                                name="sortOrder"
+                                                label="Sort Order"
+                                                type="number"
+                                                value={form.sortOrder}
+                                                onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
+                                                variant="outlined"
+                                                fullWidth
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleFileChange}
+                                                style={{ marginBottom: '1rem' }}
+                                                required
+                                            />
+                                            {!preview && (
+                                                <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
+                                                    * Image is required (max size: 1MB)
+                                                </Box>
+                                            )}
+                                            {preview && (
+                                                <Box sx={{ mt: 2 }}>
+                                                    <img
+                                                        src={preview}
+                                                        alt="Preview"
+                                                        style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
+                                                    />
+                                                </Box>
+                                            )}
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <Box textAlign="center">
+                                                <Button
+                                                    type="submit"
+                                                    variant="contained"
+                                                    disabled={loading}
+                                                    size="large"
+                                                >
+                                                    {loading ? "Adding..." : "Add Image"}
+                                                </Button>
+                                            </Box>
+                                        </Grid>
+                                    </Grid>
+                                </CardContent>
+                            </Card>
+                        </form>
+                    </Box>
+
+                    {/* Images List */}
+                    <Card>
+                        <CardHeader title="Gallery Images" />
+                        <Divider />
+                        <CardContent>
+                            {productsLoading ? (
+                                <Box display="flex" justifyContent="center" p={3}>
+                                    <Typography>Loading...</Typography>
+                                </Box>
+                            ) : !products || !products.data || products.data.length === 0 ? (
+                                <Typography variant="h6" color="textSecondary" align="center" py={3}>
+                                    No images found.
+                                </Typography>
+                            ) : (
+                                <GenericTable
+                                    data={products.data}
+                                    idKey="id"
+                                    columns={columns}
+                                    onDelete={(prd) => handleDeleteClick(prd)}
+                                    currentPage={page}
+                                    pageSize={limit}
+                                    totalCount={products.total || products.data.length}
+                                    onPageChange={handlePageChange}
+                                    onPageSizeChange={handleLimitChange}
+                                    disableInternalPagination={true}
+                                />
+                            )}
+                        </CardContent>
+                    </Card>
+                </Container>
+
+                <ConfirmDialog
+                    open={confirmOpen}
+                    onClose={handleCancelDelete}
+                    onConfirm={handleConfirmDelete}
+                    title="Delete Image"
+                    message="Are you sure you want to delete this item? This action cannot be undone."
+                    confirmText="Delete"
+                    cancelText="Cancel"
+                    confirmVariant="danger"
+                />
+            </Box>
+        </>
+    );
+}
+
+export default ProductsGallery;

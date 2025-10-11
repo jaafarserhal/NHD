@@ -30,6 +30,13 @@ export interface DatesProduct {
     isFilled: boolean;
 }
 
+export interface ProductGallery {
+    prdId?: number;
+    imageUrl: string;
+    altText: string;
+    sortOrder: number;
+}
+
 export interface LookupItem {
     id: number;
     nameEn: string;

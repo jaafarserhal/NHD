@@ -10,6 +10,7 @@ using NHD.Core.Data;
 using NHD.Core.Models;
 using NHD.Core.Repository.DateProducts;
 using NHD.Core.Repository.Dates;
+using NHD.Core.Repository.Gallery;
 using NHD.Core.Repository.Lookup;
 using NHD.Core.Repository.Products;
 using NHD.Core.Services.Model;
@@ -26,18 +27,21 @@ namespace NHD.Core.Services.Products
         private readonly ILookupRepository _lookupRepository;
         private readonly IDateProductsRepository _dateProductsRepository;
 
+        private readonly IProductGalleryRepository _productGalleryRepository;
+
         private readonly IDatesRepository _datesRepository;
 
         private readonly ILogger<ProductService> _logger;
 
         protected internal IDbContextTransaction Transaction;
 
-        public ProductService(AppDbContext context, IProductRepository productRepository, ILookupRepository lookupRepository, IDateProductsRepository dateProductsRepository, IDatesRepository datesRepository, ILogger<ProductService> logger)
+        public ProductService(AppDbContext context, IProductRepository productRepository, ILookupRepository lookupRepository, IDateProductsRepository dateProductsRepository, IProductGalleryRepository productGalleryRepository, IDatesRepository datesRepository, ILogger<ProductService> logger)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             _productRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));
             _lookupRepository = lookupRepository ?? throw new ArgumentNullException(nameof(lookupRepository));
             _dateProductsRepository = dateProductsRepository ?? throw new ArgumentNullException(nameof(dateProductsRepository));
+            _productGalleryRepository = productGalleryRepository ?? throw new ArgumentNullException(nameof(productGalleryRepository));
             _datesRepository = datesRepository ?? throw new ArgumentNullException(nameof(datesRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -143,6 +147,31 @@ namespace NHD.Core.Services.Products
             }
         }
 
+        public async Task<PagedServiceResult<IEnumerable<ProductGalleryViewModel>>> GetProductGalleriesAsync(int productId, int page = 1, int limit = 10)
+        {
+            try
+            {
+                if (page <= 0 || limit <= 0)
+                {
+                    return PagedServiceResult<IEnumerable<ProductGalleryViewModel>>.Failure("Page and limit must be greater than 0");
+                }
+
+                var pagedResult = await _productGalleryRepository.GetProductGalleriesAsync(productId, page, limit);
+                var productGalleryDtos = pagedResult.Data.Select(MapToProductGalleryDto).ToList();
+
+                return PagedServiceResult<IEnumerable<ProductGalleryViewModel>>.Success(
+                    productGalleryDtos,
+                    pagedResult.Total,
+                    pagedResult.Page,
+                    pagedResult.Limit
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving product galleries");
+                return PagedServiceResult<IEnumerable<ProductGalleryViewModel>>.Failure("An error occurred while retrieving product galleries");
+            }
+        }
 
         public async Task<List<DatesProduct>> SaveDatesProductsAsync(List<DatesProductBindingModel> datesProducts)
         {
@@ -253,6 +282,41 @@ namespace NHD.Core.Services.Products
                 return null;
             }
         }
+
+        public async Task<ProductGallery> AddProductGalleryAsync(ProductGallery productGallery)
+        {
+            await _productGalleryRepository.AddAsync(productGallery);
+            return productGallery;
+        }
+
+        public async Task<ServiceResult<bool>> DeleteGalleryAsync(int galleryId)
+        {
+            var productGallery = await _productGalleryRepository.GetByIdAsync(galleryId);
+            if (productGallery == null)
+            {
+                return ServiceResult<bool>.Failure($"Product gallery with ID {galleryId} not found.");
+            }
+
+            await _productGalleryRepository.DeleteAsync(productGallery.GalleryId);
+            return ServiceResult<bool>.Success(true);
+        }
+
+        public async Task<ServiceResult<bool>> DeleteProductGalleryAsync(int productId)
+        {
+            var result = await _productGalleryRepository.DeleteProductGalleriesAsync(productId);
+            if (!result)
+            {
+                return ServiceResult<bool>.Failure($"Product galleries for product ID {productId} not found.");
+            }
+            return ServiceResult<bool>.Success(true);
+        }
+
+
+        public async Task<ProductGallery> GetGalleryAsync(int id)
+        {
+            return await _productGalleryRepository.GetByIdAsync(id);
+        }
+
         #endregion Products
 
         #region Lookups
@@ -346,6 +410,18 @@ namespace NHD.Core.Services.Products
                 IsActive = product.IsActive ?? false,
                 CreatedAt = product.CreatedAt,
 
+            };
+        }
+
+        private ProductGalleryViewModel MapToProductGalleryDto(ProductGallery productGallery)
+        {
+            return new ProductGalleryViewModel
+            {
+                Id = productGallery.GalleryId,
+                AltText = productGallery.AltText,
+                ImageUrl = productGallery.ImageUrl,
+                SortOrder = productGallery.SortOrder,
+                CreatedAt = productGallery.CreatedAt
             };
         }
         #endregion Mappers

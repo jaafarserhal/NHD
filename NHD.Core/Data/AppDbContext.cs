@@ -10,6 +10,7 @@ public partial class AppDbContext : DbContext
     public AppDbContext()
     {
     }
+
     public bool InMemoryDatabase { get; }
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { InMemoryDatabase = options.Extensions.Any(item => item.GetType().Name == "InMemoryOptionsExtension"); }
 
@@ -35,9 +36,13 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<ProductGallery> ProductGalleries { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer($"Name=ConnectionStrings:{Utilities.AppConstants.CONNECTION_NAME}");
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Address>(entity =>
@@ -407,6 +412,36 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.PrdLookupTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_product_type");
+        });
+
+        modelBuilder.Entity<ProductGallery>(entity =>
+        {
+            entity.HasKey(e => e.GalleryId).HasName("PK__product___43D54A71F1CEC753");
+
+            entity.ToTable("product_gallery");
+
+            entity.Property(e => e.GalleryId).HasColumnName("gallery_id");
+            entity.Property(e => e.AltText)
+                .HasMaxLength(255)
+                .HasColumnName("alt_text");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.FileSizeKb).HasColumnName("file_size_kb");
+            entity.Property(e => e.ImageUrl)
+                .IsRequired()
+                .HasMaxLength(500)
+                .HasColumnName("image_url");
+            entity.Property(e => e.IsPrimary).HasColumnName("is_primary");
+            entity.Property(e => e.MimeType)
+                .HasMaxLength(100)
+                .HasColumnName("mime_type");
+            entity.Property(e => e.PrdId).HasColumnName("prd_id");
+            entity.Property(e => e.SortOrder).HasColumnName("sort_order");
+
+            entity.HasOne(d => d.Prd).WithMany(p => p.ProductGalleries)
+                .HasForeignKey(d => d.PrdId)
+                .HasConstraintName("FK_product_gallery_product");
         });
 
         modelBuilder.Entity<User>(entity =>

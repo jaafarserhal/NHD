@@ -31,4 +31,12 @@ namespace NHD.Core.Services.Model.Products
         public bool IsFilled { get; set; }
         public int Quantity { get; set; }
     }
+
+    public class ProductGalleryBindingModel
+    {
+        public int PrdId { get; set; }
+        public IFormFile ImageUrl { get; set; }
+        public string AltText { get; set; }
+        public int? SortOrder { get; set; }
+    }
 }

@@ -25,4 +25,13 @@ namespace NHD.Core.Services.Model.Products
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
     }
+
+    public class ProductGalleryViewModel
+    {
+        public int Id { get; set; }
+        public string AltText { get; set; }
+        public string ImageUrl { get; set; }
+        public int? SortOrder { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
 }
