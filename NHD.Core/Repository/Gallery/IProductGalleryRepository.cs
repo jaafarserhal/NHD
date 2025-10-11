@@ -12,5 +12,7 @@ namespace NHD.Core.Repository.Gallery
     {
         Task<PagedResult<ProductGallery>> GetProductGalleriesAsync(int productId, int page, int limit);
         Task<bool> DeleteProductGalleriesAsync(int productId);
+
+        Task<IEnumerable<ProductGallery>> GetAllGalleriesByProductIdAsync(int productId);
     }
 }

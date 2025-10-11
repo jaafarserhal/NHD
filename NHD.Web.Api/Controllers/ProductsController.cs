@@ -271,6 +271,8 @@ namespace NHD.Web.Api.Controllers
                     }
                 }
             }
+
+
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Failed to delete product image for product ID {Id}", id);
@@ -312,6 +314,11 @@ namespace NHD.Web.Api.Controllers
 
                 if (dto.ImageUrl == null || dto.ImageUrl.Length == 0)
                     return BadRequest("Image is required");
+
+                // Validate file size (1MB max as per frontend)
+                if (dto.ImageUrl.Length > 1024 * 1024)
+                    return BadRequest("Image size must be less than 1MB");
+
                 // Create unique file name
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
                 var folderPath = Path.Combine("wwwroot/uploads", "products");
@@ -337,13 +344,14 @@ namespace NHD.Web.Api.Controllers
                     FileSizeKb = (int)(dto.ImageUrl.Length / 1024),
                     IsPrimary = false
                 };
+
                 var created = await _productService.AddProductGalleryAsync(gallery);
-                return CreatedAtAction("GetAllProductGalleries", new { id = created.GalleryId });
+                return Ok(created);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while adding product gallery");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, new { message = "Internal server error", details = ex.Message });
             }
         }
 
@@ -359,7 +367,7 @@ namespace NHD.Web.Api.Controllers
             }
 
             // Attempt to delete from DB
-            var result = await _productService.DeleteProductGalleryAsync(galleryId);
+            var result = await _productService.DeleteGalleryAsync(galleryId);
 
             if (!result.IsSuccess)
             {

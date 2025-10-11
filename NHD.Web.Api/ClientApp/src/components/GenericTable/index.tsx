@@ -17,7 +17,7 @@ import {
   Backdrop
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { LinkIcon } from 'lucide-react';
+import { ImageIcon, LinkIcon } from 'lucide-react';
 
 type ColumnDefinition<T> = {
   key: keyof T | string;
@@ -175,9 +175,9 @@ function GenericTable<T extends Record<string, any>>({
                           </Tooltip>
                         )}
                         {onManage && (
-                          <Tooltip title="Manage" arrow>
+                          <Tooltip title="Manage Images" arrow>
                             <IconButton onClick={() => onManage(row)} color="default">
-                              <LinkIcon fontSize="small" />
+                              <ImageIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         )}

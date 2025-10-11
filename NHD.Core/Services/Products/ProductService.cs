@@ -120,8 +120,41 @@ namespace NHD.Core.Services.Products
                 return ServiceResult<bool>.Failure($"Product with ID {productId} not found.");
             }
 
-            await _productRepository.DeleteAsync(product.PrdId);
-            return ServiceResult<bool>.Success(true);
+            // Step 1: Get gallery image paths before deleting from DB
+            var galleries = await _productGalleryRepository.GetAllGalleriesByProductIdAsync(productId);
+            var imagePaths = galleries
+                .Where(g => !string.IsNullOrEmpty(g.ImageUrl))
+                .Select(g => Path.Combine("wwwroot/uploads/products", g.ImageUrl.TrimStart('/')))
+                .ToList();
+
+            try
+            {
+                // Step 2: Delete the product (cascade will remove galleries)
+                await _productRepository.DeleteAsync(product.PrdId);
+
+                // Step 3: Delete files after successful DB deletion
+                foreach (var path in imagePaths)
+                {
+                    try
+                    {
+                        if (File.Exists(path))
+                        {
+                            File.Delete(path);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Error deleting image file at {path}");
+                    }
+                }
+
+                return ServiceResult<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting product with ID {productId}");
+                return ServiceResult<bool>.Failure($"An error occurred while deleting the product: {ex.Message}");
+            }
         }
 
 
@@ -418,6 +451,7 @@ namespace NHD.Core.Services.Products
             return new ProductGalleryViewModel
             {
                 Id = productGallery.GalleryId,
+                Name = productGallery.Prd?.NameEn,
                 AltText = productGallery.AltText,
                 ImageUrl = productGallery.ImageUrl,
                 SortOrder = productGallery.SortOrder,

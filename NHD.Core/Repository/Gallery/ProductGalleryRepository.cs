@@ -52,5 +52,13 @@ namespace NHD.Core.Repository.Gallery
             }
             return true;
         }
+
+        public async Task<IEnumerable<ProductGallery>> GetAllGalleriesByProductIdAsync(int productId)
+        {
+            return await _context.ProductGalleries
+                .Where(pg => pg.PrdId == productId)
+                .OrderByDescending(pg => pg.SortOrder)
+                .ToListAsync();
+        }
     }
 }

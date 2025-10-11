@@ -16,7 +16,6 @@ import { useState, useRef } from 'react';
 import { useApiCall } from '../../api/hooks/useApi';
 import productService from '../../api/productService';
 import GenericTable from 'src/components/GenericTable/index';
-import PageHeader from '../PageHeader';
 import ConfirmDialog from 'src/components/ConfirmDialog/Index';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RouterUrls } from 'src/common/RouterUrls';
@@ -174,7 +173,7 @@ function ProductsGallery() {
             refetch();
         } catch (error: any) {
             console.error(error);
-            setErrors([error.message || 'Failed to add product']);
+            setErrors([error.message || 'Failed to add image. Please try again.']);
         } finally {
             setLoading(false);
         }
@@ -200,6 +199,10 @@ function ProductsGallery() {
                     })}
                 </span>
             )
+        },
+        {
+            key: 'name',
+            label: 'Box Name'
         },
         {
             key: 'imageUrl',
@@ -250,13 +253,13 @@ function ProductsGallery() {
             <PortalToastContainer />
             <Box display="flex" flexDirection="column" minHeight="100vh" overflow="hidden">
                 <Helmet>
-                    <title>Product Gallery - Applications</title>
+                    <title>Box Gallery - Applications</title>
                 </Helmet>
 
                 <PageTitleWrapper>
                     <PageTitle
-                        heading="Product Gallery"
-                        subHeading="Manage product images"
+                        heading="Box Gallery"
+                        subHeading="Manage box images"
                         backUrl={`${RouterUrls.boxesList}/${prdId}`}
                     />
                 </PageTitleWrapper>
@@ -353,7 +356,7 @@ function ProductsGallery() {
 
                     {/* Images List */}
                     <Card>
-                        <CardHeader title="Gallery Images" />
+                        <CardHeader title="Box Images" />
                         <Divider />
                         <CardContent>
                             {productsLoading ? (
