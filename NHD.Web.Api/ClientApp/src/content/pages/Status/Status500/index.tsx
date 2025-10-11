@@ -122,9 +122,7 @@ function Status500() {
                     fontWeight="normal"
                     sx={{ mb: 4 }}
                   >
-                    High performance React template built with lots of powerful
-                    Material-UI components across multiple product niches for
-                    fast &amp; perfect apps development processes.
+                    Offers a premium date experience crafted for those who value authenticity, taste, and wellbeing. Each date reflects the richness of nature and the essence of a healthy lifestyle — a refined, natural snack that complements modern living and inspires mindful indulgence.
                   </TypographySecondary>
                   <Button href="/overview" size="large" variant="contained">
                     Overview

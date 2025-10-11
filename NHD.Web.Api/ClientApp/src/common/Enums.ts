@@ -15,14 +15,17 @@ export const enum BoxTypeEnum {
 }
 
 export const enum BoxSizeEnum {
-    Pieces8 = 300,
-    Pieces20 = 301,
-    Pieces35 = 302,
-    Grams250 = 303,
-    Grams500 = 304,
-    Grams400 = 305,
-    Pieces3 = 306,
-    Piece1 = 307,
-    Milliliters400 = 308,
+    Piece1 = 300,
+    Pieces3 = 301,
+    Pieces8 = 302,
+    Pieces9 = 303,
+    Pieces12 = 304,
+    Pieces20 = 305,
+    Pieces35 = 306,
+    Grams250 = 307,
+    Grams400 = 308,
     Grams450 = 309,
+    Grams500 = 310,
+    Milliliters400 = 311
 }
+

@@ -373,6 +373,53 @@ export default function UpdateProduct() {
         });
     };
 
+    const getFilteredSizes = () => {
+        if (!form.categoryId || !sizes?.data) return [];
+
+        return sizes.data.filter(size => {
+            switch (form.categoryId) {
+                case BoxCategoryEnum.SignatureDateGifts:
+                    return [
+                        BoxSizeEnum.Pieces8,
+                        BoxSizeEnum.Pieces9,
+                        BoxSizeEnum.Pieces12,
+                        BoxSizeEnum.Pieces20,
+                        BoxSizeEnum.Pieces35
+                    ].includes(size.id);
+
+                case BoxCategoryEnum.SignatureDates:
+                    return [
+                        BoxSizeEnum.Grams250,
+                        BoxSizeEnum.Grams400
+                    ].includes(size.id);
+
+                case BoxCategoryEnum.SignatureFilledDates:
+                    return [
+                        BoxSizeEnum.Grams250,
+                        BoxSizeEnum.Grams400
+                    ].includes(size.id);
+
+                case BoxCategoryEnum.ClassicDatePouches:
+                    return size.id === BoxSizeEnum.Grams500;
+
+                case BoxCategoryEnum.DateSnacks:
+                    return [
+                        BoxSizeEnum.Piece1,
+                        BoxSizeEnum.Pieces3
+                    ].includes(size.id);
+
+                case BoxCategoryEnum.DateSweetners:
+                    return [
+                        BoxSizeEnum.Milliliters400,
+                        BoxSizeEnum.Grams450
+                    ].includes(size.id);
+
+                default:
+                    return true;
+            }
+        });
+    };
+
     if (loadingProduct) {
         return (
             <>
@@ -513,55 +560,29 @@ export default function UpdateProduct() {
                                             disabled={sizesLoading || !form.categoryId}
                                         >
                                             <option value="">Select Size</option>
-                                            {sizes?.data
-                                                ?.filter(size => {
-                                                    if (form.categoryId === BoxCategoryEnum.DateSweetners) {
-                                                        return (
-                                                            size.id === BoxSizeEnum.Milliliters400 ||
-                                                            size.id === BoxSizeEnum.Grams450
-                                                        );
-                                                    } else {
-                                                        return (
-                                                            size.id != BoxSizeEnum.Milliliters400 &&
-                                                            size.id != BoxSizeEnum.Grams450
-                                                        );
-                                                    }
-                                                })
-                                                .map(option => (
-                                                    <option key={option.id} value={option.id}>
-                                                        {option.nameEn}
-                                                    </option>
-                                                ))}
+                                            {getFilteredSizes().map(option => (
+                                                <option key={option.id} value={option.id}>
+                                                    {option.nameEn}
+                                                </option>
+                                            ))}
                                         </TextField>
 
                                         <TextField
                                             required
-                                            name="typeId"
+                                            name="sizeId"
                                             select
-                                            value={form.typeId || ''}
+                                            value={form.sizeId || ''}
                                             onChange={handleChange}
                                             SelectProps={{ native: true }}
                                             variant="standard"
-                                            disabled={typesLoading || !form.categoryId}
+                                            disabled={sizesLoading || !form.categoryId}
                                         >
-                                            <option value="">Select Type</option>
-                                            {types?.data
-                                                ?.filter(type => {
-                                                    if (form.categoryId === BoxCategoryEnum.DateSweetners) {
-                                                        return (
-                                                            type.id === BoxTypeEnum.PlainDate
-                                                        );
-                                                    } else {
-                                                        return (
-                                                            type.id
-                                                        );
-                                                    }
-                                                })
-                                                .map(option => (
-                                                    <option key={option.id} value={option.id}>
-                                                        {option.nameEn}
-                                                    </option>
-                                                ))}
+                                            <option value="">Select Size</option>
+                                            {getFilteredSizes().map(option => (
+                                                <option key={option.id} value={option.id}>
+                                                    {option.nameEn}
+                                                </option>
+                                            ))}
                                         </TextField>
                                     </Box>
                                 </CardContent>
