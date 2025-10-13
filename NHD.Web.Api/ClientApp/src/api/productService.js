@@ -32,6 +32,7 @@ class productService extends apiService {
                 formData.append(`Dates[${index}].DateId`, String(date.dateId));
                 formData.append(`Dates[${index}].IsFilled`, String(date.isFilled));
                 formData.append(`Dates[${index}].Quantity`, String(date.quantity));
+                formData.append(`Dates[${index}].IsPerWeight`, String(date.isPerWeight));
             });
         }
 
@@ -64,6 +65,7 @@ class productService extends apiService {
                 formData.append(`Dates[${index}].DateId`, String(date.dateId));
                 formData.append(`Dates[${index}].IsFilled`, String(date.isFilled || false));
                 formData.append(`Dates[${index}].Quantity`, String(date.quantity || 0));
+                formData.append(`Dates[${index}].IsPerWeight`, String(date.isPerWeight || false));
             });
         }
 

@@ -17,6 +17,8 @@ public partial class DatesProduct
 
     public int Quantity { get; set; }
 
+    public bool IsPerWeight { get; set; }
+
     public virtual Date Date { get; set; }
 
     public virtual Product Prd { get; set; }

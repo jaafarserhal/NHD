@@ -154,7 +154,7 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("dates_product");
 
-            entity.HasIndex(e => new { e.PrdId, e.DateId, e.IsFilled }, "UQ_dates_product").IsUnique();
+            entity.HasIndex(e => new { e.PrdId, e.DateId, e.IsFilled, e.IsPerWeight }, "UQ_dates_product").IsUnique();
 
             entity.Property(e => e.DpId).HasColumnName("dp_id");
             entity.Property(e => e.CreatedAt)
@@ -162,6 +162,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.DateId).HasColumnName("date_id");
             entity.Property(e => e.IsFilled).HasColumnName("is_filled");
+            entity.Property(e => e.IsPerWeight).HasColumnName("is_per_weight");
             entity.Property(e => e.PrdId).HasColumnName("prd_id");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
 

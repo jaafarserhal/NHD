@@ -239,7 +239,8 @@ namespace NHD.Core.Services.Products
                         PrdId = item.PrdId,
                         DateId = item.DateId,
                         IsFilled = item.IsFilled,
-                        Quantity = item.Quantity
+                        Quantity = item.Quantity,
+                        IsPerWeight = item.IsPerWeight
                     };
 
                     await context.DatesProducts.AddAsync(entity);
@@ -439,7 +440,8 @@ namespace NHD.Core.Services.Products
                     PrdId = dp.PrdId,
                     DateId = dp.DateId,
                     IsFilled = dp.IsFilled,
-                    Quantity = dp.Quantity
+                    Quantity = dp.Quantity,
+                    IsPerWeight = dp.IsPerWeight
                 }).ToList() ?? new List<DatesProductBindingModel>(),
                 IsActive = product.IsActive ?? false,
                 CreatedAt = product.CreatedAt,

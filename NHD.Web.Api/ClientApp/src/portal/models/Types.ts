@@ -29,6 +29,7 @@ export interface DatesProduct {
     dateId: number;
     quantity: number;
     isFilled: boolean;
+    isPerWeight: boolean;
 }
 
 export interface ProductGallery {

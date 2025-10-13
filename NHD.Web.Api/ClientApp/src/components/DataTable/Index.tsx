@@ -26,6 +26,7 @@ interface RowState {
   dateId: number;
   plainQuantity: number;
   filledQuantity: number;
+  isPerWeight: boolean;
 }
 
 export default function DatesTable({
@@ -52,6 +53,7 @@ export default function DatesTable({
         dateId: d.id as number,
         plainQuantity: plain?.quantity || 0,
         filledQuantity: filled?.quantity || 0,
+        isPerWeight: false,
       };
     });
     setRows(initial);
@@ -77,6 +79,7 @@ export default function DatesTable({
           dateId: r.dateId,
           quantity: r.plainQuantity,
           isFilled: false,
+          isPerWeight: r.isPerWeight
         });
       }
 
@@ -86,6 +89,7 @@ export default function DatesTable({
           dateId: r.dateId,
           quantity: r.filledQuantity,
           isFilled: true,
+          isPerWeight: r.isPerWeight
         });
       }
 

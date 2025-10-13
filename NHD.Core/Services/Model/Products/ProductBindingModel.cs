@@ -30,6 +30,7 @@ namespace NHD.Core.Services.Model.Products
         public int DateId { get; set; }
         public bool IsFilled { get; set; }
         public int Quantity { get; set; }
+        public bool IsPerWeight { get; set; }
     }
 
     public class ProductGalleryBindingModel

@@ -94,7 +94,7 @@ export default function AddProduct() {
             setForm((prev) => ({
                 ...prev,
                 fromPrice: calculatedPrice,
-                dates: [{ prdId: undefined, dateId: selectedDateId, quantity: weight, isFilled: prev.typeId === BoxTypeEnum.FilledDate }]
+                dates: [{ prdId: undefined, dateId: selectedDateId, quantity: weight, isFilled: prev.typeId === BoxTypeEnum.FilledDate, isPerWeight: true }]
             }));
         } else {
             setWeightPrice(0);
@@ -284,6 +284,16 @@ export default function AddProduct() {
         }
         if (!image) {
             validationErrors.push("Image is required");
+        }
+
+        // Add validation for Classic Date Pouches
+        if (form.categoryId === BoxCategoryEnum.ClassicDatePouches) {
+            if (!selectedDateId) {
+                validationErrors.push("Date selection is required for Classic Date Pouches");
+            }
+            if (!selectedWeight || selectedWeight <= 0) {
+                validationErrors.push("Quantity (grams) must be greater than 0 for Classic Date Pouches");
+            }
         }
 
         setErrors(validationErrors);
@@ -568,7 +578,6 @@ export default function AddProduct() {
                                 <Divider />
                                 <CardContent>
                                     {form.categoryId === BoxCategoryEnum.ClassicDatePouches ? (
-                                        // Date and weight selector for Classic Date Pouches
                                         <Box>
                                             <TextField
                                                 required
@@ -582,6 +591,7 @@ export default function AddProduct() {
                                                 fullWidth
                                                 sx={{ mb: 2 }}
                                                 disabled={allDatesLoading}
+                                                error={errors.some(e => e.includes('Date selection'))}
                                             >
                                                 <option value="">Select Date</option>
                                                 {allDates?.data?.map((date) => (
@@ -601,6 +611,7 @@ export default function AddProduct() {
                                                     onChange={handleWeightChange}
                                                     variant="standard"
                                                     fullWidth
+                                                    inputProps={{ min: 1 }}
                                                     sx={{
                                                         mb: 2,
                                                         '& input[type=number]': {
@@ -615,6 +626,7 @@ export default function AddProduct() {
                                                             margin: 0,
                                                         },
                                                     }}
+                                                    error={errors.some(e => e.includes('Weight must be greater'))}
                                                 />
                                             )}
 
