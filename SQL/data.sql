@@ -24,6 +24,7 @@ VALUES
 (200, 200,'Plain Date', 'Naturell Dadel',SYSUTCDATETIME(), 1),
 (201, 200,'Assorted Date', 'Blandade Dadlar',SYSUTCDATETIME(), 1),
 (202, 200,'Filled Date', 'Fyllda Dadlar',SYSUTCDATETIME(), 1),
+(203, 200,'None', 'Ingen',SYSUTCDATETIME(), 1),
  -- Product Sizes (300 series)
 (300, 300, '1 piece', '1 stycken', SYSUTCDATETIME(), 1),
 (301, 300, '3 pieces', '3 stycken', SYSUTCDATETIME(), 1),

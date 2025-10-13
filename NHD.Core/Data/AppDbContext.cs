@@ -139,10 +139,13 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NameSv)
                 .HasMaxLength(100)
                 .HasColumnName("name_sv");
-            entity.Property(e => e.Price)
-                .HasColumnType("decimal(10, 2)")
-                .HasColumnName("price");
             entity.Property(e => e.Quality).HasColumnName("quality");
+            entity.Property(e => e.UnitPrice)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("unit_price");
+            entity.Property(e => e.WeightPrice)
+                .HasColumnType("decimal(10, 2)")
+                .HasColumnName("weight_price");
         });
 
         modelBuilder.Entity<DatesProduct>(entity =>

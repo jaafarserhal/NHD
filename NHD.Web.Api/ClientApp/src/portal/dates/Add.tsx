@@ -19,7 +19,8 @@ export default function AddDate() {
         nameEn: "",
         nameSv: "",
         quality: false,
-        price: undefined,
+        unitPrice: undefined,
+        weightPrice: undefined,
         isActive: true,
     });
 
@@ -37,7 +38,7 @@ export default function AddDate() {
             [name]:
                 type === "checkbox"
                     ? checked
-                    : name === "price"
+                    : name === "unitPrice" || name === "weightPrice"
                         ? (value === "" ? 0 : parseFloat(value)) // ✅ convert to number
                         : name.toLowerCase().includes("id")
                             ? (value === "" ? undefined : Number(value))
@@ -76,8 +77,11 @@ export default function AddDate() {
         if (!form.nameSv.trim()) {
             validationErrors.push("Swedish name is required");
         }
-        if (form.price === undefined || form.price < 0) {
-            validationErrors.push("Valid price is required");
+        if (form.unitPrice === undefined || form.unitPrice < 0) {
+            validationErrors.push("Valid unit price is required");
+        }
+        if (form.weightPrice === undefined || form.weightPrice < 0) {
+            validationErrors.push("Valid weight price is required");
         }
 
         setErrors(validationErrors);
@@ -110,19 +114,21 @@ export default function AddDate() {
                 nameEn: form.nameEn,
                 nameSv: form.nameSv,
                 quality: form.quality,
-                price: form.price,
+                unitPrice: form.unitPrice || 0,
+                weightPrice: form.weightPrice || 0,
                 isActive: form.isActive,
             };
             await dateService.addDate(dateData);
 
-            navigate('/dates');
+            navigate(RouterUrls.datesList);
 
             // Reset form
             setForm({
                 nameEn: "",
                 nameSv: "",
                 quality: false,
-                price: undefined,
+                unitPrice: undefined,
+                weightPrice: undefined,
                 isActive: true,
             });
 
@@ -139,7 +145,7 @@ export default function AddDate() {
         <>
             <PortalToastContainer />
             <Helmet>
-                <title>Add Set - Application</title>
+                <title>Add Date - Application</title>
             </Helmet>
             <PageTitleWrapper>
                 <PageTitle
@@ -201,10 +207,34 @@ export default function AddDate() {
                                         />
 
                                         <TextField
-                                            name="price"
-                                            label="Price"
+                                            name="unitPrice"
+                                            label="Price / piece"
                                             type="number"
-                                            value={form.price || ''}
+                                            value={form.unitPrice || ''}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                            required
+                                            sx={{
+                                                '& input[type=number]': {
+                                                    '-moz-appearance': 'textfield',
+                                                },
+                                                '& input[type=number]::-webkit-outer-spin-button': {
+                                                    '-webkit-appearance': 'none',
+                                                    margin: 0,
+                                                },
+                                                '& input[type=number]::-webkit-inner-spin-button': {
+                                                    '-webkit-appearance': 'none',
+                                                    margin: 0,
+                                                },
+                                            }}
+                                        />
+
+                                        <TextField
+                                            name="weightPrice"
+                                            label="Price / gram"
+                                            type="number"
+                                            value={form.weightPrice || ''}
                                             onChange={handleChange}
                                             variant="standard"
                                             fullWidth

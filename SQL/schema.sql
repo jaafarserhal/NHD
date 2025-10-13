@@ -125,7 +125,8 @@ CREATE TABLE dbo.[dates] (
     name_en NVARCHAR(100) NOT NULL,
     name_sv NVARCHAR(100),
     quality BIT NOT NULL DEFAULT 0,
-    price DECIMAL(10, 2),
+    unit_price DECIMAL(10, 2) NOT NULL,
+	weight_price DECIMAL(10, 2) NOT NULL,
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_product_created DEFAULT SYSUTCDATETIME(),
     is_active BIT NOT NULL DEFAULT 1
@@ -141,13 +142,14 @@ CREATE TABLE dbo.dates_product (
     date_id INT NOT NULL,
     is_filled BIT NOT NULL DEFAULT 0,
 	quantity INT NOT NULL,
+	is_per_weight BIT NOT NULL,
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_dates_product_created DEFAULT SYSUTCDATETIME(),
     CONSTRAINT FK_dates_product_product FOREIGN KEY (prd_id)
         REFERENCES dbo.product(prd_id) ON DELETE CASCADE,
     CONSTRAINT FK_dates_product_dates FOREIGN KEY (date_id)
         REFERENCES dbo.dates(date_id) ON DELETE CASCADE,
-    CONSTRAINT UQ_dates_product UNIQUE (prd_id, date_id, is_filled)
+    CONSTRAINT UQ_dates_product UNIQUE (prd_id, date_id, is_filled, is_per_weight)
 );
 
 -- =============================================

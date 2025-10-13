@@ -168,8 +168,9 @@ namespace NHD.Core.Services.Products
                     Id = d.DateId,
                     NameEn = d.NameEn,
                     NameSv = d.NameSv,
-                    Price = d.Price ?? 0,
-
+                    UnitPrice = d.UnitPrice,
+                    WeightPrice = d.WeightPrice,
+                    Quality = d.Quality,
                 });
                 return ServiceResult<IEnumerable<DateViewModel>>.Success(dateViewModels);
             }
@@ -438,7 +439,7 @@ namespace NHD.Core.Services.Products
                     PrdId = dp.PrdId,
                     DateId = dp.DateId,
                     IsFilled = dp.IsFilled,
-                    Quantity = dp.Quantity ?? 0
+                    Quantity = dp.Quantity
                 }).ToList() ?? new List<DatesProductBindingModel>(),
                 IsActive = product.IsActive ?? false,
                 CreatedAt = product.CreatedAt,

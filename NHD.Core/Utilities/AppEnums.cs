@@ -49,6 +49,14 @@ namespace NHD.Core.Utilities
         DateSweetners = 105
     }
 
+    public enum BoxTypeEnum
+    {
+        PlainDate = 200,
+        AssortedDate = 201,
+        FilledDate = 202,
+        None = 203
+    }
+
     public enum HttpStatusCodeEnum
     {
         OK = 200,

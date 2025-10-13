@@ -108,7 +108,8 @@ namespace NHD.Core.Services.Dates
                 NameEn = date.NameEn,
                 NameSv = date.NameSv,
                 IsActive = date.IsActive,
-                Price = date?.Price ?? 0,
+                UnitPrice = date.UnitPrice,
+                WeightPrice = date.WeightPrice,
                 CreatedAt = date.CreatedAt
             };
         }

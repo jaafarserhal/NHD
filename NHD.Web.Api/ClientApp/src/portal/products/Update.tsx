@@ -42,7 +42,9 @@ export default function UpdateProduct() {
     const [totalPrice, setTotalPrice] = useState(0);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [pendingCategoryChange, setPendingCategoryChange] = useState<number | undefined>(undefined);
-
+    const [selectedDateId, setSelectedDateId] = useState<number | undefined>(undefined);
+    const [selectedWeight, setSelectedWeight] = useState<number>(0);
+    const [weightPrice, setWeightPrice] = useState<number>(0);
 
     const handleConfirmChange = async () => {
         setConfirmOpen(false);
@@ -54,10 +56,11 @@ export default function UpdateProduct() {
                 categoryId: pendingCategoryChange,
                 sizeId: undefined,
                 typeId: undefined,
-                dates: [], // Clear all dates
-                fromPrice: 0 // Reset price
+                dates: [],
+                fromPrice: 0
             }));
 
+            clearPriceAndDates();
             setPendingCategoryChange(undefined);
         }
     };
@@ -65,7 +68,6 @@ export default function UpdateProduct() {
     const handleCancelChange = () => {
         setConfirmOpen(false);
         setPendingCategoryChange(undefined);
-        // Category change is cancelled, no action needed
     };
 
     const [form, setForm] = useState<Product>({
@@ -123,6 +125,14 @@ export default function UpdateProduct() {
                 setPreview(product.imageUrl);
             }
 
+            // If this is a Classic Date Pouch, set the selected date and weight
+            if (product.categoryId === BoxCategoryEnum.ClassicDatePouches && product.dates?.length > 0) {
+                const firstDate = product.dates[0];
+                setSelectedDateId(firstDate.dateId);
+                setSelectedWeight(firstDate.quantity);
+                setWeightPrice(product.fromPrice || 0);
+            }
+
             // Clear the selected file when loading fresh data
             setImage(null);
         } catch (error: any) {
@@ -136,6 +146,62 @@ export default function UpdateProduct() {
     useEffect(() => {
         loadProduct();
     }, [id]);
+
+    const handleDateSelectionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const dateId = e.target.value ? parseInt(e.target.value, 10) : undefined;
+        setSelectedDateId(dateId);
+
+        // Reset weight and price when date changes
+        setSelectedWeight(0);
+        setWeightPrice(0);
+        setForm((prev) => ({
+            ...prev,
+            fromPrice: 0
+        }));
+
+        // Clear errors
+        if (errors.length > 0) {
+            setErrors([]);
+        }
+    };
+
+    const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const weight = e.target.value ? parseInt(e.target.value, 10) : 0;
+        setSelectedWeight(weight);
+
+        if (weight > 0 && selectedDateId) {
+            // Get the weightPrice from the selected date
+            const selectedDate = allDates?.data?.find(d => d.id === selectedDateId);
+            const pricePerGram = selectedDate?.weightPrice || 0;
+            const calculatedPrice = weight * pricePerGram;
+            setWeightPrice(calculatedPrice);
+
+            // Update form price
+            setForm((prev) => ({
+                ...prev,
+                fromPrice: calculatedPrice,
+                dates: [{ prdId: prev.id, dateId: selectedDateId, quantity: weight, isFilled: prev.typeId === BoxTypeEnum.FilledDate }]
+            }));
+        } else {
+            setWeightPrice(0);
+            setForm((prev) => ({
+                ...prev,
+                fromPrice: 0
+            }));
+        }
+
+        // Clear errors
+        if (errors.length > 0) {
+            setErrors([]);
+        }
+    };
+
+    const clearPriceAndDates = () => {
+        setTotalPrice(0);
+        setSelectedDateId(undefined);
+        setSelectedWeight(0);
+        setWeightPrice(0);
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -171,10 +237,9 @@ export default function UpdateProduct() {
                 updatedForm.sizeId = undefined;
                 updatedForm.typeId = undefined;
                 updatedForm.fromPrice = 0;
-                setTotalPrice(0);
+                clearPriceAndDates();
             }
 
-            // When typeId changes, update isFilled values in dates based on new type
             if (name === "typeId" && value !== "") {
                 const newTypeId = Number(value);
                 let newIsFilled = false;
@@ -188,13 +253,18 @@ export default function UpdateProduct() {
                     isFilled: newIsFilled,
                     quantity: 0
                 }));
-
                 updatedForm.fromPrice = 0;
-                setTotalPrice(0);
+                clearPriceAndDates();
             }
 
             if (name === "sizeId" && value !== "") {
                 updatedForm.typeId = undefined;
+
+                if (prev.categoryId === BoxCategoryEnum.DateSweetners) {
+                    updatedForm.typeId = BoxTypeEnum.None;
+                }
+                updatedForm.fromPrice = 0;
+                clearPriceAndDates();
             }
 
             return updatedForm;
@@ -205,7 +275,6 @@ export default function UpdateProduct() {
             setErrors([]);
         }
     };
-
 
     const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm((prev) => ({
@@ -267,12 +336,10 @@ export default function UpdateProduct() {
 
     // Handle date selection changes
     const handleDatesChange = (updatedDates: DatesProduct[]) => {
-        console.log("Updated Dates:", updatedDates);
-
         // Calculate price directly here
         const calculatedPrice = updatedDates.reduce((sum, item) => {
             const dateInfo = allDates?.data?.find((d) => d.id === item.dateId);
-            return sum + item.quantity * (dateInfo?.price || 0);
+            return sum + item.quantity * (dateInfo?.unitPrice || 0);
         }, 0);
 
         setTotalPrice(calculatedPrice);
@@ -343,7 +410,7 @@ export default function UpdateProduct() {
                 fromPrice: form.fromPrice,
                 isActive: form.isActive,
                 dates: form.dates,
-                imageFile: image // Only include if a new image was selected
+                imageFile: image
             };
 
             await productService.updateProduct(productData);
@@ -390,17 +457,17 @@ export default function UpdateProduct() {
                 case BoxCategoryEnum.SignatureDates:
                     return [
                         BoxSizeEnum.Grams250,
-                        BoxSizeEnum.Grams400
+                        BoxSizeEnum.Grams500
                     ].includes(size.id);
 
                 case BoxCategoryEnum.SignatureFilledDates:
                     return [
                         BoxSizeEnum.Grams250,
-                        BoxSizeEnum.Grams400
+                        BoxSizeEnum.Grams500
                     ].includes(size.id);
 
                 case BoxCategoryEnum.ClassicDatePouches:
-                    return size.id === BoxSizeEnum.Grams500;
+                    return size.id === BoxSizeEnum.Grams400;
 
                 case BoxCategoryEnum.DateSnacks:
                     return [
@@ -413,6 +480,27 @@ export default function UpdateProduct() {
                         BoxSizeEnum.Milliliters400,
                         BoxSizeEnum.Grams450
                     ].includes(size.id);
+
+                default:
+                    return true;
+            }
+        });
+    };
+
+    const getFilteredTypes = () => {
+        if (!form.categoryId || !types?.data) return [];
+
+        return types.data.filter(type => {
+            switch (form.categoryId) {
+
+                case BoxCategoryEnum.ClassicDatePouches:
+                    return [
+                        BoxTypeEnum.PlainDate,
+                        BoxTypeEnum.FilledDate
+                    ].includes(type.id);
+
+                case BoxCategoryEnum.DateSweetners:
+                    return type.id === BoxTypeEnum.PlainDate;
 
                 default:
                     return true;
@@ -567,69 +655,169 @@ export default function UpdateProduct() {
                                             ))}
                                         </TextField>
 
-                                        <TextField
-                                            required
-                                            name="sizeId"
-                                            select
-                                            value={form.sizeId || ''}
-                                            onChange={handleChange}
-                                            SelectProps={{ native: true }}
-                                            variant="standard"
-                                            disabled={sizesLoading || !form.categoryId}
-                                        >
-                                            <option value="">Select Size</option>
-                                            {getFilteredSizes().map(option => (
-                                                <option key={option.id} value={option.id}>
-                                                    {option.nameEn}
-                                                </option>
-                                            ))}
-                                        </TextField>
+                                        {form.categoryId !== BoxCategoryEnum.DateSweetners && (
+                                            <TextField
+                                                required
+                                                name="typeId"
+                                                select
+                                                value={form.typeId || ''}
+                                                onChange={handleChange}
+                                                SelectProps={{ native: true }}
+                                                variant="standard"
+                                                disabled={typesLoading || !form.categoryId}
+                                            >
+                                                <option value="">Select Type</option>
+                                                {getFilteredTypes().map(option => (
+                                                    <option key={option.id} value={option.id}>
+                                                        {option.nameEn}
+                                                    </option>
+                                                ))}
+                                            </TextField>
+                                        )}
                                     </Box>
                                 </CardContent>
                             </Card>
                         </Grid>
-                        {form.typeId && (<Grid item xs={12}>
-                            <Card>
-                                <CardHeader title="Price" />
-                                <Divider />
-                                <CardContent>
-                                    {form.categoryId !== BoxCategoryEnum.DateSweetners && (
-                                        <DatesTable
-                                            dates={(allDates?.data) || []}
-                                            value={form.dates}
-                                            onChange={handleDatesChange}
-                                            loading={allDatesLoading}
-                                            productId={0}
-                                            typeId={form.typeId}
-                                        />)}
-                                    <TextField
-                                        name="fromPrice"
-                                        label="Total Price"
-                                        type="number"
-                                        value={form.fromPrice || 0}
-                                        onChange={handleChange}
-                                        InputProps={{
-                                            readOnly: form.categoryId !== BoxCategoryEnum.DateSweetners,
-                                        }}
-                                        variant="standard"
-                                        fullWidth
-                                        sx={{
-                                            '& input[type=number]': {
-                                                '-moz-appearance': 'textfield',
-                                            },
-                                            '& input[type=number]::-webkit-outer-spin-button': {
-                                                '-webkit-appearance': 'none',
-                                                margin: 0,
-                                            },
-                                            '& input[type=number]::-webkit-inner-spin-button': {
-                                                '-webkit-appearance': 'none',
-                                                margin: 0,
-                                            },
-                                        }}
-                                    />
-                                </CardContent>
-                            </Card>
-                        </Grid>)}
+
+                        {![BoxCategoryEnum.DateSweetners].includes(form.categoryId) && form.typeId && (
+                            <Grid item xs={12}>
+                                <Card>
+                                    <CardHeader title="Dates" />
+                                    <Divider />
+                                    <CardContent>
+                                        {form.categoryId === BoxCategoryEnum.ClassicDatePouches ? (
+                                            // Date and weight selector for Classic Date Pouches
+                                            <Box>
+                                                <TextField
+                                                    required
+                                                    name="dateId"
+                                                    label="Select Date"
+                                                    select
+                                                    value={selectedDateId || ''}
+                                                    onChange={handleDateSelectionChange}
+                                                    SelectProps={{ native: true }}
+                                                    variant="standard"
+                                                    fullWidth
+                                                    sx={{ mb: 2 }}
+                                                    disabled={allDatesLoading}
+                                                >
+                                                    <option value="">Select Date</option>
+                                                    {allDates?.data?.map((date) => (
+                                                        <option key={date.id} value={date.id}>
+                                                            {date.nameEn}
+                                                        </option>
+                                                    ))}
+                                                </TextField>
+
+                                                {selectedDateId && (
+                                                    <TextField
+                                                        required
+                                                        name="weight"
+                                                        label="Quantity (grams)"
+                                                        type="number"
+                                                        value={selectedWeight || ''}
+                                                        onChange={handleWeightChange}
+                                                        variant="standard"
+                                                        fullWidth
+                                                        sx={{
+                                                            mb: 2,
+                                                            '& input[type=number]': {
+                                                                '-moz-appearance': 'textfield',
+                                                            },
+                                                            '& input[type=number]::-webkit-outer-spin-button': {
+                                                                '-webkit-appearance': 'none',
+                                                                margin: 0,
+                                                            },
+                                                            '& input[type=number]::-webkit-inner-spin-button': {
+                                                                '-webkit-appearance': 'none',
+                                                                margin: 0,
+                                                            },
+                                                        }}
+                                                    />
+                                                )}
+
+                                                {selectedWeight > 0 && selectedDateId && (
+                                                    <Box
+                                                        sx={{
+                                                            mt: 2,
+                                                            p: 2,
+                                                            bgcolor: 'action.hover',
+                                                            borderRadius: 1,
+                                                            border: '1px solid',
+                                                            borderColor: 'divider'
+                                                        }}
+                                                    >
+                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                            <strong>Selected Date:</strong>
+                                                            <span>{allDates?.data?.find(d => d.id === selectedDateId)?.nameEn}</span>
+                                                        </Box>
+                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                            <strong>Quantity:</strong>
+                                                            <span>{selectedWeight}g</span>
+                                                        </Box>
+                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                            <strong>Price per Gram:</strong>
+                                                            <span>${(allDates?.data?.find(d => d.id === selectedDateId)?.weightPrice || 0).toFixed(2)}</span>
+                                                        </Box>
+                                                        <Divider sx={{ my: 1 }} />
+                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                            <strong style={{ fontSize: '1.1rem' }}>Total Price:</strong>
+                                                            <strong style={{ fontSize: '1.1rem' }}>${weightPrice.toFixed(2)}</strong>
+                                                        </Box>
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                        ) : form.categoryId !== BoxCategoryEnum.ClassicDatePouches ? (
+                                            // Regular dates table for other categories
+                                            <DatesTable
+                                                dates={allDates?.data || []}
+                                                value={form.dates}
+                                                onChange={handleDatesChange}
+                                                loading={allDatesLoading}
+                                                productId={form.id}
+                                                typeId={form.typeId}
+                                            />
+                                        ) : null}
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        )}
+
+                        {form.typeId && (
+                            <Grid item xs={12}>
+                                <Card>
+                                    <CardHeader title="Price" />
+                                    <Divider />
+                                    <CardContent>
+                                        <TextField
+                                            name="fromPrice"
+                                            label="Total Price"
+                                            type="number"
+                                            value={form.fromPrice || 0}
+                                            onChange={handleChange}
+                                            InputProps={{
+                                                readOnly: form.categoryId !== BoxCategoryEnum.DateSweetners,
+                                            }}
+                                            variant="standard"
+                                            fullWidth
+                                            sx={{
+                                                '& input[type=number]': {
+                                                    '-moz-appearance': 'textfield',
+                                                },
+                                                '& input[type=number]::-webkit-outer-spin-button': {
+                                                    '-webkit-appearance': 'none',
+                                                    margin: 0,
+                                                },
+                                                '& input[type=number]::-webkit-inner-spin-button': {
+                                                    '-webkit-appearance': 'none',
+                                                    margin: 0,
+                                                },
+                                            }}
+                                        />
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        )}
 
                         <Grid item xs={12}>
                             <Card>
@@ -672,7 +860,7 @@ export default function UpdateProduct() {
                                                 name="isActive"
                                             />
                                         }
-                                        label="Active"
+                                        label=""
                                     />
                                 </CardContent>
                             </Card>

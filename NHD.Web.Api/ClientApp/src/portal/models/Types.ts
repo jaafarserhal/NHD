@@ -18,7 +18,8 @@ export interface Date {
     nameEn: string;
     nameSv: string;
     quality: boolean;
-    price: number;
+    unitPrice: number;
+    weightPrice: number;
     isActive: boolean;
 }
 

@@ -74,8 +74,12 @@ function Dates() {
             label: 'Name',
         },
         {
-            key: 'price',
-            label: 'Price'
+            key: 'unitPrice',
+            label: 'Price / piece',
+        },
+        {
+            key: 'weightPrice',
+            label: 'Price / gram',
         },
         {
             key: 'quality',

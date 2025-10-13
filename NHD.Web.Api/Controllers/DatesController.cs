@@ -76,7 +76,8 @@ namespace NHD.Web.Api.Controllers
                     NameEn = dto.NameEn,
                     NameSv = dto.NameSv,
                     Quality = dto.Quality,
-                    Price = dto.Price,
+                    UnitPrice = dto.UnitPrice,
+                    WeightPrice = dto.WeightPrice,
                     IsActive = dto.IsActive,
                 };
 
@@ -109,7 +110,8 @@ namespace NHD.Web.Api.Controllers
             existingDate.NameEn = dto.NameEn;
             existingDate.NameSv = dto.NameSv;
             existingDate.Quality = dto.Quality;
-            existingDate.Price = dto.Price;
+            existingDate.UnitPrice = dto.UnitPrice;
+            existingDate.WeightPrice = dto.WeightPrice;
             existingDate.IsActive = dto.IsActive;
             existingDate.CreatedAt = DateTime.UtcNow;
 

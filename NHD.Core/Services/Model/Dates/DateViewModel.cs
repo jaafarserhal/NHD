@@ -12,7 +12,9 @@ namespace NHD.Core.Services.Model.Dates
         public string NameSv { get; set; }
 
         public bool Quality { get; set; }
-        public decimal Price { get; set; }
+        public decimal UnitPrice { get; set; }
+
+        public decimal WeightPrice { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
 
