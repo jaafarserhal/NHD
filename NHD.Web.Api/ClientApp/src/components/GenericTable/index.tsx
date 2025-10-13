@@ -123,14 +123,14 @@ function GenericTable<T extends Record<string, any>>({
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
+              {/* <TableCell padding="checkbox">
                 <Checkbox
                   color="primary"
                   checked={allSelected}
                   indeterminate={someSelected}
                   onChange={handleSelectAll}
                 />
-              </TableCell>
+              </TableCell> */}
               {columns.map((col) => (
                 <TableCell key={col.key.toString()} align={col.align || 'left'}>
                   {col.label}
@@ -146,13 +146,13 @@ function GenericTable<T extends Record<string, any>>({
                 const isSelected = selected.includes(rowId);
                 return (
                   <TableRow key={rowId} hover selected={isSelected}>
-                    <TableCell padding="checkbox">
+                    {/* <TableCell padding="checkbox">
                       <Checkbox
                         color="primary"
                         checked={isSelected}
                         onChange={(e) => handleSelectOne(e, rowId)}
                       />
-                    </TableCell>
+                    </TableCell> */}
                     {columns.map((col) => (
                       <TableCell key={col.key.toString()} align={col.align || 'left'}>
                         {col.render ? col.render(row) : row[col.key]}

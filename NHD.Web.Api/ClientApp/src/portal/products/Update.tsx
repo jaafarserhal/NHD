@@ -704,7 +704,6 @@ export default function UpdateProduct() {
                                                 <TextField
                                                     required
                                                     name="dateId"
-                                                    label="Select Date"
                                                     select
                                                     value={selectedDateId || ''}
                                                     onChange={handleDateSelectionChange}
