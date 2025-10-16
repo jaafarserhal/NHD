@@ -380,7 +380,7 @@ namespace NHD.Core.Services.Products
             try
             {
                 var types = await _lookupRepository.GetProductTypesAsync();
-                var typeDtos = types.Select(t => new LookupItemDto
+                var typeDtos = types.Where(t => t.LookupId != (int)BoxTypeEnum.None).Select(t => new LookupItemDto
                 {
                     Id = t.LookupId,
                     NameEn = t.NameEn,
