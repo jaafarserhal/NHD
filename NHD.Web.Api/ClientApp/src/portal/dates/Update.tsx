@@ -242,7 +242,7 @@ export default function UpdateDate() {
                     >
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Set Details" />
+                                <CardHeader title="Details" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>

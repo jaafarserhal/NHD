@@ -25,9 +25,11 @@ import { PortalToastContainer } from 'src/components/Toaster/Index';
 import PageTitle from 'src/components/PageTitle';
 
 
-function ProductsGallery() {
+function Gallery() {
     const { prdId, dateId } = useParams<{ prdId?: string; dateId?: string }>();
     const navigate = useNavigate();
+
+    const isProductMode = Boolean(prdId);
 
     // List states
     const [page, setPage] = useState(0);
@@ -259,14 +261,14 @@ function ProductsGallery() {
             <PortalToastContainer />
             <Box display="flex" flexDirection="column" minHeight="100vh" overflow="hidden">
                 <Helmet>
-                    <title>Box Gallery - Applications</title>
+                    <title>Gallery - Applications</title>
                 </Helmet>
 
                 <PageTitleWrapper>
                     <PageTitle
-                        heading="Product Gallery"
-                        subHeading="Manage product images"
-                        backUrl={`${RouterUrls.productsList}/${prdId}`}
+                        heading="Gallery"
+                        subHeading="Manage images"
+                        backUrl={isProductMode ? `${RouterUrls.productsList}` : `${RouterUrls.datesList}`}
                     />
                 </PageTitleWrapper>
 
@@ -362,7 +364,7 @@ function ProductsGallery() {
 
                     {/* Images List */}
                     <Card>
-                        <CardHeader title="Box Images" />
+                        <CardHeader title="Gallery Images" />
                         <Divider />
                         <CardContent>
                             {productsLoading ? (
@@ -406,4 +408,4 @@ function ProductsGallery() {
     );
 }
 
-export default ProductsGallery;
+export default Gallery;

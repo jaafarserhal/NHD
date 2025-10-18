@@ -7,9 +7,9 @@ import BaseLayout from 'src/layouts/BaseLayout';
 
 import SuspenseLoader from 'src/components/SuspenseLoader';
 import AddProduct from './portal/products/Add';
-import EditProduct from './portal/products/Update';
+import UpdateProduct from './portal/products/Update';
 import AddDate from './portal/dates/Add';
-import EditDate from './portal/dates/Update';
+import UpdateDate from './portal/dates/Update';
 import Login from './portal/auth/Login';
 
 import { RouterUrls } from './common/RouterUrls';
@@ -44,10 +44,10 @@ const routes: RouteObject[] = [
     children: [
       { path: '', element: <Products /> },
       { path: RouterUrls.productAdd, element: <AddProduct /> },
-      { path: RouterUrls.productEdit, element: <EditProduct /> },
+      { path: RouterUrls.productEdit, element: <UpdateProduct /> },
       { path: RouterUrls.datesList, element: <Dates /> },
       { path: RouterUrls.dateAdd, element: <AddDate /> },
-      { path: RouterUrls.dateEdit, element: <EditDate /> },
+      { path: RouterUrls.dateEdit, element: <UpdateDate /> },
       { path: RouterUrls.ordersList, element: <Orders /> },
       { path: RouterUrls.customersList, element: <Customers /> },
       { path: RouterUrls.addressesList, element: <Addresses /> },

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using NHD.Core.Common.Models;
 using NHD.Core.Models;
 using NHD.Core.Repository.Dates;
+using NHD.Core.Repository.ImageGallery;
 using NHD.Core.Services.Model.Dates;
 
 namespace NHD.Core.Services.Dates
@@ -10,13 +11,15 @@ namespace NHD.Core.Services.Dates
     {
         private readonly IDatesRepository _datesRepository;
         private readonly IDatesCollectionRepository _datesCollectionRepository;
+        private readonly IGalleryRepository _galleryRepository;
 
         private readonly ILogger<DatesService> _logger;
 
-        public DatesService(IDatesRepository datesRepository, IDatesCollectionRepository datesCollectionRepository, ILogger<DatesService> logger)
+        public DatesService(IDatesRepository datesRepository, IDatesCollectionRepository datesCollectionRepository, IGalleryRepository galleryRepository, ILogger<DatesService> logger)
         {
             _datesRepository = datesRepository ?? throw new ArgumentNullException(nameof(datesRepository));
             _datesCollectionRepository = datesCollectionRepository ?? throw new ArgumentNullException(nameof(datesCollectionRepository));
+            _galleryRepository = galleryRepository ?? throw new ArgumentNullException(nameof(galleryRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -171,8 +174,41 @@ namespace NHD.Core.Services.Dates
                 return ServiceResult<bool>.Failure($"Date with ID {dateId} not found.");
             }
 
-            await _datesRepository.DeleteAsync(date.DateId);
-            return ServiceResult<bool>.Success(true);
+            // Step 1: Get gallery image paths before deleting from DB
+            var galleries = await _galleryRepository.GetAllGalleriesByProductIdOrDateIdAsync(null, dateId);
+            var imagePaths = galleries
+                .Where(g => !string.IsNullOrEmpty(g.ImageUrl))
+                .Select(g => Path.Combine("wwwroot/uploads/dates", g.ImageUrl.TrimStart('/')))
+                .ToList();
+
+            try
+            {
+                // Step 2: Delete the date (cascade will remove galleries)
+                await _datesRepository.DeleteAsync(date.DateId);
+
+                // Step 3: Delete files after successful DB deletion
+                foreach (var path in imagePaths)
+                {
+                    try
+                    {
+                        if (File.Exists(path))
+                        {
+                            File.Delete(path);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Error deleting image file at {path}");
+                    }
+                }
+
+                return ServiceResult<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting date with ID {dateId}");
+                return ServiceResult<bool>.Failure($"An error occurred while deleting the date: {ex.Message}");
+            }
         }
 
 
