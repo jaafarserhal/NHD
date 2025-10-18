@@ -133,7 +133,7 @@ function Products() {
     if (error) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-                <Typography color="error">Error loading Boxes: {error.message}</Typography>
+                <Typography color="error">Error loading Products: {error.message}</Typography>
             </Box>
         );
     }
@@ -146,11 +146,11 @@ function Products() {
             overflow="hidden"
         >
             <Helmet>
-                <title>Boxes - Applications</title>
+                <title>Products - Applications</title>
             </Helmet>
 
             <PageTitleWrapper>
-                <PageHeader sectionTitle="Boxes" href={RouterUrls.boxAdd} />
+                <PageHeader sectionTitle="Products" href={RouterUrls.productAdd} />
             </PageTitleWrapper>
 
             <Container
@@ -164,7 +164,7 @@ function Products() {
             >
                 {!products || !products.data || products.data.length === 0 ? (
                     <Typography variant="h6" color="textSecondary" align="center">
-                        No Boxes found.
+                        No Products found.
                     </Typography>
                 ) : (
                     <Grid
@@ -180,9 +180,9 @@ function Products() {
                                 data={products.data}
                                 idKey="id"
                                 columns={columns}
-                                onEdit={(prd) => navigate(`/boxes/edit/${prd.id}`)}
+                                onEdit={(prd) => navigate(`/products/edit/${prd.id}`)}
                                 onDelete={(prd) => handleDeleteClick(prd)}
-                                onManage={(prd) => navigate(`/boxes/gallery/${prd.id}`)}
+                                onManage={(prd) => navigate(`/products/gallery/${prd.id}`)}
                                 currentPage={page}
                                 pageSize={limit}
                                 totalCount={products.total || products.data.length}

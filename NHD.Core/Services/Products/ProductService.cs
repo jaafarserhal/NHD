@@ -360,7 +360,7 @@ namespace NHD.Core.Services.Products
             try
             {
                 var categories = await _lookupRepository.GetProductCategoriesAsync();
-                var categoryDtos = categories.Select(c => new LookupItemDto
+                var categoryDtos = categories.Where(c => c.LookupId != (int)BoxCategoryEnum.ChocolateDates).Select(c => new LookupItemDto
                 {
                     Id = c.LookupId,
                     NameEn = c.NameEn,

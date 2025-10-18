@@ -1,7 +1,7 @@
 export const RouterUrls = {
-    boxesList: '/boxes',
-    boxAdd: '/boxes/add',
-    boxEdit: '/boxes/edit/:id',
+    productsList: '/products',
+    productAdd: '/products/add',
+    productEdit: '/products/edit/:id',
     datesList: '/dates',
     dateAdd: '/dates/add',
     dateEdit: '/dates/edit/:id',
@@ -9,6 +9,6 @@ export const RouterUrls = {
     addressesList: '/addresses',
     ordersList: '/orders',
     transactionsList: '/transactions',
-    boxGallery: '/boxes/gallery/:prdId',
-    galleryAdd: '/boxes/gallery/add',
+    productsGallery: '/products/gallery/:prdId',
+    galleryAdd: '/products/gallery/add',
 };

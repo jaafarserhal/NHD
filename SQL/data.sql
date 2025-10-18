@@ -16,7 +16,7 @@ INSERT INTO dbo.gen_lookup
 VALUES
 (100, 100, N'Signature Date Gifts', N'DelikatessDadelgåvor',SYSUTCDATETIME(), 1),
 (101, 100, N'Signature Dates', N'DelikatessDadlar',SYSUTCDATETIME(), 1),
-(102, 100, N'Signature Filled Dates', N'Delikatessfyllda Dadlar',SYSUTCDATETIME(), 1),
+(102, 100, N'Chocolate Dates', N'ChokladDadlar',SYSUTCDATETIME(), 1),
 (103, 100, N'Classic Date Pouches', N'Klassisk dadelpåse',SYSUTCDATETIME(), 1),
 (104, 100, N'Date Snacks', N'Dadelmellanmål',SYSUTCDATETIME(), 1),
 (105, 100, N'Date Sweetners', N'Dadelsötning',SYSUTCDATETIME(), 1),

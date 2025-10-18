@@ -40,8 +40,8 @@ const routes: RouteObject[] = [
     ),
     children: [
       { path: '', element: <Products /> },
-      { path: RouterUrls.boxAdd, element: <AddProduct /> },
-      { path: RouterUrls.boxEdit, element: <EditProduct /> },
+      { path: RouterUrls.productAdd, element: <AddProduct /> },
+      { path: RouterUrls.productEdit, element: <EditProduct /> },
       { path: RouterUrls.datesList, element: <Dates /> },
       { path: RouterUrls.dateAdd, element: <AddDate /> },
       { path: RouterUrls.dateEdit, element: <EditDate /> },
@@ -49,7 +49,7 @@ const routes: RouteObject[] = [
       { path: RouterUrls.customersList, element: <Customers /> },
       { path: RouterUrls.addressesList, element: <Addresses /> },
       { path: RouterUrls.transactionsList, element: <Transactions /> },
-      { path: RouterUrls.boxGallery, element: <Galleries /> }
+      { path: RouterUrls.productsGallery, element: <Galleries /> }
     ]
   },
   {

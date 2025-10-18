@@ -2,7 +2,7 @@
 export const enum BoxCategoryEnum {
     SignatureDateGifts = 100,
     SignatureDates = 101,
-    SignatureFilledDates = 102,
+    ChocolateDates = 102,
     ClassicDatePouches = 103,
     DateSnacks = 104,
     DateSweetners = 105

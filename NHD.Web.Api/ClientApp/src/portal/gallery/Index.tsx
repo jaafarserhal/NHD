@@ -258,9 +258,9 @@ function ProductsGallery() {
 
                 <PageTitleWrapper>
                     <PageTitle
-                        heading="Box Gallery"
-                        subHeading="Manage box images"
-                        backUrl={`${RouterUrls.boxesList}/${prdId}`}
+                        heading="Product Gallery"
+                        subHeading="Manage product images"
+                        backUrl={`${RouterUrls.productsList}/${prdId}`}
                     />
                 </PageTitleWrapper>
 

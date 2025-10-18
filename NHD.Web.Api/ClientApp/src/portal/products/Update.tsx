@@ -473,12 +473,6 @@ export default function UpdateProduct() {
                         BoxSizeEnum.Grams500
                     ].includes(size.id);
 
-                case BoxCategoryEnum.SignatureFilledDates:
-                    return [
-                        BoxSizeEnum.Grams250,
-                        BoxSizeEnum.Grams500
-                    ].includes(size.id);
-
                 case BoxCategoryEnum.ClassicDatePouches:
                     return size.id === BoxSizeEnum.Grams400;
 
@@ -525,13 +519,13 @@ export default function UpdateProduct() {
         return (
             <>
                 <Helmet>
-                    <title>Update Box - Application</title>
+                    <title>Update Product - Application</title>
                 </Helmet>
                 <PageTitleWrapper>
                     <PageTitle
-                        heading="Update Box"
-                        subHeading="Loading Box details..."
-                        backUrl={RouterUrls.boxesList}
+                        heading="Update Product"
+                        subHeading="Loading Product details..."
+                        backUrl={RouterUrls.productsList}
                     />
                 </PageTitleWrapper>
                 <Container maxWidth="lg">
@@ -548,13 +542,13 @@ export default function UpdateProduct() {
         <>
             <PortalToastContainer />
             <Helmet>
-                <title>Update Box - Application</title>
+                <title>Update Product - Application</title>
             </Helmet>
             <PageTitleWrapper>
                 <PageTitle
-                    heading="Update Box"
-                    subHeading="Update existing Box set information"
-                    backUrl="/boxes"
+                    heading="Update Product"
+                    subHeading="Update existing Product information"
+                    backUrl={RouterUrls.productsList}
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
@@ -585,7 +579,7 @@ export default function UpdateProduct() {
                     >
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Box Details" />
+                                <CardHeader title="Details" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -628,7 +622,7 @@ export default function UpdateProduct() {
 
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Box Categories" />
+                                <CardHeader title="Categories" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -895,7 +889,7 @@ export default function UpdateProduct() {
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => navigate(RouterUrls.boxesList)}
+                            onClick={() => navigate(RouterUrls.productsList)}
                             size="large"
                             sx={{ ml: 2 }}
                         >
@@ -909,7 +903,7 @@ export default function UpdateProduct() {
                 onClose={handleCancelChange}
                 onConfirm={handleConfirmChange}
                 title="Change Category"
-                message={`Are you sure you want to change the category of this Box? Your about to remove all selected dates and reset the price. This action cannot be undone.`}
+                message={`Are you sure you want to change the category of this Product? Your about to remove all selected dates and reset the price. This action cannot be undone.`}
                 confirmText="Change"
                 cancelText="Cancel"
                 confirmVariant="danger"

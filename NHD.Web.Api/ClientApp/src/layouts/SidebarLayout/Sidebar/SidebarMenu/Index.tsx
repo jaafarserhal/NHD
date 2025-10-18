@@ -194,7 +194,7 @@ function SidebarMenu() {
                   to="/"
                   startIcon={<CheckBoxTwoToneIcon />}
                 >
-                  Boxes
+                  Products
                 </Button>
               </ListItem>
               <ListItem component="div">

@@ -327,7 +327,7 @@ export default function AddProduct() {
 
             await productService.addProduct(productData);
 
-            navigate('/boxes');
+            navigate(RouterUrls.productsList);
 
             // Reset form
             setForm({
@@ -371,12 +371,6 @@ export default function AddProduct() {
                     ].includes(size.id);
 
                 case BoxCategoryEnum.SignatureDates:
-                    return [
-                        BoxSizeEnum.Grams250,
-                        BoxSizeEnum.Grams500
-                    ].includes(size.id);
-
-                case BoxCategoryEnum.SignatureFilledDates:
                     return [
                         BoxSizeEnum.Grams250,
                         BoxSizeEnum.Grams500
@@ -430,13 +424,13 @@ export default function AddProduct() {
         <>
             <PortalToastContainer />
             <Helmet>
-                <title>Add Box - Application</title>
+                <title>Add Product - Application</title>
             </Helmet>
             <PageTitleWrapper>
                 <PageTitle
-                    heading="Add Box"
-                    subHeading="Add a new box to your catalog"
-                    backUrl={RouterUrls.boxesList}
+                    heading="Add Product"
+                    subHeading="Add a new product to your catalog"
+                    backUrl={RouterUrls.productsList}
                 />
             </PageTitleWrapper>
             <Container maxWidth="lg">
@@ -467,7 +461,7 @@ export default function AddProduct() {
                     >
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Box Details" />
+                                <CardHeader title="Details" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -510,7 +504,7 @@ export default function AddProduct() {
 
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Box Categories" />
+                                <CardHeader title="Categories" />
                                 <Divider />
                                 <CardContent>
                                     <Box sx={{ '& .MuiTextField-root': { m: 1, width: '100%' } }}>
@@ -771,7 +765,7 @@ export default function AddProduct() {
                         <Button
                             type="button"
                             variant="outlined"
-                            onClick={() => navigate(RouterUrls.boxesList)}
+                            onClick={() => navigate(RouterUrls.productsList)}
                             size="large"
                             sx={{ ml: 2 }}
                         >
