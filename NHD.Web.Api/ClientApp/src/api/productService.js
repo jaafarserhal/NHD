@@ -100,21 +100,28 @@ class productService extends apiService {
     async getAllDates() {
         return this.get(apiUrls.allDates);
     }
-    async getProductGalleries(productId, page = 1, limit = 10) {
-        return this.get(`${apiUrls.productsGallery}${productId}`, { page, limit });
+    async getGallery(productId, dateId, page = 1, limit = 10) {
+        let id = productId ? productId : dateId;
+        let type = productId ? 'product' : 'date';
+        return this.get(`${apiUrls.gallery}${id}/${type}`, { page, limit });
     }
-    async addProductGallery(gallery) {
+    async addGallery(gallery) {
         const formData = new FormData();
-        formData.append('PrdId', String(gallery.prdId));
+        if (gallery.prdId) {
+            formData.append('PrdId', String(gallery.prdId));
+        }
+        if (gallery.dateId) {
+            formData.append('DateId', String(gallery.dateId));
+        }
         formData.append('AltText', gallery.altText || '');
         formData.append('SortOrder', String(gallery.sortOrder || 0));
         if (gallery.imageFile && gallery.imageFile instanceof File) {
             formData.append('ImageUrl', gallery.imageFile, gallery.imageFile.name);
         }
-        return this.post(formData, apiUrls.addProductGallery);
+        return this.post(formData, apiUrls.addGallery);
     }
-    async deleteProductGallery(galleryId) {
-        return this.delete(`${apiUrls.deleteProductGallery}${galleryId}`);
+    async deleteGallery(galleryId) {
+        return this.delete(`${apiUrls.deleteGallery}${galleryId}`);
     }
 }
 

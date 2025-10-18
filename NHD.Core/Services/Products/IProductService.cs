@@ -25,12 +25,12 @@ namespace NHD.Core.Services.Products
         Task<Product> SaveProductWithDatesAsync(Product product, List<DatesProductBindingModel> datesProducts);
 
         Task<ServiceResult<IEnumerable<DateViewModel>>> GetAllDatesAsync();
-        Task<PagedServiceResult<IEnumerable<ProductGalleryViewModel>>> GetProductGalleriesAsync(int productId, int page = 1, int limit = 10);
-        Task<ProductGallery> AddProductGalleryAsync(ProductGallery productGallery);
+        Task<PagedServiceResult<IEnumerable<ProductGalleryViewModel>>> GetGalleriesAsync(int? productId, int? dateId, int page = 1, int limit = 10);
+        Task<Gallery> AddGalleryAsync(Gallery gallery);
         Task<ServiceResult<bool>> DeleteGalleryAsync(int galleryId);
 
-        Task<ServiceResult<bool>> DeleteProductGalleryAsync(int productId);
+        Task<ServiceResult<bool>> DeleteGalleryAsync(int? productId, int? dateId);
 
-        Task<ProductGallery> GetGalleryAsync(int id);
+        Task<Gallery> GetGalleryAsync(int id);
     }
 }

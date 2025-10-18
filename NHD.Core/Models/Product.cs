@@ -31,6 +31,8 @@ public partial class Product
 
     public virtual ICollection<DatesProduct> DatesProducts { get; set; } = new List<DatesProduct>();
 
+    public virtual ICollection<Gallery> Galleries { get; set; } = new List<Gallery>();
+
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
     public virtual GenLookup PrdLookupCategory { get; set; }
@@ -38,6 +40,4 @@ public partial class Product
     public virtual GenLookup PrdLookupSize { get; set; }
 
     public virtual GenLookup PrdLookupType { get; set; }
-
-    public virtual ICollection<ProductGallery> ProductGalleries { get; set; } = new List<ProductGallery>();
 }

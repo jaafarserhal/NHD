@@ -30,6 +30,7 @@ namespace NHD.Core.Services.Model.Products
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Type { get; set; }
         public string AltText { get; set; }
         public string ImageUrl { get; set; }
         public int? SortOrder { get; set; }

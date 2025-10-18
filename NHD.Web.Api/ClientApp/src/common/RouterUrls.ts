@@ -9,6 +9,9 @@ export const RouterUrls = {
     addressesList: '/addresses',
     ordersList: '/orders',
     transactionsList: '/transactions',
+    datesGallery: '/dates/gallery/:dateId',
     productsGallery: '/products/gallery/:prdId',
-    galleryAdd: '/products/gallery/add',
+    galleryProductAdd: '/products/gallery/add',
+    galleryDateAdd: '/dates/gallery/add',
+
 };

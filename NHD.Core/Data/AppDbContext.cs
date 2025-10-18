@@ -20,7 +20,11 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Date> Dates { get; set; }
 
+    public virtual DbSet<DatesCollection> DatesCollections { get; set; }
+
     public virtual DbSet<DatesProduct> DatesProducts { get; set; }
+
+    public virtual DbSet<Gallery> Galleries { get; set; }
 
     public virtual DbSet<GenLookup> GenLookups { get; set; }
 
@@ -35,8 +39,6 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
     public virtual DbSet<Product> Products { get; set; }
-
-    public virtual DbSet<ProductGallery> ProductGalleries { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -126,9 +128,12 @@ public partial class AppDbContext : DbContext
             entity.ToTable("dates");
 
             entity.Property(e => e.DateId).HasColumnName("date_id");
+            entity.Property(e => e.CollectionId).HasColumnName("collection_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
+            entity.Property(e => e.DescriptionEn).HasColumnName("description_en");
+            entity.Property(e => e.DescriptionSv).HasColumnName("description_sv");
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
@@ -146,6 +151,37 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.WeightPrice)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("weight_price");
+
+            entity.HasOne(d => d.Collection).WithMany(p => p.Dates)
+                .HasForeignKey(d => d.CollectionId)
+                .HasConstraintName("FK_dates_collection");
+        });
+
+        modelBuilder.Entity<DatesCollection>(entity =>
+        {
+            entity.HasKey(e => e.CollectionId).HasName("PK__dates_co__53D3A5CA2428DE11");
+
+            entity.ToTable("dates_collection");
+
+            entity.Property(e => e.CollectionId).HasColumnName("collection_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.DescriptionEn).HasColumnName("description_en");
+            entity.Property(e => e.DescriptionSv).HasColumnName("description_sv");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(500)
+                .HasColumnName("image_url");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.NameEn)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("name_en");
+            entity.Property(e => e.NameSv)
+                .HasMaxLength(255)
+                .HasColumnName("name_sv");
         });
 
         modelBuilder.Entity<DatesProduct>(entity =>
@@ -173,6 +209,43 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Prd).WithMany(p => p.DatesProducts)
                 .HasForeignKey(d => d.PrdId)
                 .HasConstraintName("FK_dates_product_product");
+        });
+
+        modelBuilder.Entity<Gallery>(entity =>
+        {
+            entity.HasKey(e => e.GalleryId).HasName("PK__product___43D54A71F1CEC753");
+
+            entity.ToTable("gallery");
+
+            entity.Property(e => e.GalleryId).HasColumnName("gallery_id");
+            entity.Property(e => e.AltText)
+                .HasMaxLength(255)
+                .HasColumnName("alt_text");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.DateId).HasColumnName("date_id");
+            entity.Property(e => e.FileSizeKb).HasColumnName("file_size_kb");
+            entity.Property(e => e.ImageUrl)
+                .IsRequired()
+                .HasMaxLength(500)
+                .HasColumnName("image_url");
+            entity.Property(e => e.IsPrimary).HasColumnName("is_primary");
+            entity.Property(e => e.MimeType)
+                .HasMaxLength(100)
+                .HasColumnName("mime_type");
+            entity.Property(e => e.PrdId).HasColumnName("prd_id");
+            entity.Property(e => e.SortOrder).HasColumnName("sort_order");
+
+            entity.HasOne(d => d.Date).WithMany(p => p.Galleries)
+                .HasForeignKey(d => d.DateId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_product_gallery_dates");
+
+            entity.HasOne(d => d.Prd).WithMany(p => p.Galleries)
+                .HasForeignKey(d => d.PrdId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_product_gallery_product");
         });
 
         modelBuilder.Entity<GenLookup>(entity =>
@@ -416,36 +489,6 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.PrdLookupTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_product_type");
-        });
-
-        modelBuilder.Entity<ProductGallery>(entity =>
-        {
-            entity.HasKey(e => e.GalleryId).HasName("PK__product___43D54A71F1CEC753");
-
-            entity.ToTable("product_gallery");
-
-            entity.Property(e => e.GalleryId).HasColumnName("gallery_id");
-            entity.Property(e => e.AltText)
-                .HasMaxLength(255)
-                .HasColumnName("alt_text");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(sysutcdatetime())")
-                .HasColumnName("created_at");
-            entity.Property(e => e.FileSizeKb).HasColumnName("file_size_kb");
-            entity.Property(e => e.ImageUrl)
-                .IsRequired()
-                .HasMaxLength(500)
-                .HasColumnName("image_url");
-            entity.Property(e => e.IsPrimary).HasColumnName("is_primary");
-            entity.Property(e => e.MimeType)
-                .HasMaxLength(100)
-                .HasColumnName("mime_type");
-            entity.Property(e => e.PrdId).HasColumnName("prd_id");
-            entity.Property(e => e.SortOrder).HasColumnName("sort_order");
-
-            entity.HasOne(d => d.Prd).WithMany(p => p.ProductGalleries)
-                .HasForeignKey(d => d.PrdId)
-                .HasConstraintName("FK_product_gallery_product");
         });
 
         modelBuilder.Entity<User>(entity =>

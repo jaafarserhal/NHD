@@ -10,13 +10,13 @@ using NHD.Core.Data;
 using NHD.Core.Models;
 using NHD.Core.Repository.DateProducts;
 using NHD.Core.Repository.Dates;
-using NHD.Core.Repository.Gallery;
 using NHD.Core.Repository.Lookup;
 using NHD.Core.Repository.Products;
 using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Dates;
 using NHD.Core.Services.Model.Products;
 using NHD.Core.Utilities;
+using NHD.Core.Repository.ImageGallery;
 
 namespace NHD.Core.Services.Products
 {
@@ -27,7 +27,7 @@ namespace NHD.Core.Services.Products
         private readonly ILookupRepository _lookupRepository;
         private readonly IDateProductsRepository _dateProductsRepository;
 
-        private readonly IProductGalleryRepository _productGalleryRepository;
+        private readonly IGalleryRepository _galleryRepository;
 
         private readonly IDatesRepository _datesRepository;
 
@@ -35,13 +35,13 @@ namespace NHD.Core.Services.Products
 
         protected internal IDbContextTransaction Transaction;
 
-        public ProductService(AppDbContext context, IProductRepository productRepository, ILookupRepository lookupRepository, IDateProductsRepository dateProductsRepository, IProductGalleryRepository productGalleryRepository, IDatesRepository datesRepository, ILogger<ProductService> logger)
+        public ProductService(AppDbContext context, IProductRepository productRepository, ILookupRepository lookupRepository, IDateProductsRepository dateProductsRepository, IGalleryRepository galleryRepository, IDatesRepository datesRepository, ILogger<ProductService> logger)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             _productRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));
             _lookupRepository = lookupRepository ?? throw new ArgumentNullException(nameof(lookupRepository));
             _dateProductsRepository = dateProductsRepository ?? throw new ArgumentNullException(nameof(dateProductsRepository));
-            _productGalleryRepository = productGalleryRepository ?? throw new ArgumentNullException(nameof(productGalleryRepository));
+            _galleryRepository = galleryRepository ?? throw new ArgumentNullException(nameof(galleryRepository));
             _datesRepository = datesRepository ?? throw new ArgumentNullException(nameof(datesRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -121,7 +121,7 @@ namespace NHD.Core.Services.Products
             }
 
             // Step 1: Get gallery image paths before deleting from DB
-            var galleries = await _productGalleryRepository.GetAllGalleriesByProductIdAsync(productId);
+            var galleries = await _galleryRepository.GetAllGalleriesByProductIdOrDateIdAsync(productId, null);
             var imagePaths = galleries
                 .Where(g => !string.IsNullOrEmpty(g.ImageUrl))
                 .Select(g => Path.Combine("wwwroot/uploads/products", g.ImageUrl.TrimStart('/')))
@@ -181,7 +181,7 @@ namespace NHD.Core.Services.Products
             }
         }
 
-        public async Task<PagedServiceResult<IEnumerable<ProductGalleryViewModel>>> GetProductGalleriesAsync(int productId, int page = 1, int limit = 10)
+        public async Task<PagedServiceResult<IEnumerable<ProductGalleryViewModel>>> GetGalleriesAsync(int? productId, int? dateId, int page = 1, int limit = 10)
         {
             try
             {
@@ -190,7 +190,7 @@ namespace NHD.Core.Services.Products
                     return PagedServiceResult<IEnumerable<ProductGalleryViewModel>>.Failure("Page and limit must be greater than 0");
                 }
 
-                var pagedResult = await _productGalleryRepository.GetProductGalleriesAsync(productId, page, limit);
+                var pagedResult = await _galleryRepository.GetGalleriesAsync(productId, dateId, page, limit);
                 var productGalleryDtos = pagedResult.Data.Select(MapToProductGalleryDto).ToList();
 
                 return PagedServiceResult<IEnumerable<ProductGalleryViewModel>>.Success(
@@ -318,38 +318,38 @@ namespace NHD.Core.Services.Products
             }
         }
 
-        public async Task<ProductGallery> AddProductGalleryAsync(ProductGallery productGallery)
+        public async Task<Gallery> AddGalleryAsync(Gallery gallery)
         {
-            await _productGalleryRepository.AddAsync(productGallery);
-            return productGallery;
+            await _galleryRepository.AddAsync(gallery);
+            return gallery;
         }
 
         public async Task<ServiceResult<bool>> DeleteGalleryAsync(int galleryId)
         {
-            var productGallery = await _productGalleryRepository.GetByIdAsync(galleryId);
-            if (productGallery == null)
+            var gallery = await _galleryRepository.GetByIdAsync(galleryId);
+            if (gallery == null)
             {
-                return ServiceResult<bool>.Failure($"Product gallery with ID {galleryId} not found.");
+                return ServiceResult<bool>.Failure($"Gallery with ID {galleryId} not found.");
             }
 
-            await _productGalleryRepository.DeleteAsync(productGallery.GalleryId);
+            await _galleryRepository.DeleteAsync(galleryId);
             return ServiceResult<bool>.Success(true);
         }
 
-        public async Task<ServiceResult<bool>> DeleteProductGalleryAsync(int productId)
+        public async Task<ServiceResult<bool>> DeleteGalleryAsync(int? productId, int? dateId)
         {
-            var result = await _productGalleryRepository.DeleteProductGalleriesAsync(productId);
+            var result = await _galleryRepository.DeleteGalleriesAsync(productId, dateId);
             if (!result)
             {
-                return ServiceResult<bool>.Failure($"Product galleries for product ID {productId} not found.");
+                return ServiceResult<bool>.Failure($"Product galleries for product ID {productId} and date ID {dateId} not found.");
             }
             return ServiceResult<bool>.Success(true);
         }
 
 
-        public async Task<ProductGallery> GetGalleryAsync(int id)
+        public async Task<Gallery> GetGalleryAsync(int id)
         {
-            return await _productGalleryRepository.GetByIdAsync(id);
+            return await _galleryRepository.GetByIdAsync(id);
         }
 
         #endregion Products
@@ -449,16 +449,17 @@ namespace NHD.Core.Services.Products
             };
         }
 
-        private ProductGalleryViewModel MapToProductGalleryDto(ProductGallery productGallery)
+        private ProductGalleryViewModel MapToProductGalleryDto(Gallery gallery)
         {
             return new ProductGalleryViewModel
             {
-                Id = productGallery.GalleryId,
-                Name = productGallery.Prd?.NameEn,
-                AltText = productGallery.AltText,
-                ImageUrl = productGallery.ImageUrl,
-                SortOrder = productGallery.SortOrder,
-                CreatedAt = productGallery.CreatedAt
+                Id = gallery.GalleryId,
+                Name = gallery.DateId != null ? gallery.Date?.NameEn : gallery.Prd?.NameEn,
+                Type = gallery.DateId != null ? "date" : "product",
+                AltText = gallery.AltText,
+                ImageUrl = gallery.ImageUrl,
+                SortOrder = gallery.SortOrder,
+                CreatedAt = gallery.CreatedAt
             };
         }
         #endregion Mappers

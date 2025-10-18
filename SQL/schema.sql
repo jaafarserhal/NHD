@@ -102,19 +102,43 @@ CREATE TABLE dbo.product (
 
 CREATE TABLE dbo.product_gallery (
     gallery_id INT IDENTITY(1,1) PRIMARY KEY,
-    prd_id INT NOT NULL,
+    prd_id INT NULL,
+    date_id INT NULL,
     image_url NVARCHAR(500) NOT NULL,
     alt_text NVARCHAR(255) NULL,            -- SEO: alternative text for accessibility/search
     mime_type NVARCHAR(100) NULL,           -- e.g., image/jpeg, image/png
-    file_size_kb INT NULL,                  -- Approx file size in KB              -- Optional: image height in pixels
+    file_size_kb INT NULL,                  -- Approx file size in KB
     is_primary BIT NOT NULL DEFAULT 0,      -- Marks main image
     sort_order INT NULL,                    -- Controls display order
+
     created_at DATETIME2 NOT NULL 
-        CONSTRAINT DF_date_product_gallery_created DEFAULT SYSUTCDATETIME(),
-    CONSTRAINT FK_product_gallery_product FOREIGN KEY (prd_id)
+        CONSTRAINT DF_product_gallery_created DEFAULT SYSUTCDATETIME(),
+
+    -- 🔗 Foreign key: links to dbo.product
+    CONSTRAINT FK_product_gallery_product 
+        FOREIGN KEY (prd_id)
         REFERENCES dbo.product(prd_id)
+        ON DELETE CASCADE,
+
+    -- 🔗 Foreign key: links to dbo.dates
+    CONSTRAINT FK_product_gallery_dates 
+        FOREIGN KEY (date_id)
+        REFERENCES dbo.[dates](date_id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE dbo.dates_collection (
+    collection_id INT IDENTITY(1,1) PRIMARY KEY,
+    name_en NVARCHAR(255) NOT NULL,
+    name_sv NVARCHAR(255),
+    description_en NVARCHAR(MAX),
+    description_sv NVARCHAR(MAX),
+    image_url NVARCHAR(500),
+    created_at DATETIME2 NOT NULL
+	CONSTRAINT CD__DATES_created DEFAULT SYSUTCDATETIME(),
+    is_active BIT NOT NULL DEFAULT 1
+);
+
 
 
 -- =============================================
@@ -122,14 +146,19 @@ CREATE TABLE dbo.product_gallery (
 -- =============================================
 CREATE TABLE dbo.[dates] (
     date_id INT IDENTITY(1,1) PRIMARY KEY,
+	collection_id INT NOT NULL,
     name_en NVARCHAR(100) NOT NULL,
     name_sv NVARCHAR(100),
     quality BIT NOT NULL DEFAULT 0,
     unit_price DECIMAL(10, 2) NOT NULL,
 	weight_price DECIMAL(10, 2) NOT NULL,
+    description_en NVARCHAR(MAX) NULL,
+    description_sv NVARCHAR(MAX) NULL,
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_product_created DEFAULT SYSUTCDATETIME(),
-    is_active BIT NOT NULL DEFAULT 1
+    is_active BIT NOT NULL DEFAULT 1,
+    CONSTRAINT FK_dates_collection 
+          FOREIGN KEY (collection_id) REFERENCES dbo.dates_collection(collection_id)
 );
 
 

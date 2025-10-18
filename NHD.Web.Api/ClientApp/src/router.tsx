@@ -49,7 +49,8 @@ const routes: RouteObject[] = [
       { path: RouterUrls.customersList, element: <Customers /> },
       { path: RouterUrls.addressesList, element: <Addresses /> },
       { path: RouterUrls.transactionsList, element: <Transactions /> },
-      { path: RouterUrls.productsGallery, element: <Galleries /> }
+      { path: RouterUrls.productsGallery, element: <Galleries /> },
+      { path: RouterUrls.datesGallery, element: <Galleries /> }
     ]
   },
   {

@@ -293,19 +293,36 @@ namespace NHD.Web.Api.Controllers
             return BadRequest(data);
         }
 
-        [HttpGet]
-        [Route("AllProductGalleries/{productId}")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<ProductGalleryViewModel>>>> GetAllProductGalleries(int productId)
+        [HttpGet("AllGalleries/{id:int}/{type}")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<ProductGalleryViewModel>>>> GetAllGalleries(int id, string type)
         {
-            var data = await _productService.GetProductGalleriesAsync(productId);
-            if (data.IsSuccess)
-                return Ok(data);
-            return BadRequest(data);
+            if (string.IsNullOrWhiteSpace(type))
+                return BadRequest(new { message = "Type parameter is required." });
+
+            int? productId = null;
+            int? dateId = null;
+
+            switch (type.ToLowerInvariant())
+            {
+                case "product":
+                    productId = id;
+                    break;
+                case "date":
+                    dateId = id;
+                    break;
+                default:
+                    return BadRequest(new { message = "Invalid type parameter. Must be 'product' or 'date'." });
+            }
+
+            var result = await _productService.GetGalleriesAsync(productId, dateId);
+
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
         }
 
+
         [HttpPost]
-        [Route("AddProductGallery")]
-        public async Task<IActionResult> AddProductGallery([FromForm] ProductGalleryBindingModel dto)
+        [Route("AddGallery")]
+        public async Task<IActionResult> AddGallery([FromForm] ProductGalleryBindingModel dto)
         {
             try
             {
@@ -320,8 +337,9 @@ namespace NHD.Web.Api.Controllers
                     return BadRequest("Image size must be less than 1MB");
 
                 // Create unique file name
+                string folderName = dto.PrdId != 0 ? "products" : "dates";
                 var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageUrl.FileName)}";
-                var folderPath = Path.Combine("wwwroot/uploads", "products");
+                var folderPath = Path.Combine("wwwroot/uploads", folderName);
 
                 if (!Directory.Exists(folderPath))
                     Directory.CreateDirectory(folderPath);
@@ -334,9 +352,10 @@ namespace NHD.Web.Api.Controllers
                 }
 
                 // Create Product entity
-                var gallery = new ProductGallery
+                var gallery = new Gallery
                 {
-                    PrdId = dto.PrdId,
+                    PrdId = dto.PrdId == 0 ? (int?)null : dto.PrdId,
+                    DateId = dto.DateId == 0 ? (int?)null : dto.DateId,
                     ImageUrl = fileName,
                     SortOrder = dto.SortOrder,
                     AltText = dto.AltText,
@@ -345,7 +364,7 @@ namespace NHD.Web.Api.Controllers
                     IsPrimary = false
                 };
 
-                var created = await _productService.AddProductGalleryAsync(gallery);
+                var created = await _productService.AddGalleryAsync(gallery);
                 return Ok(created);
             }
             catch (Exception ex)
@@ -356,8 +375,8 @@ namespace NHD.Web.Api.Controllers
         }
 
 
-        [HttpDelete("DeleteProductGallery/{galleryId}")]
-        public async Task<IActionResult> DeleteProductGallery(int galleryId)
+        [HttpDelete("DeleteGallery/{galleryId}")]
+        public async Task<IActionResult> DeleteGallery(int galleryId)
         {
             // First, try to get the product so we know the image name
             var gallery = await _productService.GetGalleryAsync(galleryId);
@@ -382,7 +401,8 @@ namespace NHD.Web.Api.Controllers
             {
                 if (!string.IsNullOrEmpty(gallery.ImageUrl))
                 {
-                    var imagePath = Path.Combine("wwwroot/uploads/products", gallery.ImageUrl);
+                    var folderName = gallery.PrdId != null ? "products" : "dates";
+                    var imagePath = Path.Combine("wwwroot/uploads", folderName, gallery.ImageUrl);
                     if (System.IO.File.Exists(imagePath))
                     {
                         System.IO.File.Delete(imagePath);

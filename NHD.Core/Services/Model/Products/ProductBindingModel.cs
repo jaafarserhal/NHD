@@ -36,6 +36,7 @@ namespace NHD.Core.Services.Model.Products
     public class ProductGalleryBindingModel
     {
         public int PrdId { get; set; }
+        public int DateId { get; set; }
         public IFormFile ImageUrl { get; set; }
         public string AltText { get; set; }
         public int? SortOrder { get; set; }

@@ -34,6 +34,7 @@ export interface DatesProduct {
 
 export interface ProductGallery {
     prdId?: number;
+    dateId?: number;
     imageUrl: string;
     altText: string;
     sortOrder: number;

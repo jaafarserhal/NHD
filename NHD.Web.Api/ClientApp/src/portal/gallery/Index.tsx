@@ -26,7 +26,7 @@ import PageTitle from 'src/components/PageTitle';
 
 
 function ProductsGallery() {
-    const { prdId } = useParams<{ prdId: string }>();
+    const { prdId, dateId } = useParams<{ prdId?: string; dateId?: string }>();
     const navigate = useNavigate();
 
     // List states
@@ -48,7 +48,7 @@ function ProductsGallery() {
 
     // Fetch products
     const { data: products, loading: productsLoading, error, refetch } = useApiCall(
-        () => productService.getProductGalleries(prdId, page + 1, limit),
+        () => productService.getGallery(prdId, dateId, page + 1, limit),
         [page, limit]
     );
 
@@ -61,7 +61,7 @@ function ProductsGallery() {
     const handleConfirmDelete = async () => {
         if (!selectedGallery) return;
         try {
-            await productService.deleteProductGallery(selectedGallery.id);
+            await productService.deleteGallery(selectedGallery.id);
             setConfirmOpen(false);
             setSelectedGallery(null);
             refetch();
@@ -152,11 +152,17 @@ function ProductsGallery() {
 
             const galleryData = {
                 ...form,
-                imageFile: image,
-                prdId: Number(prdId)
+                imageFile: image
             };
 
-            await productService.addProductGallery(galleryData);
+            if (prdId) {
+                galleryData.prdId = Number(prdId);
+            }
+            if (dateId) {
+                galleryData.dateId = Number(dateId);
+            }
+
+            await productService.addGallery(galleryData);
 
             // Reset form
             setForm({
@@ -202,14 +208,14 @@ function ProductsGallery() {
         },
         {
             key: 'name',
-            label: 'Box Name'
+            label: 'Product Name'
         },
         {
             key: 'imageUrl',
             label: 'Image',
             render: (prd) => (
                 <img
-                    src={getImageSrc(prd.imageUrl)}
+                    src={getImageSrc(prd.imageUrl, prd.type == 'product' ? 'products' : 'dates')}
                     alt={prd.name}
                     style={{
                         width: '50px',
