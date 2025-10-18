@@ -14,6 +14,9 @@ import Login from './portal/auth/Login';
 
 import { RouterUrls } from './common/RouterUrls';
 import ProtectedRoute from './protectedRoutes/Index';
+import Collections from './portal/collections/Index';
+import AddCollection from './portal/collections/Add';
+import UpdateCollection from './portal/collections/Update';
 
 const Loader = (Component) => (props) => (
   <Suspense fallback={<SuspenseLoader />}>
@@ -50,7 +53,10 @@ const routes: RouteObject[] = [
       { path: RouterUrls.addressesList, element: <Addresses /> },
       { path: RouterUrls.transactionsList, element: <Transactions /> },
       { path: RouterUrls.productsGallery, element: <Galleries /> },
-      { path: RouterUrls.datesGallery, element: <Galleries /> }
+      { path: RouterUrls.datesGallery, element: <Galleries /> },
+      { path: RouterUrls.collectionsList, element: <Collections /> },
+      { path: RouterUrls.collectionAdd, element: <AddCollection /> },
+      { path: RouterUrls.collectionEdit, element: <UpdateCollection /> },
     ]
   },
   {

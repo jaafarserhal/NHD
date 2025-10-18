@@ -155,6 +155,7 @@ namespace NHD.Web.Api
             services.AddScoped<IDatesRepository, DatesRepository>();
             services.AddScoped<IGalleryRepository, GalleryRepository>();
             services.AddScoped<IDateProductsRepository, DateProductsRepository>();
+            services.AddScoped<IDatesCollectionRepository, DatesCollectionRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IProductService, ProductService>();

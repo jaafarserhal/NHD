@@ -23,6 +23,16 @@ export interface Date {
     isActive: boolean;
 }
 
+export interface DatesCollection {
+    id?: number;
+    nameEn: string;
+    nameSv: string;
+    imageUrl: string;
+    descriptionEn: string;
+    descriptionSv: string;
+    isActive: boolean;
+}
+
 export interface DatesProduct {
     id?: number;
     prdId: number;

@@ -846,7 +846,7 @@ export default function UpdateProduct() {
                                     {preview && (
                                         <Box sx={{ mt: 2 }}>
                                             <img
-                                                src={getImageSrc(preview)}
+                                                src={getImageSrc(preview, 'products')}
                                                 alt="Preview"
                                                 style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
                                             />

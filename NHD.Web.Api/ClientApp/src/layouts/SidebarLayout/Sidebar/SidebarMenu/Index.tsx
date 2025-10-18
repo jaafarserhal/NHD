@@ -197,6 +197,19 @@ function SidebarMenu() {
                   Products
                 </Button>
               </ListItem>
+
+
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to={RouterUrls.collectionsList}
+                  startIcon={<EmergencyShareIcon />}
+                >
+                  Collections
+                </Button>
+              </ListItem>
               <ListItem component="div">
                 <Button
                   disableRipple

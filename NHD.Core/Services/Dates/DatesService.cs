@@ -9,12 +9,14 @@ namespace NHD.Core.Services.Dates
     public class DatesService : IDatesService
     {
         private readonly IDatesRepository _datesRepository;
+        private readonly IDatesCollectionRepository _datesCollectionRepository;
 
         private readonly ILogger<DatesService> _logger;
 
-        public DatesService(IDatesRepository datesRepository, ILogger<DatesService> logger)
+        public DatesService(IDatesRepository datesRepository, IDatesCollectionRepository datesCollectionRepository, ILogger<DatesService> logger)
         {
             _datesRepository = datesRepository ?? throw new ArgumentNullException(nameof(datesRepository));
+            _datesCollectionRepository = datesCollectionRepository ?? throw new ArgumentNullException(nameof(datesCollectionRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -46,6 +48,32 @@ namespace NHD.Core.Services.Dates
             }
         }
 
+        public async Task<PagedServiceResult<IEnumerable<DatesCollectionViewModel>>> GetDatesCollectionAsync(int page = 1, int limit = 10)
+        {
+            try
+            {
+                if (page <= 0 || limit <= 0)
+                {
+                    return PagedServiceResult<IEnumerable<DatesCollectionViewModel>>.Failure("Page and limit must be greater than 0");
+                }
+
+                var pagedResult = await _datesCollectionRepository.GetCollectionsAsync(page, limit);
+                var collectionDtos = pagedResult.Data.Select(MapToDatesCollectionDto).ToList();
+
+                return PagedServiceResult<IEnumerable<DatesCollectionViewModel>>.Success(
+                    collectionDtos,
+                    pagedResult.Total,
+                    pagedResult.Page,
+                    pagedResult.Limit
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving dates collections");
+                return PagedServiceResult<IEnumerable<DatesCollectionViewModel>>.Failure("An error occurred while retrieving dates collections");
+            }
+        }
+
         public async Task<Date> GetDateAsync(int id)
         {
             return await _datesRepository.GetByIdAsync(id);
@@ -70,6 +98,57 @@ namespace NHD.Core.Services.Dates
                 return ServiceResult<DateViewModel>.Failure("An error occurred while retrieving the date");
             }
         }
+
+        public async Task<ServiceResult<DatesCollectionViewModel>> GetCollectionByViewModel(int id)
+        {
+            try
+            {
+                var collection = await _datesCollectionRepository.GetByIdAsync(id);
+                if (collection == null)
+                {
+                    return ServiceResult<DatesCollectionViewModel>.Failure($"Collection with ID {id} not found.");
+                }
+
+                var collectionDto = MapToDatesCollectionDto(collection);
+                return ServiceResult<DatesCollectionViewModel>.Success(collectionDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving collection with ID {id}");
+                return ServiceResult<DatesCollectionViewModel>.Failure("An error occurred while retrieving the collection");
+            }
+        }
+
+        public async Task<DatesCollection> GetCollectionAsync(int id)
+        {
+            return await _datesCollectionRepository.GetByIdAsync(id);
+        }
+
+        public async Task<DatesCollection> AddCollectionAsync(DatesCollection collection)
+        {
+            await _datesCollectionRepository.AddAsync(collection);
+            return collection;
+        }
+
+        public async Task<DatesCollection> UpdateCollectionAsync(DatesCollection collection)
+        {
+            await _datesCollectionRepository.UpdateAsync(collection);
+            return collection;
+        }
+
+        public async Task<ServiceResult<bool>> DeleteCollectionAsync(int collectionId)
+        {
+            var collection = await _datesCollectionRepository.GetByIdAsync(collectionId);
+            if (collection == null)
+            {
+                return ServiceResult<bool>.Failure($"Collection with ID {collectionId} not found.");
+            }
+
+            await _datesCollectionRepository.DeleteAsync(collection.CollectionId);
+            return ServiceResult<bool>.Success(true);
+        }
+
+        #endregion Dates
 
 
         public async Task<Date> AddDateAsync(Date date)
@@ -96,8 +175,6 @@ namespace NHD.Core.Services.Dates
             return ServiceResult<bool>.Success(true);
         }
 
-        #endregion Products
-
 
         #region Mappers
         private DateViewModel MapToDateDto(Date date)
@@ -111,6 +188,21 @@ namespace NHD.Core.Services.Dates
                 UnitPrice = date.UnitPrice,
                 WeightPrice = date.WeightPrice,
                 CreatedAt = date.CreatedAt
+            };
+        }
+
+        private DatesCollectionViewModel MapToDatesCollectionDto(DatesCollection collection)
+        {
+            return new DatesCollectionViewModel
+            {
+                Id = collection.CollectionId,
+                NameEn = collection.NameEn,
+                NameSv = collection.NameSv,
+                ImageUrl = collection.ImageUrl,
+                DescriptionEn = collection.DescriptionEn,
+                DescriptionSv = collection.DescriptionSv,
+                IsActive = collection.IsActive,
+                CreatedAt = collection.CreatedAt
             };
         }
         #endregion Mappers

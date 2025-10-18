@@ -18,5 +18,10 @@ export const apiUrls = {
     deleteDate: '/Delete/',
     gallery: '/AllGalleries/',
     addGallery: '/AddGallery',
-    deleteGallery: '/DeleteGallery/'
+    deleteGallery: '/DeleteGallery/',
+    dateCollections: '/Collections',
+    addDateCollection: '/Collections/Add',
+    updateDateCollection: '/Collections/Update',
+    getDateCollectionById: '/Collections/',
+    deleteDateCollection: '/Collections/Delete/',
 };

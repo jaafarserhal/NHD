@@ -13,5 +13,8 @@ export const RouterUrls = {
     productsGallery: '/products/gallery/:prdId',
     galleryProductAdd: '/products/gallery/add',
     galleryDateAdd: '/dates/gallery/add',
+    collectionsList: '/collections',
+    collectionAdd: '/collections/add',
+    collectionEdit: '/collections/edit/:id',
 
 };

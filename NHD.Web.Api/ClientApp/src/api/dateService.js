@@ -11,6 +11,51 @@ class dateService extends apiService {
         return this.get('', { page, limit });
     }
 
+    async getCollections(page = 1, limit = 10) {
+        return this.get(apiUrls.dateCollections, { page, limit });
+    }
+
+    async getCollectionById(id) {
+        return this.get(`${apiUrls.getDateCollectionById}${id}`);
+    }
+
+    async addCollection(collection) {
+        const formData = new FormData();
+
+        formData.append('NameEn', collection.nameEn || '');
+        formData.append('NameSv', collection.nameSv || '');
+        formData.append('DescriptionEn', collection.descriptionEn || '');
+        formData.append('DescriptionSv', collection.descriptionSv || '');
+        formData.append('IsActive', String(collection.isActive));
+
+        if (collection.imageFile && collection.imageFile instanceof File) {
+            formData.append('ImageFile', collection.imageFile, collection.imageFile.name);
+        }
+
+        return this.post(formData, apiUrls.addDateCollection);
+    }
+
+    async updateCollection(collection) {
+        const formData = new FormData();
+
+        formData.append('Id', String(collection.id));
+        formData.append('NameEn', collection.nameEn || '');
+        formData.append('NameSv', collection.nameSv || '');
+        formData.append('DescriptionEn', collection.descriptionEn || '');
+        formData.append('DescriptionSv', collection.descriptionSv || '');
+        formData.append('IsActive', String(collection.isActive));
+
+        if (collection.imageFile && collection.imageFile instanceof File) {
+            formData.append('ImageFile', collection.imageFile, collection.imageFile.name);
+        }
+
+        return this.put(formData, apiUrls.updateDateCollection);
+    }
+
+    async deleteCollection(collectionId) {
+        return this.delete(`${apiUrls.deleteDateCollection}${collectionId}`);
+    }
+
     async addDate(date) {
         return this.post(date, apiUrls.addDate);
     }
