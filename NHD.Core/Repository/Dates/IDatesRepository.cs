@@ -12,5 +12,6 @@ namespace NHD.Core.Repository.Dates
     {
         Task<PagedResult<Date>> GetDatesAsync(int page, int limit);
         Task<Date> GetDateByIdAsync(int dateId);
+        Task<bool> ExistsByCollectionIdAsync(int collectionId);
     }
 }

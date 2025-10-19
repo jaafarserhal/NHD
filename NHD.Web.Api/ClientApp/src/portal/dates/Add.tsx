@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Card, CardContent, Button, Box, CardHeader, Container, Divider, FormControlLabel, Grid, Switch, TextField } from "@mui/material";
 import { Date } from "../models/Types";
+import { useApiCall } from '../../api/hooks/useApi';
 import dateService from '../../api/dateService';
 import { Helmet } from "react-helmet-async";
-import Footer from "src/components/Footer";
 import PageTitle from "src/components/PageTitle";
 import PageTitleWrapper from "src/components/PageTitleWrapper";
 import { useNavigate } from 'react-router-dom';
@@ -14,10 +14,16 @@ export default function AddDate() {
 
     const navigate = useNavigate();
 
+    const { data: activeCollections, loading: activeCollectionsLoading } = useApiCall(
+        () => dateService.getActiveCollections(),
+        []
+    );
+
 
     const [form, setForm] = useState<Omit<Date, "id">>({
         nameEn: "",
         nameSv: "",
+        collectionId: 0,
         quality: false,
         unitPrice: undefined,
         weightPrice: undefined,
@@ -83,6 +89,9 @@ export default function AddDate() {
         if (form.weightPrice === undefined || form.weightPrice < 0) {
             validationErrors.push("Valid weight price is required");
         }
+        if (!form.collectionId || form.collectionId <= 0) {
+            validationErrors.push("Collection selection is required");
+        }
 
         setErrors(validationErrors);
 
@@ -113,6 +122,7 @@ export default function AddDate() {
             const dateData: Omit<Date, "id"> = {
                 nameEn: form.nameEn,
                 nameSv: form.nameSv,
+                collectionId: form.collectionId,
                 quality: form.quality,
                 unitPrice: form.unitPrice || 0,
                 weightPrice: form.weightPrice || 0,
@@ -126,6 +136,7 @@ export default function AddDate() {
             setForm({
                 nameEn: "",
                 nameSv: "",
+                collectionId: 0,
                 quality: false,
                 unitPrice: undefined,
                 weightPrice: undefined,
@@ -253,6 +264,23 @@ export default function AddDate() {
                                                 },
                                             }}
                                         />
+                                        <TextField
+                                            required
+                                            name="collectionId"
+                                            select
+                                            value={form.collectionId || ''}
+                                            onChange={handleChange}
+                                            SelectProps={{ native: true }}
+                                            variant="standard"
+                                            disabled={activeCollectionsLoading}
+                                        >
+                                            <option value="">Select Collection</option>
+                                            {activeCollections?.data?.map((option) => (
+                                                <option key={option.id} value={option.id}>
+                                                    {option.nameEn}
+                                                </option>
+                                            ))}
+                                        </TextField>
                                     </Box>
                                 </CardContent>
                             </Card>

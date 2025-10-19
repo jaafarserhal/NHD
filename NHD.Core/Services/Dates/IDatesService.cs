@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NHD.Core.Common.Models;
 using NHD.Core.Models;
+using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Dates;
 
 namespace NHD.Core.Services.Dates
@@ -22,5 +23,7 @@ namespace NHD.Core.Services.Dates
         Task<ServiceResult<bool>> DeleteCollectionAsync(int collectionId);
         Task<DatesCollection> GetCollectionAsync(int id);
         Task<ServiceResult<DatesCollectionViewModel>> GetCollectionByViewModel(int id);
+
+        Task<ServiceResult<IEnumerable<LookupItemDto>>> GetCollectionsAsync();
     }
 }

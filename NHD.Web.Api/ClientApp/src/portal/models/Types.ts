@@ -15,6 +15,7 @@ export interface Product {
 
 export interface Date {
     id?: number;
+    collectionId: number;
     nameEn: string;
     nameSv: string;
     quality: boolean;

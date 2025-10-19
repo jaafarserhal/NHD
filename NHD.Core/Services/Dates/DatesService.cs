@@ -3,6 +3,7 @@ using NHD.Core.Common.Models;
 using NHD.Core.Models;
 using NHD.Core.Repository.Dates;
 using NHD.Core.Repository.ImageGallery;
+using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Dates;
 
 namespace NHD.Core.Services.Dates
@@ -122,6 +123,26 @@ namespace NHD.Core.Services.Dates
             }
         }
 
+        public async Task<ServiceResult<IEnumerable<LookupItemDto>>> GetCollectionsAsync()
+        {
+            try
+            {
+                var collections = await _datesCollectionRepository.GetActiveCollectionsAsync();
+                var collectionDtos = collections.Select(c => new LookupItemDto
+                {
+                    Id = c.CollectionId,
+                    NameEn = c.NameEn,
+                    NameSv = c.NameSv
+                });
+                return ServiceResult<IEnumerable<LookupItemDto>>.Success(collectionDtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving date collections");
+                return ServiceResult<IEnumerable<LookupItemDto>>.Failure("An error occurred while retrieving date collections");
+            }
+        }
+
         public async Task<DatesCollection> GetCollectionAsync(int id)
         {
             return await _datesCollectionRepository.GetByIdAsync(id);
@@ -218,6 +239,8 @@ namespace NHD.Core.Services.Dates
             return new DateViewModel
             {
                 Id = date.DateId,
+                CollectionId = date.CollectionId.HasValue ? date.CollectionId.Value : 0,
+                CollectionName = date.Collection != null ? date.Collection.NameEn : string.Empty,
                 NameEn = date.NameEn,
                 NameSv = date.NameSv,
                 IsActive = date.IsActive,
@@ -238,6 +261,7 @@ namespace NHD.Core.Services.Dates
                 DescriptionEn = collection.DescriptionEn,
                 DescriptionSv = collection.DescriptionSv,
                 IsActive = collection.IsActive,
+                CanDelete = !_datesRepository.ExistsByCollectionIdAsync(collection.CollectionId).Result,
                 CreatedAt = collection.CreatedAt
             };
         }

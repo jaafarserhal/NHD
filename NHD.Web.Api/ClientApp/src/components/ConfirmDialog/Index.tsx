@@ -33,7 +33,14 @@ const ConfirmDialog = ({
             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
             width: '100%',
             margin: '0 16px',
-            maxWidth: size === 'sm' ? '384px' : size === 'md' ? '448px' : size === 'lg' ? '512px' : '576px',
+            maxWidth:
+                size === 'sm'
+                    ? '384px'
+                    : size === 'md'
+                        ? '448px'
+                        : size === 'lg'
+                            ? '512px'
+                            : '576px',
             transform: 'scale(1)',
             transition: 'all 0.2s ease-out'
         },
@@ -159,14 +166,18 @@ const ConfirmDialog = ({
                 </div>
 
                 <div style={styles.actions}>
-                    <button
-                        style={{ ...styles.button, ...styles.cancelButton }}
-                        onClick={onClose}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f9fafb')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'white')}
-                    >
-                        {cancelText}
-                    </button>
+                    {/* ✅ Only render Cancel if cancelText is provided */}
+                    {cancelText ? (
+                        <button
+                            style={{ ...styles.button, ...styles.cancelButton }}
+                            onClick={onClose}
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f9fafb')}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'white')}
+                        >
+                            {cancelText}
+                        </button>
+                    ) : null}
+
                     <button
                         style={{ ...styles.button, ...styles.confirmButton, backgroundColor: confirmBg }}
                         onClick={onConfirm}

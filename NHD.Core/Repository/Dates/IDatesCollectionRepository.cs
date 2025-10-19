@@ -11,5 +11,6 @@ namespace NHD.Core.Repository.Dates
     public interface IDatesCollectionRepository : IRepository<DatesCollection>
     {
         Task<PagedResult<DatesCollection>> GetCollectionsAsync(int page, int limit);
+        Task<IEnumerable<DatesCollection>> GetActiveCollectionsAsync();
     }
 }

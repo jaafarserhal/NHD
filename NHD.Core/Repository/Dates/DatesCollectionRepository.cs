@@ -36,5 +36,10 @@ namespace NHD.Core.Repository.Dates
                 Limit = limit
             };
         }
+
+        public async Task<IEnumerable<DatesCollection>> GetActiveCollectionsAsync()
+        {
+            return await _context.DatesCollections.Where(c => c.IsActive).ToListAsync();
+        }
     }
 }

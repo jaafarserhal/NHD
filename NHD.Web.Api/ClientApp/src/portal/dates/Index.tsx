@@ -74,6 +74,10 @@ function Dates() {
             label: 'Name',
         },
         {
+            key: 'collectionName',
+            label: 'Collection',
+        },
+        {
             key: 'unitPrice',
             label: 'Price / piece',
         },

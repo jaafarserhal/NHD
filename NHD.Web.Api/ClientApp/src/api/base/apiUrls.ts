@@ -24,4 +24,5 @@ export const apiUrls = {
     updateDateCollection: '/Collections/Update',
     getDateCollectionById: '/Collections/',
     deleteDateCollection: '/Collections/Delete/',
+    activeCollections: '/Collections/Active',
 };

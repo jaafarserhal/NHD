@@ -23,14 +23,15 @@ namespace NHD.Core.Repository.Dates
 
             var total = await query.CountAsync();
 
-            var products = await query
+            var dates = await query
+                .Include(d => d.Collection)
                 .Skip((page - 1) * limit)
                 .Take(limit)
                 .ToListAsync();
 
             return new PagedResult<Date>
             {
-                Data = products,
+                Data = dates,
                 Total = total,
                 Page = page,
                 Limit = limit
@@ -41,6 +42,11 @@ namespace NHD.Core.Repository.Dates
         {
             return await _context.Dates
                 .FirstOrDefaultAsync(p => p.DateId == dateId);
+        }
+
+        public async Task<bool> ExistsByCollectionIdAsync(int collectionId)
+        {
+            return await _context.Dates.AnyAsync(d => d.CollectionId == collectionId);
         }
     }
 }

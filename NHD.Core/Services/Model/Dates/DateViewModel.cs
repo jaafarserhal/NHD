@@ -9,6 +9,8 @@ namespace NHD.Core.Services.Model.Dates
     public class DateViewModel
     {
         public int Id { get; set; }
+        public int CollectionId { get; set; }
+        public string CollectionName { get; set; }
         public string NameEn { get; set; }
         public string NameSv { get; set; }
 
@@ -32,5 +34,6 @@ namespace NHD.Core.Services.Model.Dates
         public string DescriptionSv { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
+        public bool CanDelete { get; set; }
     }
 }

@@ -12,83 +12,102 @@ import { RouterUrls } from 'src/common/RouterUrls';
 import { getImageSrc } from 'src/common/getImageSrc';
 
 function Collections() {
-    const [page, setPage] = useState(0); // 0-based for MUI TablePagination
+    const [page, setPage] = useState(0);
     const [limit, setLimit] = useState(10);
+
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmMessage, setConfirmMessage] = useState('');
+    const [confirmMode, setConfirmMode] = useState('delete'); // 'delete' | 'info'
     const [selectedCollection, setSelectedCollection] = useState(null);
+
     const navigate = useNavigate();
 
-    // Convert 0-based page to 1-based for API
     const { data: collections, loading, error, refetch } = useApiCall(
         () => dateService.getCollections(page + 1, limit),
-        [page, limit] // Dependencies to refetch when page/limit changes
+        [page, limit]
     );
 
-    const handleDeleteClick = (collection) => {
+    // 🔹 Helper to open dialog in delete or info mode
+    const openConfirmDialog = (mode, message, collection = null) => {
+        setConfirmMode(mode);
+        setConfirmMessage(message);
         setSelectedCollection(collection);
         setConfirmOpen(true);
+    };
+
+    const handleDeleteClick = (collection) => {
+        // Example: If a collection is not deletable, show info-only dialog
+        if (collection.canDelete === false) {
+            openConfirmDialog(
+                'info',
+                'This collection cannot be deleted because it is associated with existing dates.'
+            );
+            return;
+        }
+
+        // Otherwise open normal delete confirmation
+        openConfirmDialog(
+            'delete',
+            'Are you sure you want to delete this collection? This action cannot be undone.',
+            collection
+        );
     };
 
     const handleConfirmDelete = async () => {
         if (!selectedCollection) return;
         try {
             await dateService.deleteCollection(selectedCollection.id);
-            setConfirmOpen(false);
-            setSelectedCollection(null);
-            refetch(); // refresh table
+            refetch();
         } catch (err) {
-            console.error("Delete failed:", err);
-            setConfirmOpen(false);
+            console.error('Delete failed:', err);
+        } finally {
+            handleCancelDelete();
         }
-        setConfirmOpen(false);
     };
 
     const handleCancelDelete = () => {
         setConfirmOpen(false);
         setSelectedCollection(null);
+        setConfirmMessage('');
+        setConfirmMode('delete');
     };
 
     const columns = [
         {
             key: 'createdAt',
             label: 'Date',
-            render: (prd) => {
-                return (
-                    <span>
-                        {new Date(prd.createdAt).toLocaleDateString(undefined, {
-                            year: "numeric",
-                            month: "numeric",
-                            day: "numeric",
-                        })}{" "}
-                        -{" "}
-                        {new Date(prd.createdAt).toLocaleTimeString(undefined, {
-                            hour: "numeric",
-                            minute: "2-digit",
-                            hour12: false,
-                        })}
-                    </span>
-                );
-            }
+            render: (prd) => (
+                <span>
+                    {new Date(prd.createdAt).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                    })}{' '}
+                    -{' '}
+                    {new Date(prd.createdAt).toLocaleTimeString(undefined, {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: false,
+                    })}
+                </span>
+            ),
         },
-        {
-            key: 'nameEn',
-            label: 'Name',
-        },
+        { key: 'nameEn', label: 'Name' },
         {
             key: 'imageUrl',
             label: 'Image',
             render: (prd) => (
                 <img
                     src={getImageSrc(prd.imageUrl, 'collections')}
-                    alt={prd.name}
+                    alt={prd.nameEn}
                     style={{
                         width: '50px',
                         height: '50px',
                         objectFit: 'cover',
-                        borderRadius: '4px'
+                        borderRadius: '4px',
                     }}
                 />
-            )
+            ),
         },
         {
             key: 'isActive',
@@ -99,18 +118,14 @@ function Collections() {
                     color={prd.isActive ? 'success' : 'error'}
                     size="small"
                 />
-            )
-        }
+            ),
+        },
     ];
 
-    // Handle pagination changes
-    const handlePageChange = (newPage) => {
-        setPage(newPage);
-    };
-
+    const handlePageChange = (newPage) => setPage(newPage);
     const handleLimitChange = (newLimit) => {
         setLimit(newLimit);
-        setPage(0); // Reset to first page when changing page size
+        setPage(0);
     };
 
     if (error) {
@@ -122,12 +137,7 @@ function Collections() {
     }
 
     return (
-        <Box
-            display="flex"
-            flexDirection="column"
-            minHeight="100vh"
-            overflow="hidden"
-        >
+        <Box display="flex" flexDirection="column" minHeight="100vh" overflow="hidden">
             <Helmet>
                 <title>Collections - Applications</title>
             </Helmet>
@@ -140,9 +150,9 @@ function Collections() {
                 maxWidth="lg"
                 sx={{
                     flex: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
                 }}
             >
                 {!collections || !collections.data || collections.data.length === 0 ? (
@@ -164,7 +174,7 @@ function Collections() {
                                 idKey="id"
                                 columns={columns}
                                 onEdit={(collection) => navigate(`/collections/edit/${collection.id}`)}
-                                onDelete={(collection) => handleDeleteClick(collection)}
+                                onDelete={handleDeleteClick}
                                 currentPage={page}
                                 pageSize={limit}
                                 totalCount={collections.total || collections.data.length}
@@ -177,15 +187,16 @@ function Collections() {
                 )}
             </Container>
 
+            {/* 🔹 Shared Confirm Dialog */}
             <ConfirmDialog
                 open={confirmOpen}
                 onClose={handleCancelDelete}
-                onConfirm={handleConfirmDelete}
-                title="Delete Date"
-                message={`Are you sure you want to delete this item? This action cannot be undone.`}
-                confirmText="Delete"
-                cancelText="Cancel"
-                confirmVariant="danger"
+                onConfirm={confirmMode === 'delete' ? handleConfirmDelete : handleCancelDelete}
+                title={confirmMode === 'delete' ? 'Delete Collection' : 'Cannot Delete'}
+                message={confirmMessage}
+                confirmText={confirmMode === 'delete' ? 'Delete' : 'OK'}
+                cancelText={confirmMode === 'delete' ? 'Cancel' : null}
+                confirmVariant={confirmMode === 'delete' ? 'danger' : 'primary'}
             />
         </Box>
     );

@@ -6,7 +6,7 @@ import { Helmet } from "react-helmet-async";
 import Footer from "src/components/Footer";
 import PageTitle from "src/components/PageTitle";
 import PageTitleWrapper from "src/components/PageTitleWrapper";
-import Editor from "src/components/Editor/Index";
+import { useApiCall } from '../../api/hooks/useApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
@@ -16,10 +16,16 @@ export default function UpdateDate() {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
 
+    const { data: activeCollections, loading: activeCollectionsLoading } = useApiCall(
+        () => dateService.getActiveCollections(),
+        []
+    );
+
     const [form, setForm] = useState<Date>({
         id: 0,
         nameEn: "",
         nameSv: "",
+        collectionId: 0,
         quality: false,
         unitPrice: undefined,
         weightPrice: undefined,
@@ -49,6 +55,7 @@ export default function UpdateDate() {
                 id: date.id,
                 nameEn: date.nameEn,
                 nameSv: date.nameSv,
+                collectionId: date.collectionId,
                 quality: date.quality,
                 unitPrice: date.unitPrice,
                 weightPrice: date.weightPrice,
@@ -119,6 +126,9 @@ export default function UpdateDate() {
         if (form.weightPrice === undefined || form.weightPrice <= 0) {
             validationErrors.push("Valid weight price is required");
         }
+        if (!form.collectionId || form.collectionId <= 0) {
+            validationErrors.push("Collection selection is required");
+        }
 
         setErrors(validationErrors);
 
@@ -144,17 +154,18 @@ export default function UpdateDate() {
         setLoading(true);
 
         try {
-            const productData = {
+            const datesData = {
                 id: form.id,
                 nameEn: form.nameEn,
                 nameSv: form.nameSv,
+                collectionId: form.collectionId,
                 quality: form.quality,
                 unitPrice: form.unitPrice,
                 weightPrice: form.weightPrice,
                 isActive: form.isActive
             };
 
-            await dateService.updateDate(productData);
+            await dateService.updateDate(datesData);
 
             notifySuccess();
         } catch (error: any) {
@@ -205,7 +216,7 @@ export default function UpdateDate() {
         <>
             <PortalToastContainer />
             <Helmet>
-                <title>Update Set - Application</title>
+                <title>Update Date - Application</title>
             </Helmet>
             <PageTitleWrapper>
                 <PageTitle
@@ -313,6 +324,23 @@ export default function UpdateDate() {
                                                 },
                                             }}
                                         />
+                                        <TextField
+                                            required
+                                            name="collectionId"
+                                            select
+                                            value={form.collectionId || ''}
+                                            onChange={handleChange}
+                                            SelectProps={{ native: true }}
+                                            variant="standard"
+                                            disabled={activeCollectionsLoading}
+                                        >
+                                            <option value="">Select Collection</option>
+                                            {activeCollections?.data?.map((option) => (
+                                                <option key={option.id} value={option.id}>
+                                                    {option.nameEn}
+                                                </option>
+                                            ))}
+                                        </TextField>
                                     </Box>
                                 </CardContent>
                             </Card>
