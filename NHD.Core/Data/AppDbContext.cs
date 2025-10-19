@@ -154,6 +154,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Collection).WithMany(p => p.Dates)
                 .HasForeignKey(d => d.CollectionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_dates_collection");
         });
 

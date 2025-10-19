@@ -25,7 +25,7 @@ public partial class Date
 
     public string DescriptionSv { get; set; }
 
-    public int? CollectionId { get; set; }
+    public int CollectionId { get; set; }
 
     public virtual DatesCollection Collection { get; set; }
 

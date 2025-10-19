@@ -239,7 +239,7 @@ namespace NHD.Core.Services.Dates
             return new DateViewModel
             {
                 Id = date.DateId,
-                CollectionId = date.CollectionId.HasValue ? date.CollectionId.Value : 0,
+                CollectionId = date.CollectionId,
                 CollectionName = date.Collection != null ? date.Collection.NameEn : string.Empty,
                 NameEn = date.NameEn,
                 NameSv = date.NameSv,
