@@ -13,6 +13,7 @@ using NHD.Core.Services.Products;
 using NHD.Core.Repository.Dates;
 using NHD.Core.Services.Dates;
 using NHD.Core.Repository.DateProducts;
+using NHD.Core.Repository.ImageGallery;
 
 namespace NHD.Web.UI
 {
@@ -148,7 +149,9 @@ namespace NHD.Web.UI
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IDatesRepository, DatesRepository>();
+            services.AddScoped<IGalleryRepository, GalleryRepository>();
             services.AddScoped<IDateProductsRepository, DateProductsRepository>();
+            services.AddScoped<IDatesCollectionRepository, DatesCollectionRepository>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IProductService, ProductService>();
