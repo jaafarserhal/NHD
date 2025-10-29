@@ -49,12 +49,12 @@ const Header: React.FC = () => {
                             <div className="header-menu">
                                 <ul className="header-primary-menu d-flex justify-content-center">
                                     <li>
-                                        <a href="#" className="menu-item-link active">
+                                        <a href="/" className="menu-item-link active">
                                             <span>Home</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#" className="menu-item-link active">
+                                        <a href="/shop" className="menu-item-link active">
                                             <span>Shope</span>
                                         </a>
                                     </li>
@@ -66,7 +66,7 @@ const Header: React.FC = () => {
                                     </li>
 
                                     <li>
-                                        <a href="#" className="menu-item-link active">
+                                        <a href="/about" className="menu-item-link active">
                                             <span>About</span>
                                         </a>
                                     </li>
