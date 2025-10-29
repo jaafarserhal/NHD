@@ -1,8 +1,6 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
 
 interface SliderItem {
     backgroundImage: string;
@@ -17,8 +15,8 @@ interface SliderItem {
 
 const sliderData: SliderItem[] = [
     {
-        backgroundImage: "assets/images/slider/slider-01.jpg",
-        shapeImage: "assets/images/slider/shape-01.png",
+        backgroundImage: "assets/images/slider/slider-test-01.jpg",
+        shapeImage: "assets/images/shape/shape-test-01.png",
         shapeWidth: 95,
         shapeHeight: 108,
         title: "Bring The Best Experience",
@@ -26,8 +24,8 @@ const sliderData: SliderItem[] = [
         btnLink: "single-product.html",
     },
     {
-        backgroundImage: "assets/images/slider/slider-02.jpg",
-        shapeImage: "assets/images/slider/shape-02.png",
+        backgroundImage: "assets/images/slider/slider-test-02.jpg",
+        shapeImage: "assets/images/shape/shape-test-02.png",
         shapeWidth: 95,
         shapeHeight: 62,
         title: "Taste That Lasts Forever",
@@ -50,11 +48,11 @@ const Slider: React.FC = () => {
                 {sliderData.map((slide, index) => (
                     <SwiperSlide
                         key={index}
-                        className={`single-slider animation-style-01`}
+                        className="single-slider swiper-slide animation-style-01"
                         style={{ backgroundImage: `url(${slide.backgroundImage})` }}
                     >
                         <div className="container">
-                            <div className={`slider-content text-center mx-auto ${slide.customClass || ""}`}>
+                            <div className={`slider-content text-center ${slide.customClass ? slide.customClass : 'mx-auto'}`}>
                                 <img
                                     className="slider-content__shape"
                                     width={slide.shapeWidth}
