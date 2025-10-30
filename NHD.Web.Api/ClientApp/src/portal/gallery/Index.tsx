@@ -23,6 +23,8 @@ import { getImageSrc } from 'src/common/getImageSrc';
 import { ProductGallery } from '../models/Types';
 import { PortalToastContainer } from 'src/components/Toaster/Index';
 import PageTitle from 'src/components/PageTitle';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 
 function Gallery() {
@@ -216,15 +218,11 @@ function Gallery() {
             key: 'imageUrl',
             label: 'Image',
             render: (prd) => (
-                <img
-                    src={getImageSrc(prd.imageUrl, prd.type == 'product' ? 'products' : 'dates')}
-                    alt={prd.name}
-                    style={{
-                        width: '50px',
-                        height: '50px',
-                        objectFit: 'cover',
-                        borderRadius: '4px'
-                    }}
+                <LazyLoadImage
+                    src={getImageSrc(prd.imageUrl, isProductMode ? 'products' : 'dates')}
+                    alt={prd.altText}
+                    effect="blur"
+                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                 />
             )
         },

@@ -11,6 +11,8 @@ import ConfirmDialog from 'src/components/ConfirmDialog/Index';
 import { useNavigate } from 'react-router-dom';
 import { RouterUrls } from 'src/common/RouterUrls';
 import { getImageSrc } from 'src/common/getImageSrc';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 function Products() {
     const [page, setPage] = useState(0); // 0-based for MUI TablePagination
@@ -95,18 +97,20 @@ function Products() {
             key: 'imageUrl',
             label: 'Image',
             render: (prd) => (
-                <img
-                    src={getImageSrc(prd.imageUrl)}
+                <LazyLoadImage
+                    src={getImageSrc(prd.imageUrl, 'products')}
                     alt={prd.name}
+                    effect="blur"
+                    width="50px"
+                    height="50px"
                     style={{
-                        width: '50px',
-                        height: '50px',
                         objectFit: 'cover',
                         borderRadius: '4px'
                     }}
                 />
             )
-        },
+        }
+        ,
         {
             key: 'isActive',
             label: 'Status',

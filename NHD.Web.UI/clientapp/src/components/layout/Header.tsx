@@ -85,11 +85,11 @@ const Header: React.FC = () => {
                             {/* Header Meta Start */}
                             <div className="header-meta">
                                 <ul className="header-meta__action d-flex justify-content-end">
-                                    <li>
+                                    {/* <li>
                                         <button className="action search-open">
                                             <i className="lastudioicon-zoom-1" />
                                         </button>
-                                    </li>
+                                    </li> */}
                                     <li>
                                         <button
                                             className="action"
