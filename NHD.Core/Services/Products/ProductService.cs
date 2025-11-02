@@ -46,6 +46,23 @@ namespace NHD.Core.Services.Products
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        #region Homepage
+        public async Task<ServiceResult<IEnumerable<ProductViewModel>>> GetCarouselProductsAsync()
+        {
+            try
+            {
+                var products = await _productRepository.GetCarouselProductsAsync();
+                var productDtos = products.Select(MapToProductDto).ToList();
+                return ServiceResult<IEnumerable<ProductViewModel>>.Success(productDtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving carousel products");
+                return ServiceResult<IEnumerable<ProductViewModel>>.Failure("An error occurred while retrieving carousel products");
+            }
+        }
+        #endregion Homepage
+
         #region Products
 
         public async Task<PagedServiceResult<IEnumerable<ProductViewModel>>> GetProductsAsync(int page = 1, int limit = 10)

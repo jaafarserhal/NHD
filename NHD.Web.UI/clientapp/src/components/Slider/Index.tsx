@@ -1,41 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
+import productService from "../../api/productService";
 
 interface SliderItem {
     backgroundImage: string;
-    shapeImage: string;
-    shapeWidth: number;
-    shapeHeight: number;
     title: string;
-    btnText: string;
-    btnLink: string;
-    customClass?: string;
 }
 
-const sliderData: SliderItem[] = [
-    {
-        backgroundImage: "assets/images/slider/slider-test-01.jpg",
-        shapeImage: "assets/images/shape/shape-test-01.png",
-        shapeWidth: 95,
-        shapeHeight: 108,
-        title: "Bring The Best Experience",
-        btnText: "Order Now",
-        btnLink: "single-product.html",
-    },
-    {
-        backgroundImage: "assets/images/slider/slider-test-02.jpg",
-        shapeImage: "assets/images/shape/shape-test-02.png",
-        shapeWidth: 95,
-        shapeHeight: 62,
-        title: "Taste That Lasts Forever",
-        btnText: "Order Now",
-        btnLink: "single-product.html",
-        customClass: "custom-ms-01",
-    },
-];
-
 const Slider: React.FC = () => {
+    const [sliderData, setSliderData] = useState<SliderItem[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await productService.getCarouselProducts();
+
+                // Make sure it's an array before mapping
+                if (Array.isArray(response)) {
+                    const mapped = response.map((product: any) => ({
+                        backgroundImage: `/uploads/products/${product.imageUrl}`,
+                        title: product.nameEn,
+                    }));
+
+                    setSliderData(mapped);
+                } else {
+                    setSliderData([]);
+                    console.warn("Carousel response is not an array:", response);
+                }
+
+            } catch (error) {
+                console.error("Error fetching carousel products:", error);
+                setSliderData([]);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     return (
         <div className="slider-section slider-active overflow-hidden">
             <Swiper
@@ -52,17 +54,10 @@ const Slider: React.FC = () => {
                         style={{ backgroundImage: `url(${slide.backgroundImage})` }}
                     >
                         <div className="container">
-                            <div className={`slider-content text-center ${slide.customClass ? slide.customClass : 'mx-auto'}`}>
-                                <img
-                                    className="slider-content__shape"
-                                    width={slide.shapeWidth}
-                                    height={slide.shapeHeight}
-                                    src={slide.shapeImage}
-                                    alt="Shape"
-                                />
+                            <div className="slider-content text-center mx-auto">
                                 <h1 className="slider-content__title text-white">{slide.title}</h1>
-                                <a className="slider-content__btn btn btn-primary btn-hover-black" href={slide.btnLink}>
-                                    {slide.btnText}
+                                <a className="slider-content__btn btn btn-primary btn-hover-black">
+                                    Order Now
                                 </a>
                             </div>
                         </div>

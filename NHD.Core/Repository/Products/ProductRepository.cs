@@ -49,5 +49,13 @@ namespace NHD.Core.Repository.Products
                 .Include(p => p.DatesProducts)
                 .FirstOrDefaultAsync(p => p.PrdId == productId);
         }
+
+        public async Task<IEnumerable<Product>> GetCarouselProductsAsync()
+        {
+            return await _context.Products
+                .Where(p => p.IsCarousel == true && p.IsActive == true)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+        }
     }
 }

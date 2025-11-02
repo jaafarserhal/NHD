@@ -32,5 +32,7 @@ namespace NHD.Core.Services.Products
         Task<ServiceResult<bool>> DeleteGalleryAsync(int? productId, int? dateId);
 
         Task<Gallery> GetGalleryAsync(int id);
+
+        Task<ServiceResult<IEnumerable<ProductViewModel>>> GetCarouselProductsAsync();
     }
 }
