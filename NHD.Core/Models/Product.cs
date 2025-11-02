@@ -29,6 +29,8 @@ public partial class Product
 
     public DateTime CreatedAt { get; set; }
 
+    public bool? IsCarousel { get; set; }
+
     public virtual ICollection<DatesProduct> DatesProducts { get; set; } = new List<DatesProduct>();
 
     public virtual ICollection<Gallery> Galleries { get; set; } = new List<Gallery>();

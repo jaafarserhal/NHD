@@ -10,6 +10,7 @@ export interface Product {
     sizeId: number;
     imageUrl: string;
     isActive: boolean;
+    isCarousel: boolean;
     dates: DatesProduct[];
 }
 

@@ -84,6 +84,7 @@ CREATE TABLE dbo.product (
     description_en NVARCHAR(MAX) NULL,
     description_sv NVARCHAR(MAX) NULL,
     image_url NVARCHAR(500) NULL,
+	is_carousel BIT NULL,
     from_price DECIMAL(18,2) NULL,
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_date_product_created DEFAULT SYSUTCDATETIME(),

@@ -81,6 +81,7 @@ export default function UpdateProduct() {
         descriptionSv: "",
         fromPrice: 0,
         isActive: true,
+        isCarousel: false,
         imageUrl: "",
         dates: []
     });
@@ -116,6 +117,7 @@ export default function UpdateProduct() {
                 descriptionSv: product.descriptionSv || "",
                 fromPrice: product.fromPrice || 0,
                 isActive: product.isActive,
+                isCarousel: product.isCarousel,
                 imageUrl: product.imageUrl || "",
                 dates: product.dates || []
             });
@@ -283,6 +285,13 @@ export default function UpdateProduct() {
         }));
     };
 
+    const handleCarouselChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm((prev) => ({
+            ...prev,
+            isCarousel: e.target.checked,
+        }));
+    };
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
 
@@ -419,6 +428,7 @@ export default function UpdateProduct() {
                 descriptionSv: form.descriptionSv,
                 fromPrice: form.fromPrice,
                 isActive: form.isActive,
+                isCarousel: form.isCarousel,
                 dates: form.dates.map(d => ({
                     ...d,
                     isPerWeight: form.categoryId === Number(BoxCategoryEnum.ClassicDatePouches) ? true : d.isPerWeight
@@ -858,6 +868,25 @@ export default function UpdateProduct() {
 
                         <Grid item xs={12}>
                             <Card>
+                                <CardHeader title="Carousel" />
+                                <Divider />
+                                <CardContent>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={form.isCarousel}
+                                                onChange={handleCarouselChange}
+                                                name="isCarousel"
+                                            />
+                                        }
+                                        label=''
+                                    />
+                                </CardContent>
+                            </Card>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Card>
                                 <CardHeader title="Status" />
                                 <Divider />
                                 <CardContent>
@@ -869,7 +898,7 @@ export default function UpdateProduct() {
                                                 name="isActive"
                                             />
                                         }
-                                        label=""
+                                        label=''
                                     />
                                 </CardContent>
                             </Card>

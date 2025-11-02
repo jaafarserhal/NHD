@@ -22,6 +22,7 @@ class productService extends apiService {
         formData.append('FromPrice', String(product.fromPrice));
         formData.append('DescriptionEn', product.descriptionEn || '');
         formData.append('DescriptionSv', product.descriptionSv || '');
+        formData.append('IsCarousel', String(product.isCarousel));
         formData.append('IsActive', String(product.isActive));
 
         // Handle dates array properly
@@ -56,6 +57,7 @@ class productService extends apiService {
         formData.append('DescriptionEn', product.descriptionEn || '');
         formData.append('DescriptionSv', product.descriptionSv || '');
         formData.append('IsActive', String(product.isActive));
+        formData.append('IsCarousel', String(product.isCarousel));
 
         // ✅ Add proper handling for dates array (same as addProduct)
         if (product.dates && product.dates.length > 0) {

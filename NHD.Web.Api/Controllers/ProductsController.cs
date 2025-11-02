@@ -105,6 +105,7 @@ namespace NHD.Web.Api.Controllers
                     DescriptionEn = dto.DescriptionEn,
                     DescriptionSv = dto.DescriptionSv,
                     FromPrice = dto.FromPrice,
+                    IsCarousel = dto.IsCarousel,
                     IsActive = dto.IsActive,
                     ImageUrl = fileName
                 };
@@ -186,6 +187,7 @@ namespace NHD.Web.Api.Controllers
                 existingProduct.DescriptionEn = dto.DescriptionEn;
                 existingProduct.DescriptionSv = dto.DescriptionSv;
                 existingProduct.FromPrice = dto.FromPrice;
+                existingProduct.IsCarousel = dto.IsCarousel;
                 existingProduct.IsActive = dto.IsActive;
                 existingProduct.CreatedAt = DateTime.UtcNow;
 

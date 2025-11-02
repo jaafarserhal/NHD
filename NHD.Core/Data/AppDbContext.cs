@@ -465,6 +465,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
+            entity.Property(e => e.IsCarousel).HasColumnName("is_carousel");
             entity.Property(e => e.NameEn)
                 .IsRequired()
                 .HasMaxLength(200)

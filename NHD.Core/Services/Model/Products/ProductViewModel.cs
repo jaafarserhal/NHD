@@ -23,6 +23,8 @@ namespace NHD.Core.Services.Model.Products
 
         public List<DatesProductBindingModel> Dates { get; set; } = new List<DatesProductBindingModel>();
         public bool IsActive { get; set; }
+
+        public bool IsCarousel { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 

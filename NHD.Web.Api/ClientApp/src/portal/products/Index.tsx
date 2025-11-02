@@ -90,6 +90,17 @@ function Products() {
             label: 'Size'
         },
         {
+            key: 'isCarousel',
+            label: 'Status',
+            render: (prd) => (
+                <Chip
+                    label={prd.isCarousel ? 'Carousel' : 'Regular'}
+                    color={prd.isCarousel ? 'success' : 'error'}
+                    size="small"
+                />
+            )
+        },
+        {
             key: 'fromPrice',
             label: 'Price'
         },

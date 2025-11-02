@@ -434,6 +434,7 @@ namespace NHD.Core.Services.Products
                 Size = product.PrdLookupSize?.NameEn,
                 ImageUrl = product.ImageUrl ?? null,
                 FromPrice = product.FromPrice ?? 0,
+                IsCarousel = product.IsCarousel ?? false,
                 Dates = product.DatesProducts?.Select(dp => new DatesProductBindingModel
                 {
                     Id = dp.DpId,

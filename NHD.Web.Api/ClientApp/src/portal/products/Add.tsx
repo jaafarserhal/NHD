@@ -48,6 +48,7 @@ export default function AddProduct() {
         descriptionSv: "",
         fromPrice: 0,
         isActive: true,
+        isCarousel: false,
         dates: []
     });
 
@@ -180,6 +181,13 @@ export default function AddProduct() {
         setForm((prev) => ({
             ...prev,
             isActive: e.target.checked,
+        }));
+    };
+
+    const handleCarouselChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm((prev) => ({
+            ...prev,
+            isCarousel: e.target.checked,
         }));
     };
 
@@ -340,6 +348,7 @@ export default function AddProduct() {
                 descriptionSv: "",
                 fromPrice: 0,
                 isActive: true,
+                isCarousel: false,
                 dates: []
             });
             setImage(null);
@@ -728,6 +737,24 @@ export default function AddProduct() {
                                             />
                                         </Box>
                                     )}
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Carousel" />
+                                <Divider />
+                                <CardContent>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={form.isCarousel}
+                                                onChange={handleCarouselChange}
+                                                name="isCarousel"
+                                            />
+                                        }
+                                        label=''
+                                    />
                                 </CardContent>
                             </Card>
                         </Grid>
