@@ -1,7 +1,7 @@
 import { Product } from "../../api/common/Types";
 
 
-const ProductItem: React.FC<{ product: Product }> = ({ product }) => (
+const Item: React.FC<{ product: Product }> = ({ product }) => (
     <div className="col mb-50">
         <div className="product-item text-center">
             <div className={`product-item__badge ${!product.isHot ? 'd-none' : ''}`}>
@@ -36,4 +36,4 @@ const ProductItem: React.FC<{ product: Product }> = ({ product }) => (
     </div>
 );
 
-export default ProductItem;
+export default Item;

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import ProductItem from "../Products/ProductsItem";
 import { Product } from "../../api/common/Types";
+import Item from "../HotOffer/Item";
 
 const HomeContent: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -116,7 +116,7 @@ const HomeContent: React.FC = () => {
                         <div className="tab-pane fade show active" id="tab1">
                             <div className="row row-cols-lg-4 row-cols-sm-2 row-cols-1 mb-n50">
                                 {products.map((product) => (
-                                    <ProductItem key={product.id} product={product} />
+                                    <Item key={product.id} product={product} />
                                 ))}
                             </div>
                         </div>
