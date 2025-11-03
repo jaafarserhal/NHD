@@ -14,6 +14,8 @@ using NHD.Core.Repository.Dates;
 using NHD.Core.Services.Dates;
 using NHD.Core.Repository.DateProducts;
 using NHD.Core.Repository.ImageGallery;
+using Microsoft.Extensions.FileProviders;
+
 
 namespace NHD.Web.UI
 {
@@ -29,28 +31,28 @@ namespace NHD.Web.UI
         // Register services
         public void ConfigureServices(IServiceCollection services)
         {
-            var keycloakDomain = Configuration["Keycloak:Url"];
-            var keycloakRealm = Configuration["Keycloak:Realm"];
-            var keycloakClientId = Configuration["Keycloak:ClientId"];
+            // Bind JwtSettings from config
+            var jwtSettingsSection = Configuration.GetSection("JwtSettings");
+            services.Configure<JwtSettings>(jwtSettingsSection);
+            var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.Authority = $"{keycloakDomain}/realms/{keycloakRealm}";
-                    options.Audience = keycloakClientId; // optional, but recommended
-                    options.RequireHttpsMetadata = false; // set true in production
-
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ClockSkew = TimeSpan.FromSeconds(30)
-                    };
-                });
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                    ValidateIssuer = false,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidAudience = jwtSettings.Audience,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
 
             services.AddAuthorization();
-
             services.AddControllers();
             services.AddEndpointsApiExplorer();
 
@@ -59,23 +61,26 @@ namespace NHD.Web.UI
                 options.AddPolicy("AllowReactApp", policy =>
                 {
                     policy.WithOrigins(
-                        "http://localhost:3000",
-                        "https://www.nawahomeofdates.com"
+                        "http://localhost:3000",           // Development
+                        "https://www.nawahomeofdates.com",     // Production (with www)
+                        "https://nawahomeofdates.com"          // Production (without www)
                     )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .AllowCredentials();
+                    .AllowCredentials(); // Add this if you're using cookies/credentials
                 });
             });
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString(AppConstants.CONNECTION_NAME)));
 
+            // Add SPA services
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "wwwroot";
             });
 
+            // Register repositories and builders
             RegisterServices(services);
         }
 
@@ -90,17 +95,31 @@ namespace NHD.Web.UI
             app.UseHttpsRedirection();
 
             // Static files configuration for SPA
+            // ✅ Serve React build/static assets with cache rule
             app.UseStaticFiles(new StaticFileOptions
             {
                 OnPrepareResponse = context =>
                 {
-                    // Add cache headers for static assets
                     if (context.File.Name.EndsWith(".js") || context.File.Name.EndsWith(".css"))
                     {
                         context.Context.Response.Headers.Add("Cache-Control", "public, max-age=31536000");
                     }
                 }
             });
+
+            // ✅ Serve uploaded images (no long cache, always fresh)
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads")),
+                RequestPath = "/uploads",
+                OnPrepareResponse = ctx =>
+                {
+                    ctx.Context.Response.Headers["Cache-Control"] = "no-cache, no-store";
+                    ctx.Context.Response.Headers["Expires"] = "-1";
+                }
+            });
+
 
             app.UseRouting();
 
