@@ -7,7 +7,10 @@ class productService extends apiService {
     }
 
     async getCarouselProducts() {
-        return this.get('carousel-products');
+        return this.get('CarouselProducts');
+    }
+    async getSignatureGiftsProducts() {
+        return this.get(`SignatureGiftsProducts`);
     }
 }
 

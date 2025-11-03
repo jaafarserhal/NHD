@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using NHD.Core.Common.Models;
 using NHD.Core.Services.Model.Products;
 using NHD.Core.Services.Products;
+using NHD.Core.Utilities;
 
 namespace NHD.Web.UI.Controllers
 {
@@ -22,10 +23,21 @@ namespace NHD.Web.UI.Controllers
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
         }
 
-        [HttpGet("carousel-products")]
+        [HttpGet("CarouselProducts")]
         public async Task<ActionResult<ServiceResult<IEnumerable<ProductViewModel>>>> GetCarouselProducts()
         {
             var result = await _productService.GetCarouselProductsAsync();
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpGet("SignatureGiftsProducts")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>>> GetProductsByCategory()
+        {
+            var result = await _productService.GetProductsByCategoryAsync(BoxCategoryEnum.SignatureDateGifts.AsInt(), false, 3);
             if (result.IsSuccess)
             {
                 return Ok(result.Data);

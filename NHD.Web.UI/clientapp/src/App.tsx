@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/About";
 import Cart from "./components/Cart/Index";
 
+
 const App: React.FC = () => {
   return (
     <Router>

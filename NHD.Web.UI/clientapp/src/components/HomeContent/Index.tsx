@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Product } from "../../api/common/Types";
-import Item from "../HotOffer/Item";
+import Item from "../HomeTopThreeProducts/Item";
 
 const HomeContent: React.FC = () => {
     const [email, setEmail] = useState('');

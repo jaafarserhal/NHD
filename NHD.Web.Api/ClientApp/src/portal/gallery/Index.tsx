@@ -29,6 +29,7 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 
 function Gallery() {
     const { prdId, dateId } = useParams<{ prdId?: string; dateId?: string }>();
+    const { title } = useParams<{ title: string }>();
     const navigate = useNavigate();
 
     const isProductMode = Boolean(prdId);
@@ -259,13 +260,13 @@ function Gallery() {
             <PortalToastContainer />
             <Box display="flex" flexDirection="column" minHeight="100vh" overflow="hidden">
                 <Helmet>
-                    <title>Gallery - Applications</title>
+                    <title>{title} | Gallery - Applications</title>
                 </Helmet>
 
                 <PageTitleWrapper>
                     <PageTitle
                         heading="Gallery"
-                        subHeading="Manage images"
+                        subHeading={`${title} | Manage gallery images`}
                         backUrl={isProductMode ? `${RouterUrls.productsList}` : `${RouterUrls.datesList}`}
                     />
                 </PageTitleWrapper>
@@ -362,7 +363,7 @@ function Gallery() {
 
                     {/* Images List */}
                     <Card>
-                        <CardHeader title="Gallery Images" />
+                        <CardHeader title={`${title} ${isProductMode ? '| Product Gallery' : '| Date Gallery'}`} />
                         <Divider />
                         <CardContent>
                             {productsLoading ? (

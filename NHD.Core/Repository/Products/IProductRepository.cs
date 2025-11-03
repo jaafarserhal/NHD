@@ -14,5 +14,6 @@ namespace NHD.Core.Repository.Products
         Task<Product> GetProductByIdAsync(int productId);
 
         Task<IEnumerable<Product>> GetCarouselProductsAsync();
+        Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId, bool IsCarousel, int take);
     }
 }

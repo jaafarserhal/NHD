@@ -57,5 +57,17 @@ namespace NHD.Core.Repository.Products
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId, bool IsCarousel, int take)
+        {
+            return await _context.Products
+                .Where(p => p.PrdLookupCategoryId == categoryId && p.IsActive == true && p.IsCarousel == IsCarousel)
+                .Include(p => p.Galleries)
+                .Include(p => p.PrdLookupType)
+                .Include(p => p.PrdLookupSize)
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(take)
+                .ToListAsync();
+        }
     }
 }

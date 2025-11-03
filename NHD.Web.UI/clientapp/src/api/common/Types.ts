@@ -12,3 +12,22 @@ export interface MenuItem {
     href: string;
     subItems?: MenuItem[];
 }
+
+export interface ProductsWithGallery {
+    id: number;
+    titleEn: string;
+    titleSv: string;
+    descriptionEn: string;
+    descriptionSv: string;
+    fromPrice: number;
+    imageUrl: string;
+    type: string;
+    size: string;
+    galleries: GalleryViewModel[];
+}
+
+export interface GalleryViewModel {
+    id: number;
+    altText: string;
+    imageUrl: string;
+}
