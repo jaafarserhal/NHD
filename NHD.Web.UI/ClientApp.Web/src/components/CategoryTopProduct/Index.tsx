@@ -58,6 +58,7 @@ const CategoryTopProduct: React.FC = () => {
                     {data.slice(0, 3).map((product) => (
                         <div className="col-lg-4 col-md-6" key={product.id}>
                             <div className="product-item border text-center">
+                                <div className="product-item__badge">Gift</div>
                                 <div className="product-item__image">
                                     <a href={`/product/${product.id}`}>
                                         <img

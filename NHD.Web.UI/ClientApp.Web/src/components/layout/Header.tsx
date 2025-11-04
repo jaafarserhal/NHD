@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 const Header: React.FC = () => {
     const [isSticky, setIsSticky] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -21,6 +23,10 @@ const Header: React.FC = () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
+
+    const isActive = (path: string) => {
+        return location.pathname === path;
+    };
 
     return (
         <>
@@ -49,30 +55,36 @@ const Header: React.FC = () => {
                             <div className="header-menu">
                                 <ul className="header-primary-menu d-flex justify-content-center">
                                     <li>
-                                        <a href="/" className="menu-item-link active">
+                                        <Link
+                                            to="/"
+                                            className={`menu-item-link ${isActive('/') ? 'active' : ''}`}
+                                        >
                                             <span>Home</span>
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
-                                        <a href="/shop" className="menu-item-link active">
-                                            <span>Shope</span>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="#" className="menu-item-link active">
-                                            <span>Products</span>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="/about" className="menu-item-link active">
+                                        <Link
+                                            to="/about"
+                                            className={`menu-item-link ${isActive('/about') ? 'active' : ''}`}
+                                        >
                                             <span>About</span>
+                                        </Link>
+                                    </li>
+
+                                    <li>
+                                        <a href="/coming-soon" className="menu-item-link">
+                                            <span>Shop</span>
                                         </a>
                                     </li>
 
                                     <li>
-                                        <a href="#" className="menu-item-link active">
+                                        <a href="/coming-soon" className="menu-item-link">
+                                            <span>Our Dates</span>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="/coming-soon" className="menu-item-link">
                                             <span>Contact</span>
                                         </a>
                                     </li>

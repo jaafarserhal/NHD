@@ -217,11 +217,6 @@ const HomeContent: React.FC = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Scroll Top */}
-            <a href="#" className="scroll-top" id="scroll-top">
-                <i className="lastudioicon-up-arrow"></i>
-            </a>
         </>
     );
 };

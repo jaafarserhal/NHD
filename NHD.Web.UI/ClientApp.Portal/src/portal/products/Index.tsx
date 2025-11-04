@@ -83,10 +83,10 @@ function Products() {
         },
         {
             key: 'isCarousel',
-            label: 'Status',
+            label: 'Carousel',
             render: (prd) => (
                 <Chip
-                    label={prd.isCarousel ? 'Carousel' : 'Regular'}
+                    label={prd.isCarousel ? 'Show' : 'Hide'}
                     color={prd.isCarousel ? 'success' : 'error'}
                     size="small"
                 />
