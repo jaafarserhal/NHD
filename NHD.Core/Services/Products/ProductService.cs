@@ -78,12 +78,12 @@ namespace NHD.Core.Services.Products
                     FromPrice = p.FromPrice ?? 0,
                     Type = p.PrdLookupType?.NameEn,
                     Size = p.PrdLookupSize?.NameEn,
-                    Galleries = p.Galleries != null ? p.Galleries.Select(g => new ProductGalleryViewModel
+                    Galleries = p.Galleries != null ? p.Galleries.Select(g => new GalleryViewModel
                     {
                         Id = g.GalleryId,
                         AltText = g.AltText,
                         ImageUrl = $"/uploads/products/{g.ImageUrl}",
-                    }).ToList() : new List<ProductGalleryViewModel>()
+                    }).ToList() : new List<GalleryViewModel>()
 
                 }).ToList();
                 return ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Success(productDtos);
@@ -212,7 +212,7 @@ namespace NHD.Core.Services.Products
         {
             try
             {
-                var dates = await _datesRepository.GetAllAsync();
+                var dates = await _datesRepository.GetActiveDatesAsync();
                 var dateViewModels = dates.Select(d => new DateViewModel
                 {
                     Id = d.DateId,
@@ -231,19 +231,19 @@ namespace NHD.Core.Services.Products
             }
         }
 
-        public async Task<PagedServiceResult<IEnumerable<ProductGalleryViewModel>>> GetGalleriesAsync(int? productId, int? dateId, int page = 1, int limit = 10)
+        public async Task<PagedServiceResult<IEnumerable<GalleryViewModel>>> GetGalleriesAsync(int? productId, int? dateId, int page = 1, int limit = 10)
         {
             try
             {
                 if (page <= 0 || limit <= 0)
                 {
-                    return PagedServiceResult<IEnumerable<ProductGalleryViewModel>>.Failure("Page and limit must be greater than 0");
+                    return PagedServiceResult<IEnumerable<GalleryViewModel>>.Failure("Page and limit must be greater than 0");
                 }
 
                 var pagedResult = await _galleryRepository.GetGalleriesAsync(productId, dateId, page, limit);
                 var productGalleryDtos = pagedResult.Data.Select(MapToProductGalleryDto).ToList();
 
-                return PagedServiceResult<IEnumerable<ProductGalleryViewModel>>.Success(
+                return PagedServiceResult<IEnumerable<GalleryViewModel>>.Success(
                     productGalleryDtos,
                     pagedResult.Total,
                     pagedResult.Page,
@@ -253,7 +253,7 @@ namespace NHD.Core.Services.Products
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving product galleries");
-                return PagedServiceResult<IEnumerable<ProductGalleryViewModel>>.Failure("An error occurred while retrieving product galleries");
+                return PagedServiceResult<IEnumerable<GalleryViewModel>>.Failure("An error occurred while retrieving product galleries");
             }
         }
 
@@ -500,9 +500,9 @@ namespace NHD.Core.Services.Products
             };
         }
 
-        private ProductGalleryViewModel MapToProductGalleryDto(Gallery gallery)
+        private GalleryViewModel MapToProductGalleryDto(Gallery gallery)
         {
-            return new ProductGalleryViewModel
+            return new GalleryViewModel
             {
                 Id = gallery.GalleryId,
                 Name = gallery.DateId != null ? gallery.Date?.NameEn : gallery.Prd?.NameEn,

@@ -44,11 +44,12 @@ export interface DatesProduct {
     isPerWeight: boolean;
 }
 
-export interface ProductGallery {
+export interface Gallery {
     prdId?: number;
     dateId?: number;
     imageUrl: string;
     altText: string;
+    isPrimary: boolean;
     sortOrder: number;
 }
 

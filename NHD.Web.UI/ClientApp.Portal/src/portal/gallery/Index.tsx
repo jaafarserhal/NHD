@@ -10,7 +10,10 @@ import {
     CardContent,
     Divider,
     TextField,
-    Button
+    Button,
+    Chip,
+    FormControlLabel,
+    Switch
 } from '@mui/material';
 import { useState, useRef } from 'react';
 import { useApiCall } from '../../api/hooks/useApi';
@@ -20,7 +23,7 @@ import ConfirmDialog from 'src/components/ConfirmDialog/Index';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RouterUrls } from 'src/common/RouterUrls';
 import { getImageSrc } from 'src/common/getImageSrc';
-import { ProductGallery } from '../models/Types';
+import { Gallery as GalleryItem } from 'src/portal/models/Types';
 import { PortalToastContainer } from 'src/components/Toaster/Index';
 import PageTitle from 'src/components/PageTitle';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
@@ -41,9 +44,10 @@ function Gallery() {
     const [selectedGallery, setSelectedGallery] = useState(null);
 
     // Form states
-    const [form, setForm] = useState<Omit<ProductGallery, "id" | "imageUrl">>({
+    const [form, setForm] = useState<Omit<GalleryItem, "id" | "imageUrl">>({
         sortOrder: 0,
-        altText: ""
+        altText: "",
+        isPrimary: false
     });
     const [image, setImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
@@ -173,6 +177,7 @@ function Gallery() {
             setForm({
                 sortOrder: 0,
                 altText: "",
+                isPrimary: false
             });
             setImage(null);
             setPreview(null);
@@ -234,6 +239,17 @@ function Gallery() {
         {
             key: 'sortOrder',
             label: 'Sort Order'
+        },
+        {
+            key: 'isPrimary',
+            label: 'Primary',
+            render: (prd) => (
+                <Chip
+                    label={prd.isPrimary ? 'Yes' : 'No'}
+                    color={prd.isPrimary ? 'success' : 'error'}
+                    size="small"
+                />
+            )
         }
     ];
 
@@ -245,6 +261,9 @@ function Gallery() {
     const handleLimitChange = (newLimit) => {
         setLimit(newLimit);
         setPage(0);
+    };
+    const handlePrimarySwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setForm({ ...form, isPrimary: event.target.checked });
     };
 
     if (error) {
@@ -320,7 +339,7 @@ function Gallery() {
                                                 fullWidth
                                             />
                                         </Grid>
-                                        <Grid item xs={12}>
+                                        <Grid item xs={12} md={6}>
                                             <input
                                                 type="file"
                                                 accept="image/*"
@@ -342,6 +361,18 @@ function Gallery() {
                                                     />
                                                 </Box>
                                             )}
+                                        </Grid>
+                                        <Grid item xs={12} md={6}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={form.isPrimary}
+                                                        onChange={handlePrimarySwitchChange}
+                                                        name="primary"
+                                                    />
+                                                }
+                                                label='Primary'
+                                            />
                                         </Grid>
                                         <Grid item xs={12}>
                                             <Box textAlign="center">

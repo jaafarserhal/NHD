@@ -48,5 +48,12 @@ namespace NHD.Core.Repository.Dates
         {
             return await _context.Dates.AnyAsync(d => d.CollectionId == collectionId);
         }
+
+        public async Task<IEnumerable<Date>> GetActiveDatesAsync()
+        {
+            return await _context.Dates
+                .Where(d => d.IsActive)
+                .ToListAsync();
+        }
     }
 }

@@ -296,7 +296,7 @@ namespace NHD.Web.UI.Portal.Controllers
         }
 
         [HttpGet("AllGalleries/{id:int}/{type}")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<ProductGalleryViewModel>>>> GetAllGalleries(int id, string type)
+        public async Task<ActionResult<ServiceResult<IEnumerable<GalleryViewModel>>>> GetAllGalleries(int id, string type)
         {
             if (string.IsNullOrWhiteSpace(type))
                 return BadRequest(new { message = "Type parameter is required." });
@@ -324,7 +324,7 @@ namespace NHD.Web.UI.Portal.Controllers
 
         [HttpPost]
         [Route("AddGallery")]
-        public async Task<IActionResult> AddGallery([FromForm] ProductGalleryBindingModel dto)
+        public async Task<IActionResult> AddGallery([FromForm] GalleryBindingModel dto)
         {
             try
             {
@@ -363,7 +363,7 @@ namespace NHD.Web.UI.Portal.Controllers
                     AltText = dto.AltText,
                     MimeType = dto.ImageUrl.ContentType,
                     FileSizeKb = (int)(dto.ImageUrl.Length / 1024),
-                    IsPrimary = false
+                    IsPrimary = dto.IsPrimary
                 };
 
                 var created = await _productService.AddGalleryAsync(gallery);

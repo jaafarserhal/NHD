@@ -28,7 +28,7 @@ namespace NHD.Core.Services.Model.Products
         public DateTime CreatedAt { get; set; }
     }
 
-    public class ProductGalleryViewModel
+    public class GalleryViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -36,6 +36,7 @@ namespace NHD.Core.Services.Model.Products
         public string AltText { get; set; }
         public string ImageUrl { get; set; }
         public int? SortOrder { get; set; }
+        public bool IsPrimary { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }
