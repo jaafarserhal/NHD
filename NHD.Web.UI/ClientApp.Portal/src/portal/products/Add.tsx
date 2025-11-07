@@ -793,25 +793,6 @@ export default function AddProduct() {
                         </Grid>
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Carousel" />
-                                <Divider />
-                                <CardContent>
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={form.isCarousel}
-                                                onChange={handleCarouselChange}
-                                                name="isCarousel"
-                                            />
-                                        }
-                                        label=''
-                                    />
-                                </CardContent>
-                            </Card>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <Card>
                                 <CardHeader title="Status" />
                                 <Divider />
                                 <CardContent>

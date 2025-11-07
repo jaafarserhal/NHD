@@ -19,6 +19,7 @@ class sectionService extends apiService {
         formData.append('DescriptionEn', section.descriptionEn || '');
         formData.append('DescriptionSv', section.descriptionSv || '');
         formData.append('IsActive', String(section.isActive));
+        formData.append('IsHomeSlider', String(section.isHomeSlider));
 
         if (section.imageFile && section.imageFile instanceof File) {
             formData.append('ImageFile', section.imageFile, section.imageFile.name);
@@ -36,6 +37,7 @@ class sectionService extends apiService {
         formData.append('DescriptionEn', section.descriptionEn || '');
         formData.append('DescriptionSv', section.descriptionSv || '');
         formData.append('IsActive', String(section.isActive));
+        formData.append('IsHomeSlider', String(section.isHomeSlider));
 
         if (section.imageFile && section.imageFile instanceof File) {
             formData.append('ImageFile', section.imageFile, section.imageFile.name);

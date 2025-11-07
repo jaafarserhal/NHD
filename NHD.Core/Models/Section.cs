@@ -20,4 +20,6 @@ public partial class Section
     public bool? IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public bool? IsHomeSlider { get; set; }
 }

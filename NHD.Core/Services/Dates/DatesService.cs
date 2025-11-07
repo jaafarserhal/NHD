@@ -241,7 +241,7 @@ namespace NHD.Core.Services.Dates
                 DescriptionEn = collection.DescriptionEn,
                 DescriptionSv = collection.DescriptionSv,
                 IsActive = collection.IsActive,
-                CanDelete = false,
+                CanDelete = collection.ProductCollections == null || !collection.ProductCollections.Any(),
                 CreatedAt = collection.CreatedAt
             };
         }

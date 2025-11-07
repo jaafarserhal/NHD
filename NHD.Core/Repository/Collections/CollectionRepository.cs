@@ -24,6 +24,7 @@ namespace NHD.Core.Repository.Collections
             var total = await query.CountAsync();
 
             var collections = await query
+                .Include(c => c.ProductCollections)
                 .Skip((page - 1) * limit)
                 .Take(limit)
                 .ToListAsync();

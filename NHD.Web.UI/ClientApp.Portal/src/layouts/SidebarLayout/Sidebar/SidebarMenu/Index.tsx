@@ -18,9 +18,8 @@ import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import BallotTwoToneIcon from '@mui/icons-material/BallotTwoTone';
 import MmsTwoToneIcon from '@mui/icons-material/MmsTwoTone';
 import EmergencyShareIcon from '@mui/icons-material/EmergencyShare';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
+import DataUsageIcon from '@mui/icons-material/DataUsage';
 
 import { RouterUrls } from 'src/common/RouterUrls';
 
@@ -74,17 +73,38 @@ const SubMenuWrapper = styled(Box)(
 // ---------- COMPONENT ----------
 function SidebarMenu() {
   const { closeSidebar } = useContext(SidebarContext);
-  const [openDates, setOpenDates] = useState(false);
-
-  const handleToggleDates = () => {
-    setOpenDates((prev) => !prev);
-  };
 
   return (
     <MenuWrapper>
       <List component="div">
         <SubMenuWrapper>
           <List component="div">
+            {/* COLLECTIONS */}
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to={RouterUrls.collectionsList}
+                startIcon={<DataUsageIcon />}
+              >
+                Product Collections
+              </Button>
+            </ListItem>
+
+            {/* DATES */}
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to={RouterUrls.datesList}
+                startIcon={<EmergencyShareIcon />}
+              >
+                Dates
+              </Button>
+            </ListItem>
+
             {/* SECTIONS */}
             <ListItem component="div">
               <Button
@@ -94,7 +114,7 @@ function SidebarMenu() {
                 to={RouterUrls.sectionsList}
                 startIcon={<AutoAwesomeMosaicIcon />}
               >
-                Sections
+                Informative Sections
               </Button>
             </ListItem>
 
@@ -111,45 +131,6 @@ function SidebarMenu() {
                 Products
               </Button>
             </ListItem>
-
-            {/* DATES (parent) */}
-            <ListItem component="div">
-              <Button
-                disableRipple
-                onClick={handleToggleDates}
-                startIcon={<EmergencyShareIcon />}
-                endIcon={openDates ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              >
-                Dates & Collections
-              </Button>
-            </ListItem>
-
-            {/* Submenu: Collections */}
-            <Collapse in={openDates} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItem component="div" sx={{ pl: 4 }}>
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to={RouterUrls.collectionsList}
-                  >
-                    Collections
-                  </Button>
-                </ListItem>
-
-                <ListItem component="div" sx={{ pl: 4 }}>
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to={RouterUrls.datesList}
-                  >
-                    Dates
-                  </Button>
-                </ListItem>
-              </List>
-            </Collapse>
 
             {/* ORDERS */}
             <ListItem component="div">

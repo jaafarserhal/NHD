@@ -440,7 +440,7 @@ export default function UpdateProduct() {
                 descriptionSv: form.descriptionSv,
                 fromPrice: form.fromPrice,
                 isActive: form.isActive,
-                isCarousel: form.isCarousel,
+                isCarousel: false,
                 dates: form.dates.map(d => ({
                     ...d,
                     isPerWeight: form.categoryId === Number(BoxCategoryEnum.ClassicDatePouches) ? true : d.isPerWeight
@@ -917,25 +917,6 @@ export default function UpdateProduct() {
                                             />
                                         </Box>
                                     )}
-                                </CardContent>
-                            </Card>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <Card>
-                                <CardHeader title="Carousel" />
-                                <Divider />
-                                <CardContent>
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={form.isCarousel}
-                                                onChange={handleCarouselChange}
-                                                name="isCarousel"
-                                            />
-                                        }
-                                        label=''
-                                    />
                                 </CardContent>
                             </Card>
                         </Grid>

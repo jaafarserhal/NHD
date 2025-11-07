@@ -115,6 +115,7 @@ namespace NHD.Core.Services.Sections
                 DescriptionEn = section.DescriptionEn,
                 DescriptionSv = section.DescriptionSv,
                 ImageUrl = section.ImageUrl,
+                IsHomeSlider = section.IsHomeSlider ?? false,
                 IsActive = section.IsActive ?? false,
                 CreatedAt = section.CreatedAt
             };

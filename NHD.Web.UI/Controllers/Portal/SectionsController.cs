@@ -97,6 +97,7 @@ namespace NHD.Web.UI.Controllers.Portal
                     DescriptionEn = dto.DescriptionEn,
                     DescriptionSv = dto.DescriptionSv,
                     ImageUrl = fileName,
+                    IsHomeSlider = dto.IsHomeSlider,
                     IsActive = dto.IsActive,
                     CreatedAt = DateTime.UtcNow
                 };
@@ -173,6 +174,7 @@ namespace NHD.Web.UI.Controllers.Portal
                 existingSection.TitleSv = dto.TitleSv;
                 existingSection.DescriptionEn = dto.DescriptionEn;
                 existingSection.DescriptionSv = dto.DescriptionSv;
+                existingSection.IsHomeSlider = dto.IsHomeSlider;
                 existingSection.IsActive = dto.IsActive;
                 existingSection.CreatedAt = DateTime.UtcNow;
 

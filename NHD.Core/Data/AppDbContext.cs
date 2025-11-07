@@ -533,6 +533,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
+            entity.Property(e => e.IsHomeSlider).HasColumnName("is_home_slider");
             entity.Property(e => e.TitleEn)
                 .IsRequired()
                 .HasMaxLength(255)

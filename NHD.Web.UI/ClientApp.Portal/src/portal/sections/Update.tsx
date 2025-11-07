@@ -24,7 +24,8 @@ export default function UpdateSection() {
         descriptionEn: "",
         descriptionSv: "",
         ImageFile: "",
-        isActive: true
+        isActive: true,
+        isHomeSlider: false,
     });
 
     const [image, setImage] = useState<File | null>(null);
@@ -55,6 +56,7 @@ export default function UpdateSection() {
                 descriptionSv: section.descriptionSv || "",
                 ImageFile: section.imageUrl || "",
                 isActive: section.isActive,
+                isHomeSlider: section.isHomeSlider,
             });
 
             // Set preview to existing image if available
@@ -82,6 +84,13 @@ export default function UpdateSection() {
         setForm((prev) => ({
             ...prev,
             isActive: e.target.checked,
+        }));
+    };
+
+    const handleHomeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm((prev) => ({
+            ...prev,
+            isHomeSlider: e.target.checked,
         }));
     };
 
@@ -195,7 +204,8 @@ export default function UpdateSection() {
                 descriptionEn: form.descriptionEn,
                 descriptionSv: form.descriptionSv,
                 isActive: form.isActive,
-                imageFile: image
+                imageFile: image,
+                isHomeSlider: form.isHomeSlider,
             };
 
             await sectionsService.updateSection(sectionData);
@@ -354,6 +364,24 @@ export default function UpdateSection() {
                                             />
                                         </Box>
                                     )}
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Home Slider" />
+                                <Divider />
+                                <CardContent>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={form.isHomeSlider}
+                                                onChange={handleHomeSliderChange}
+                                                name="isHomeSlider"
+                                            />
+                                        }
+                                        label=''
+                                    />
                                 </CardContent>
                             </Card>
                         </Grid>

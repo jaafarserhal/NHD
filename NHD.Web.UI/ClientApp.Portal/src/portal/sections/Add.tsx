@@ -19,6 +19,7 @@ export default function AddSection() {
         titleSv: "",
         descriptionEn: "",
         descriptionSv: "",
+        isHomeSlider: false,
         isActive: true
     });
 
@@ -33,6 +34,13 @@ export default function AddSection() {
         setForm((prev) => ({
             ...prev,
             isActive: e.target.checked,
+        }));
+    };
+
+    const handleHomeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm((prev) => ({
+            ...prev,
+            isHomeSlider: e.target.checked,
         }));
     };
 
@@ -154,7 +162,8 @@ export default function AddSection() {
                 titleSv: "",
                 descriptionEn: "",
                 descriptionSv: "",
-                isActive: true
+                isActive: true,
+                isHomeSlider: false
             });
             setImage(null);
             setPreview(null);
@@ -282,7 +291,24 @@ export default function AddSection() {
                                 </CardContent>
                             </Card>
                         </Grid>
-
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Home Slider" />
+                                <Divider />
+                                <CardContent>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={form.isHomeSlider}
+                                                onChange={handleHomeSliderChange}
+                                                name="isHomeSlider"
+                                            />
+                                        }
+                                        label=''
+                                    />
+                                </CardContent>
+                            </Card>
+                        </Grid>
                         <Grid item xs={12}>
                             <Card>
                                 <CardHeader title="Status" />

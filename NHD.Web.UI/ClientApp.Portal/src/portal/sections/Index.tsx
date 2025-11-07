@@ -97,7 +97,17 @@ function Sections() {
                 />
             )
         }
-        ,
+        , {
+            key: 'isHomeSlider',
+            label: 'Home Slider',
+            render: (sec) => (
+                <Chip
+                    label={sec.isHomeSlider ? 'Yes' : 'No'}
+                    color={sec.isHomeSlider ? 'primary' : 'default'}
+                    size="small"
+                />
+            )
+        },
         {
             key: 'isActive',
             label: 'Status',

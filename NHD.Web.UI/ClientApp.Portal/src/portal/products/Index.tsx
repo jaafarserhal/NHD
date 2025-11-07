@@ -82,17 +82,6 @@ function Products() {
             label: 'Category'
         },
         {
-            key: 'isCarousel',
-            label: 'Carousel',
-            render: (prd) => (
-                <Chip
-                    label={prd.isCarousel ? 'Show' : 'Hide'}
-                    color={prd.isCarousel ? 'success' : 'error'}
-                    size="small"
-                />
-            )
-        },
-        {
             key: 'fromPrice',
             label: 'Price'
         },
