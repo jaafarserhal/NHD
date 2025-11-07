@@ -124,18 +124,18 @@ namespace NHD.Core.Services.Dates
             }
         }
 
-        public async Task<DatesCollection> GetCollectionAsync(int id)
+        public async Task<Collection> GetCollectionAsync(int id)
         {
             return await _collectionRepository.GetByIdAsync(id);
         }
 
-        public async Task<DatesCollection> AddCollectionAsync(DatesCollection collection)
+        public async Task<Collection> AddCollectionAsync(Collection collection)
         {
             await _collectionRepository.AddAsync(collection);
             return collection;
         }
 
-        public async Task<DatesCollection> UpdateCollectionAsync(DatesCollection collection)
+        public async Task<Collection> UpdateCollectionAsync(Collection collection)
         {
             await _collectionRepository.UpdateAsync(collection);
             return collection;
@@ -230,7 +230,7 @@ namespace NHD.Core.Services.Dates
             };
         }
 
-        private DatesCollectionViewModel MapToDatesCollectionDto(DatesCollection collection)
+        private DatesCollectionViewModel MapToDatesCollectionDto(Collection collection)
         {
             return new DatesCollectionViewModel
             {

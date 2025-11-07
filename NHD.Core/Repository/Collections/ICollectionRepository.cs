@@ -8,9 +8,9 @@ using NHD.Core.Repository.Base;
 
 namespace NHD.Core.Repository.Collections
 {
-    public interface ICollectionRepository : IRepository<DatesCollection>
+    public interface ICollectionRepository : IRepository<Collection>
     {
-        Task<PagedResult<DatesCollection>> GetCollectionsAsync(int page, int limit);
-        Task<IEnumerable<DatesCollection>> GetActiveCollectionsAsync();
+        Task<PagedResult<Collection>> GetCollectionsAsync(int page, int limit);
+        Task<IEnumerable<Collection>> GetActiveCollectionsAsync();
     }
 }

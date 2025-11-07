@@ -248,7 +248,7 @@ namespace NHD.Web.UI.Portal.Controllers
                 }
 
                 // Create Product entity
-                var collection = new DatesCollection
+                var collection = new Collection
                 {
                     NameEn = dto.NameEn,
                     NameSv = dto.NameSv,

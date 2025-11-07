@@ -16,11 +16,11 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Address> Addresses { get; set; }
 
+    public virtual DbSet<Collection> Collections { get; set; }
+
     public virtual DbSet<Customer> Customers { get; set; }
 
     public virtual DbSet<Date> Dates { get; set; }
-
-    public virtual DbSet<DatesCollection> DatesCollections { get; set; }
 
     public virtual DbSet<DatesProduct> DatesProducts { get; set; }
 
@@ -85,6 +85,33 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.CustomerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_address_customer");
+        });
+
+        modelBuilder.Entity<Collection>(entity =>
+        {
+            entity.HasKey(e => e.CollectionId).HasName("PK__dates_co__53D3A5CA2428DE11");
+
+            entity.ToTable("collections");
+
+            entity.Property(e => e.CollectionId).HasColumnName("collection_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.DescriptionEn).HasColumnName("description_en");
+            entity.Property(e => e.DescriptionSv).HasColumnName("description_sv");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(500)
+                .HasColumnName("image_url");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.NameEn)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("name_en");
+            entity.Property(e => e.NameSv)
+                .HasMaxLength(255)
+                .HasColumnName("name_sv");
         });
 
         modelBuilder.Entity<Customer>(entity =>
@@ -154,33 +181,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.WeightPrice)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("weight_price");
-        });
-
-        modelBuilder.Entity<DatesCollection>(entity =>
-        {
-            entity.HasKey(e => e.CollectionId).HasName("PK__dates_co__53D3A5CA2428DE11");
-
-            entity.ToTable("dates_collection");
-
-            entity.Property(e => e.CollectionId).HasColumnName("collection_id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(sysutcdatetime())")
-                .HasColumnName("created_at");
-            entity.Property(e => e.DescriptionEn).HasColumnName("description_en");
-            entity.Property(e => e.DescriptionSv).HasColumnName("description_sv");
-            entity.Property(e => e.ImageUrl)
-                .HasMaxLength(500)
-                .HasColumnName("image_url");
-            entity.Property(e => e.IsActive)
-                .HasDefaultValue(true)
-                .HasColumnName("is_active");
-            entity.Property(e => e.NameEn)
-                .IsRequired()
-                .HasMaxLength(255)
-                .HasColumnName("name_en");
-            entity.Property(e => e.NameSv)
-                .HasMaxLength(255)
-                .HasColumnName("name_sv");
         });
 
         modelBuilder.Entity<DatesProduct>(entity =>
@@ -493,15 +493,18 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<ProductCollection>(entity =>
         {
-            entity.HasKey(e => new { e.ProductId, e.CollectionId }).HasName("PK__product___F23F47A925CDD665");
+            entity.HasKey(e => e.ProductCollectionId).HasName("PK__product___4E908F0B0BF168C3");
 
             entity.ToTable("product_collection");
 
-            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.HasIndex(e => new { e.ProductId, e.CollectionId }, "UQ_product_collection").IsUnique();
+
+            entity.Property(e => e.ProductCollectionId).HasColumnName("product_collection_id");
             entity.Property(e => e.CollectionId).HasColumnName("collection_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
 
             entity.HasOne(d => d.Collection).WithMany(p => p.ProductCollections)
                 .HasForeignKey(d => d.CollectionId)

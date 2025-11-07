@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NHD.Core.Models;
 
-public partial class DatesCollection
+public partial class Collection
 {
     public int CollectionId { get; set; }
 

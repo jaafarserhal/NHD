@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
@@ -574,6 +570,7 @@ namespace NHD.Core.Services.Products
                 }).ToList() ?? new List<DatesProductBindingModel>(),
                 Collections = product.ProductCollections?.Select(pc => new ProductCollectionBindingModel
                 {
+                    Id = pc.ProductCollectionId,
                     ProductId = pc.ProductId,
                     CollectionId = pc.CollectionId
                 }).ToList() ?? new List<ProductCollectionBindingModel>(),

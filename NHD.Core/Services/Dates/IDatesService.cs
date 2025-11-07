@@ -18,10 +18,10 @@ namespace NHD.Core.Services.Dates
         Task<Date> UpdateDateAsync(Date date);
         Task<ServiceResult<bool>> DeleteDateAsync(int dateId);
         Task<PagedServiceResult<IEnumerable<DatesCollectionViewModel>>> GetDatesCollectionAsync(int page = 1, int limit = 10);
-        Task<DatesCollection> AddCollectionAsync(DatesCollection collection);
-        Task<DatesCollection> UpdateCollectionAsync(DatesCollection collection);
+        Task<Collection> AddCollectionAsync(Collection collection);
+        Task<Collection> UpdateCollectionAsync(Collection collection);
         Task<ServiceResult<bool>> DeleteCollectionAsync(int collectionId);
-        Task<DatesCollection> GetCollectionAsync(int id);
+        Task<Collection> GetCollectionAsync(int id);
         Task<ServiceResult<DatesCollectionViewModel>> GetCollectionByViewModel(int id);
     }
 }

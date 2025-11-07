@@ -10,15 +10,15 @@ using NHD.Core.Repository.Base;
 
 namespace NHD.Core.Repository.Collections
 {
-    public class CollectionRepository : Repository<DatesCollection>, ICollectionRepository
+    public class CollectionRepository : Repository<Collection>, ICollectionRepository
     {
         public CollectionRepository(AppDbContext context) : base(context)
         {
         }
 
-        public async Task<PagedResult<DatesCollection>> GetCollectionsAsync(int page, int limit)
+        public async Task<PagedResult<Collection>> GetCollectionsAsync(int page, int limit)
         {
-            var query = _context.DatesCollections
+            var query = _context.Collections
                 .OrderByDescending(p => p.CreatedAt);
 
             var total = await query.CountAsync();
@@ -28,7 +28,7 @@ namespace NHD.Core.Repository.Collections
                 .Take(limit)
                 .ToListAsync();
 
-            return new PagedResult<DatesCollection>
+            return new PagedResult<Collection>
             {
                 Data = collections,
                 Total = total,
@@ -37,9 +37,9 @@ namespace NHD.Core.Repository.Collections
             };
         }
 
-        public async Task<IEnumerable<DatesCollection>> GetActiveCollectionsAsync()
+        public async Task<IEnumerable<Collection>> GetActiveCollectionsAsync()
         {
-            return await _context.DatesCollections.Where(c => c.IsActive).ToListAsync();
+            return await _context.Collections.Where(c => c.IsActive).ToListAsync();
         }
     }
 }
