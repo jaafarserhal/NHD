@@ -206,14 +206,14 @@ export default function UpdateCollection() {
 
         } catch (error: any) {
             console.error(error);
-            setErrors([error.message || 'Failed to update Box']);
+            setErrors([error.message || 'Failed to update collection.']);
         } finally {
             setLoading(false);
         }
     };
 
     const notifySuccess = () => {
-        toast.success('Box updated successfully!', {
+        toast.success('Collection updated successfully!', {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,

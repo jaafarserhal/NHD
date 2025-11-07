@@ -152,6 +152,24 @@ CREATE TABLE dbo.dates_collection (
     is_active BIT NOT NULL DEFAULT 1
 );
 
+-- =============================================
+-- Products Collections
+-- =============================================
+CREATE TABLE dbo.product_collection (
+    product_id INT NOT NULL,
+    collection_id INT NOT NULL,
+    created_at DATETIME2 NOT NULL 
+        CONSTRAINT DF_product_collection_added DEFAULT SYSUTCDATETIME(),
+    PRIMARY KEY (product_id, collection_id),
+    CONSTRAINT FK_product_collection_product FOREIGN KEY (product_id)
+        REFERENCES dbo.product (prd_id)
+        ON DELETE CASCADE,
+    CONSTRAINT FK_product_collection_collection FOREIGN KEY (collection_id)
+        REFERENCES dbo.dates_collection (collection_id)
+        ON DELETE CASCADE
+);
+
+
 
 
 -- =============================================
@@ -159,7 +177,6 @@ CREATE TABLE dbo.dates_collection (
 -- =============================================
 CREATE TABLE dbo.[dates] (
     date_id INT IDENTITY(1,1) PRIMARY KEY,
-	collection_id INT NOT NULL,
     name_en NVARCHAR(100) NOT NULL,
     name_sv NVARCHAR(100),
     quality BIT NOT NULL DEFAULT 0,
@@ -169,9 +186,7 @@ CREATE TABLE dbo.[dates] (
     description_sv NVARCHAR(MAX) NULL,
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_product_created DEFAULT SYSUTCDATETIME(),
-    is_active BIT NOT NULL DEFAULT 1,
-    CONSTRAINT FK_dates_collection 
-          FOREIGN KEY (collection_id) REFERENCES dbo.dates_collection(collection_id)
+    is_active BIT NOT NULL DEFAULT 1
 );
 
 
