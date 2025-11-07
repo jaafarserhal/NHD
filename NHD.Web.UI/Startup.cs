@@ -17,6 +17,7 @@ using NHD.Core.Repository.ImageGallery;
 using Microsoft.Extensions.FileProviders;
 using NHD.Core.Services.Sections;
 using NHD.Core.Repository.Sections;
+using NHD.Core.Repository.Collections;
 
 
 namespace NHD.Web.UI
@@ -173,7 +174,8 @@ namespace NHD.Web.UI
             services.AddScoped<IDatesRepository, DatesRepository>();
             services.AddScoped<IGalleryRepository, GalleryRepository>();
             services.AddScoped<IDateProductsRepository, DateProductsRepository>();
-            services.AddScoped<IDatesCollectionRepository, DatesCollectionRepository>();
+            services.AddScoped<ICollectionRepository, CollectionRepository>();
+            services.AddScoped<IProductCollectionRepository, ProductCollectionRepository>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();

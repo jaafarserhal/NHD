@@ -8,11 +8,11 @@ using NHD.Core.Data;
 using NHD.Core.Models;
 using NHD.Core.Repository.Base;
 
-namespace NHD.Core.Repository.Dates
+namespace NHD.Core.Repository.Collections
 {
-    public class DatesCollectionRepository : Repository<DatesCollection>, IDatesCollectionRepository
+    public class CollectionRepository : Repository<DatesCollection>, ICollectionRepository
     {
-        public DatesCollectionRepository(AppDbContext context) : base(context)
+        public CollectionRepository(AppDbContext context) : base(context)
         {
         }
 

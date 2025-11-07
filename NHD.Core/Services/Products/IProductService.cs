@@ -21,8 +21,7 @@ namespace NHD.Core.Services.Products
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetTypesAsync();
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetSizesAsync();
         Task<ServiceResult<bool>> DeleteProductAsync(int productId);
-        Task<List<DatesProduct>> SaveDatesProductsAsync(List<DatesProductBindingModel> datesProducts);
-        Task<Product> SaveProductWithDatesAsync(Product product, List<DatesProductBindingModel> datesProducts);
+        Task<Product> SaveProductWithDatesAsync(Product product, List<DatesProductBindingModel> datesProducts, List<ProductCollectionBindingModel> productCollections);
 
         Task<ServiceResult<IEnumerable<DateViewModel>>> GetAllDatesAsync();
         Task<PagedServiceResult<IEnumerable<GalleryViewModel>>> GetGalleriesAsync(int? productId, int? dateId, int page = 1, int limit = 10);
@@ -36,5 +35,7 @@ namespace NHD.Core.Services.Products
         Task<ServiceResult<IEnumerable<ProductViewModel>>> GetCarouselProductsAsync();
 
         Task<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetProductsByCategoryAsync(int categoryId, bool isCarousel, int take);
+
+        Task<ServiceResult<IEnumerable<LookupItemDto>>> GetActiveCollectionsAsync();
     }
 }

@@ -12,11 +12,11 @@ export interface Product {
     isActive: boolean;
     isCarousel: boolean;
     dates: DatesProduct[];
+    collections: ProductCollection[];
 }
 
 export interface Date {
     id?: number;
-    collectionId: number;
     nameEn: string;
     nameSv: string;
     quality: boolean;
@@ -67,4 +67,10 @@ export interface Section {
     descriptionSv: string;
     ImageFile: string;
     isActive: boolean;
+}
+
+export interface ProductCollection {
+    id?: number;
+    collectionId: number;
+    productId: number;
 }

@@ -22,6 +22,7 @@ namespace NHD.Core.Services.Model.Products
         public decimal FromPrice { get; set; }
 
         public List<DatesProductBindingModel> Dates { get; set; } = new List<DatesProductBindingModel>();
+        public List<ProductCollectionBindingModel> Collections { get; set; } = new List<ProductCollectionBindingModel>();
         public bool IsActive { get; set; }
 
         public bool IsCarousel { get; set; }

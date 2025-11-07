@@ -9,8 +9,6 @@ namespace NHD.Core.Services.Model.Dates
     public class DateViewModel
     {
         public int Id { get; set; }
-        public int CollectionId { get; set; }
-        public string CollectionName { get; set; }
         public string NameEn { get; set; }
         public string NameSv { get; set; }
 

@@ -17,6 +17,7 @@ using NHD.Core.Services.Model.Dates;
 using NHD.Core.Services.Model.Products;
 using NHD.Core.Utilities;
 using NHD.Core.Repository.ImageGallery;
+using NHD.Core.Repository.Collections;
 
 namespace NHD.Core.Services.Products
 {
@@ -26,6 +27,9 @@ namespace NHD.Core.Services.Products
         private readonly IProductRepository _productRepository;
         private readonly ILookupRepository _lookupRepository;
         private readonly IDateProductsRepository _dateProductsRepository;
+        private readonly ICollectionRepository _collectionRepository;
+
+        private readonly IProductCollectionRepository _productCollectionRepository;
 
         private readonly IGalleryRepository _galleryRepository;
 
@@ -35,7 +39,7 @@ namespace NHD.Core.Services.Products
 
         protected internal IDbContextTransaction Transaction;
 
-        public ProductService(AppDbContext context, IProductRepository productRepository, ILookupRepository lookupRepository, IDateProductsRepository dateProductsRepository, IGalleryRepository galleryRepository, IDatesRepository datesRepository, ILogger<ProductService> logger)
+        public ProductService(AppDbContext context, IProductRepository productRepository, ILookupRepository lookupRepository, IDateProductsRepository dateProductsRepository, IGalleryRepository galleryRepository, IDatesRepository datesRepository, ILogger<ProductService> logger, ICollectionRepository collectionRepository, IProductCollectionRepository productCollectionRepository)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             _productRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));
@@ -43,6 +47,8 @@ namespace NHD.Core.Services.Products
             _dateProductsRepository = dateProductsRepository ?? throw new ArgumentNullException(nameof(dateProductsRepository));
             _galleryRepository = galleryRepository ?? throw new ArgumentNullException(nameof(galleryRepository));
             _datesRepository = datesRepository ?? throw new ArgumentNullException(nameof(datesRepository));
+            _collectionRepository = collectionRepository ?? throw new ArgumentNullException(nameof(collectionRepository));
+            _productCollectionRepository = productCollectionRepository ?? throw new ArgumentNullException(nameof(productCollectionRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -142,6 +148,26 @@ namespace NHD.Core.Services.Products
             {
                 _logger.LogError(ex, $"Error retrieving product with ID {id}");
                 return ServiceResult<ProductViewModel>.Failure("An error occurred while retrieving the product");
+            }
+        }
+
+        public async Task<ServiceResult<IEnumerable<LookupItemDto>>> GetActiveCollectionsAsync()
+        {
+            try
+            {
+                var collections = await _collectionRepository.GetActiveCollectionsAsync();
+                var collectionDtos = collections.Select(c => new LookupItemDto
+                {
+                    Id = c.CollectionId,
+                    NameEn = c.NameEn,
+                    NameSv = c.NameSv
+                });
+                return ServiceResult<IEnumerable<LookupItemDto>>.Success(collectionDtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving date collections");
+                return ServiceResult<IEnumerable<LookupItemDto>>.Failure("An error occurred while retrieving date collections");
             }
         }
 
@@ -257,7 +283,48 @@ namespace NHD.Core.Services.Products
             }
         }
 
-        public async Task<List<DatesProduct>> SaveDatesProductsAsync(List<DatesProductBindingModel> datesProducts)
+        private async Task<List<ProductCollection>> SaveProductCollectionsAsync(List<ProductCollectionBindingModel> productCollections)
+        {
+            if (productCollections == null || !productCollections.Any())
+                return new List<ProductCollection>();
+
+            var prdId = productCollections.First().ProductId;
+
+            // 1. Remove ALL existing product collections for this product
+            var existingRecords = await _productCollectionRepository.GetByProductIdAsync(prdId);
+            if (existingRecords.Any())
+            {
+                context.ProductCollections.RemoveRange(existingRecords);
+            }
+
+            var resultList = new List<ProductCollection>();
+            var processedCollectionIds = new HashSet<int>();
+
+            // 2. Add only new records
+            foreach (var item in productCollections)
+            {
+                // Skip if we already processed this CollectionId in current batch
+                if (processedCollectionIds.Contains(item.CollectionId))
+                    continue;
+
+                var entity = new ProductCollection
+                {
+                    ProductId = item.ProductId,
+                    CollectionId = item.CollectionId
+                };
+
+                await context.ProductCollections.AddAsync(entity);
+                resultList.Add(entity);
+                processedCollectionIds.Add(item.CollectionId);
+            }
+
+            // 3. Save all changes in one transaction
+            await context.SaveChangesAsync();
+
+            return resultList;
+        }
+
+        private async Task<List<DatesProduct>> SaveDatesProductsAsync(List<DatesProductBindingModel> datesProducts)
         {
             if (datesProducts == null || !datesProducts.Any())
                 return new List<DatesProduct>();
@@ -305,7 +372,7 @@ namespace NHD.Core.Services.Products
             return resultList;
         }
 
-        public async Task<Product> SaveProductWithDatesAsync(Product product, List<DatesProductBindingModel> datesProducts)
+        public async Task<Product> SaveProductWithDatesAsync(Product product, List<DatesProductBindingModel> datesProducts, List<ProductCollectionBindingModel> productCollections)
         {
             await BeginTransactionAsync();
 
@@ -355,6 +422,17 @@ namespace NHD.Core.Services.Products
                     }
 
                     await SaveDatesProductsAsync(datesProducts);
+                }
+
+                // Add/Update collections if provided
+                if (productCollections != null && productCollections.Any())
+                {
+                    foreach (var pc in productCollections)
+                    {
+                        pc.ProductId = product.PrdId;
+                    }
+
+                    await SaveProductCollectionsAsync(productCollections);
                 }
 
                 await CommitTransactionAsync();
@@ -494,6 +572,11 @@ namespace NHD.Core.Services.Products
                     Quantity = dp.Quantity,
                     IsPerWeight = dp.IsPerWeight
                 }).ToList() ?? new List<DatesProductBindingModel>(),
+                Collections = product.ProductCollections?.Select(pc => new ProductCollectionBindingModel
+                {
+                    ProductId = pc.ProductId,
+                    CollectionId = pc.CollectionId
+                }).ToList() ?? new List<ProductCollectionBindingModel>(),
                 IsActive = product.IsActive ?? false,
                 CreatedAt = product.CreatedAt,
 

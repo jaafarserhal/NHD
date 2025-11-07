@@ -5,21 +5,22 @@ using NHD.Core.Repository.Dates;
 using NHD.Core.Repository.ImageGallery;
 using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Dates;
+using NHD.Core.Repository.Collections;
 
 namespace NHD.Core.Services.Dates
 {
     public class DatesService : IDatesService
     {
         private readonly IDatesRepository _datesRepository;
-        private readonly IDatesCollectionRepository _datesCollectionRepository;
+        private readonly ICollectionRepository _collectionRepository;
         private readonly IGalleryRepository _galleryRepository;
 
         private readonly ILogger<DatesService> _logger;
 
-        public DatesService(IDatesRepository datesRepository, IDatesCollectionRepository datesCollectionRepository, IGalleryRepository galleryRepository, ILogger<DatesService> logger)
+        public DatesService(IDatesRepository datesRepository, ICollectionRepository collectionRepository, IGalleryRepository galleryRepository, ILogger<DatesService> logger)
         {
             _datesRepository = datesRepository ?? throw new ArgumentNullException(nameof(datesRepository));
-            _datesCollectionRepository = datesCollectionRepository ?? throw new ArgumentNullException(nameof(datesCollectionRepository));
+            _collectionRepository = collectionRepository ?? throw new ArgumentNullException(nameof(collectionRepository));
             _galleryRepository = galleryRepository ?? throw new ArgumentNullException(nameof(galleryRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -61,7 +62,7 @@ namespace NHD.Core.Services.Dates
                     return PagedServiceResult<IEnumerable<DatesCollectionViewModel>>.Failure("Page and limit must be greater than 0");
                 }
 
-                var pagedResult = await _datesCollectionRepository.GetCollectionsAsync(page, limit);
+                var pagedResult = await _collectionRepository.GetCollectionsAsync(page, limit);
                 var collectionDtos = pagedResult.Data.Select(MapToDatesCollectionDto).ToList();
 
                 return PagedServiceResult<IEnumerable<DatesCollectionViewModel>>.Success(
@@ -107,7 +108,7 @@ namespace NHD.Core.Services.Dates
         {
             try
             {
-                var collection = await _datesCollectionRepository.GetByIdAsync(id);
+                var collection = await _collectionRepository.GetByIdAsync(id);
                 if (collection == null)
                 {
                     return ServiceResult<DatesCollectionViewModel>.Failure($"Collection with ID {id} not found.");
@@ -123,52 +124,32 @@ namespace NHD.Core.Services.Dates
             }
         }
 
-        public async Task<ServiceResult<IEnumerable<LookupItemDto>>> GetCollectionsAsync()
-        {
-            try
-            {
-                var collections = await _datesCollectionRepository.GetActiveCollectionsAsync();
-                var collectionDtos = collections.Select(c => new LookupItemDto
-                {
-                    Id = c.CollectionId,
-                    NameEn = c.NameEn,
-                    NameSv = c.NameSv
-                });
-                return ServiceResult<IEnumerable<LookupItemDto>>.Success(collectionDtos);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving date collections");
-                return ServiceResult<IEnumerable<LookupItemDto>>.Failure("An error occurred while retrieving date collections");
-            }
-        }
-
         public async Task<DatesCollection> GetCollectionAsync(int id)
         {
-            return await _datesCollectionRepository.GetByIdAsync(id);
+            return await _collectionRepository.GetByIdAsync(id);
         }
 
         public async Task<DatesCollection> AddCollectionAsync(DatesCollection collection)
         {
-            await _datesCollectionRepository.AddAsync(collection);
+            await _collectionRepository.AddAsync(collection);
             return collection;
         }
 
         public async Task<DatesCollection> UpdateCollectionAsync(DatesCollection collection)
         {
-            await _datesCollectionRepository.UpdateAsync(collection);
+            await _collectionRepository.UpdateAsync(collection);
             return collection;
         }
 
         public async Task<ServiceResult<bool>> DeleteCollectionAsync(int collectionId)
         {
-            var collection = await _datesCollectionRepository.GetByIdAsync(collectionId);
+            var collection = await _collectionRepository.GetByIdAsync(collectionId);
             if (collection == null)
             {
                 return ServiceResult<bool>.Failure($"Collection with ID {collectionId} not found.");
             }
 
-            await _datesCollectionRepository.DeleteAsync(collection.CollectionId);
+            await _collectionRepository.DeleteAsync(collection.CollectionId);
             return ServiceResult<bool>.Success(true);
         }
 
@@ -239,14 +220,13 @@ namespace NHD.Core.Services.Dates
             return new DateViewModel
             {
                 Id = date.DateId,
-                CollectionId = date.CollectionId,
-                CollectionName = date.Collection != null ? date.Collection.NameEn : string.Empty,
                 NameEn = date.NameEn,
                 NameSv = date.NameSv,
                 IsActive = date.IsActive,
                 UnitPrice = date.UnitPrice,
                 WeightPrice = date.WeightPrice,
-                CreatedAt = date.CreatedAt
+                CreatedAt = date.CreatedAt,
+                Quality = date.Quality
             };
         }
 
@@ -261,7 +241,7 @@ namespace NHD.Core.Services.Dates
                 DescriptionEn = collection.DescriptionEn,
                 DescriptionSv = collection.DescriptionSv,
                 IsActive = collection.IsActive,
-                CanDelete = !_datesRepository.ExistsByCollectionIdAsync(collection.CollectionId).Result,
+                CanDelete = false,
                 CreatedAt = collection.CreatedAt
             };
         }

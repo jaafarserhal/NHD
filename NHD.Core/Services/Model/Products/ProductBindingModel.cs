@@ -22,6 +22,7 @@ namespace NHD.Core.Services.Model.Products
         public IFormFile ImageUrl { get; set; }
         public bool IsActive { get; set; }
         public List<DatesProductBindingModel> Dates { get; set; } = new List<DatesProductBindingModel>();
+        public List<ProductCollectionBindingModel> Collections { get; set; } = new List<ProductCollectionBindingModel>();
     }
 
     public class DatesProductBindingModel
@@ -32,6 +33,13 @@ namespace NHD.Core.Services.Model.Products
         public bool IsFilled { get; set; }
         public int Quantity { get; set; }
         public bool IsPerWeight { get; set; }
+    }
+
+    public class ProductCollectionBindingModel
+    {
+        public int Id { get; set; }
+        public int ProductId { get; set; }
+        public int CollectionId { get; set; }
     }
 
     public class GalleryBindingModel

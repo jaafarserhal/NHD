@@ -35,6 +35,11 @@ export default function AddProduct() {
         []
     );
 
+    const { data: activeCollections, loading: activeCollectionsLoading } = useApiCall(
+        () => productService.getActiveCollections(),
+        []
+    );
+
     const [totalPrice, setTotalPrice] = useState(0);
 
 
@@ -49,7 +54,8 @@ export default function AddProduct() {
         fromPrice: 0,
         isActive: true,
         isCarousel: false,
-        dates: []
+        dates: [],
+        collections: []
     });
 
     const [image, setImage] = useState<File | null>(null);
@@ -294,6 +300,11 @@ export default function AddProduct() {
             validationErrors.push("Image is required");
         }
 
+        // Add validation for collections
+        if (form.collections.length === 0) {
+            validationErrors.push("At least one collection is required");
+        }
+
         // Add validation for Classic Date Pouches
         if (form.categoryId === BoxCategoryEnum.ClassicDatePouches) {
             if (!selectedDateId) {
@@ -349,7 +360,8 @@ export default function AddProduct() {
                 fromPrice: 0,
                 isActive: true,
                 isCarousel: false,
-                dates: []
+                dates: [],
+                collections: [],
             });
             setImage(null);
             setPreview(null);
@@ -711,8 +723,47 @@ export default function AddProduct() {
                                 </CardContent>
                             </Card>
                         </Grid>)}
-
-
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Collections" />
+                                <Divider />
+                                <CardContent>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                        {activeCollectionsLoading ? (
+                                            <Box sx={{ color: 'text.secondary' }}>Loading collections...</Box>
+                                        ) : activeCollections?.data && activeCollections.data.length > 0 ? (
+                                            activeCollections.data.map((collection) => (
+                                                <FormControlLabel
+                                                    key={collection.id}
+                                                    control={
+                                                        <Switch
+                                                            checked={form.collections.some(c => c.collectionId === collection.id)}
+                                                            onChange={(e) => {
+                                                                const isChecked = e.target.checked;
+                                                                setForm((prev) => ({
+                                                                    ...prev,
+                                                                    collections: isChecked
+                                                                        ? [...prev.collections, {
+                                                                            id: 0,
+                                                                            productId: 0,
+                                                                            collectionId: collection.id
+                                                                        }]
+                                                                        : prev.collections.filter(c => c.collectionId !== collection.id)
+                                                                }));
+                                                            }}
+                                                            name={`collection-${collection.id}`}
+                                                        />
+                                                    }
+                                                    label={collection.nameEn}
+                                                />
+                                            ))
+                                        ) : (
+                                            <Box sx={{ color: 'text.secondary' }}>No collections available</Box>
+                                        )}
+                                    </Box>
+                                </CardContent>
+                            </Card>
+                        </Grid>
                         <Grid item xs={12}>
                             <Card>
                                 <CardHeader title="Image Upload" />

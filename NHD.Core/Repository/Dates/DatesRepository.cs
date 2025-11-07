@@ -24,7 +24,6 @@ namespace NHD.Core.Repository.Dates
             var total = await query.CountAsync();
 
             var dates = await query
-                .Include(d => d.Collection)
                 .Skip((page - 1) * limit)
                 .Take(limit)
                 .ToListAsync();
@@ -42,11 +41,6 @@ namespace NHD.Core.Repository.Dates
         {
             return await _context.Dates
                 .FirstOrDefaultAsync(p => p.DateId == dateId);
-        }
-
-        public async Task<bool> ExistsByCollectionIdAsync(int collectionId)
-        {
-            return await _context.Dates.AnyAsync(d => d.CollectionId == collectionId);
         }
 
         public async Task<IEnumerable<Date>> GetActiveDatesAsync()

@@ -23,7 +23,5 @@ namespace NHD.Core.Services.Dates
         Task<ServiceResult<bool>> DeleteCollectionAsync(int collectionId);
         Task<DatesCollection> GetCollectionAsync(int id);
         Task<ServiceResult<DatesCollectionViewModel>> GetCollectionByViewModel(int id);
-
-        Task<ServiceResult<IEnumerable<LookupItemDto>>> GetCollectionsAsync();
     }
 }

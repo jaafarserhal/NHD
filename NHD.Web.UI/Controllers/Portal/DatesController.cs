@@ -75,7 +75,6 @@ namespace NHD.Web.UI.Portal.Controllers
                 {
                     NameEn = dto.NameEn,
                     NameSv = dto.NameSv,
-                    CollectionId = dto.CollectionId,
                     Quality = dto.Quality,
                     UnitPrice = dto.UnitPrice,
                     WeightPrice = dto.WeightPrice,
@@ -109,7 +108,6 @@ namespace NHD.Web.UI.Portal.Controllers
             // Update fields
             existingDate.NameEn = dto.NameEn;
             existingDate.NameSv = dto.NameSv;
-            existingDate.CollectionId = dto.CollectionId;
             existingDate.Quality = dto.Quality;
             existingDate.UnitPrice = dto.UnitPrice;
             existingDate.WeightPrice = dto.WeightPrice;
@@ -179,7 +177,7 @@ namespace NHD.Web.UI.Portal.Controllers
         }
 
         [HttpDelete("Collections/Delete/{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<IActionResult> DeleteCollection(int id)
         {
             // First, try to get the product so we know the image name
             var collection = await _datesService.GetCollectionAsync(id);
@@ -221,16 +219,6 @@ namespace NHD.Web.UI.Portal.Controllers
             }
 
             return NoContent();
-        }
-
-        [HttpGet]
-        [Route("Collections/Active")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetActiveCollections()
-        {
-            var data = await _datesService.GetCollectionsAsync();
-            if (data.IsSuccess)
-                return Ok(data);
-            return BadRequest(data);
         }
 
         [HttpPost("Collections/Add")]

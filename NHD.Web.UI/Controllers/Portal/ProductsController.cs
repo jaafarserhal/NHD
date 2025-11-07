@@ -111,7 +111,7 @@ namespace NHD.Web.UI.Portal.Controllers
                 };
 
                 // Use the transactional method instead of separate calls
-                var created = await _productService.SaveProductWithDatesAsync(product, dto.Dates);
+                var created = await _productService.SaveProductWithDatesAsync(product, dto.Dates, dto.Collections);
 
                 return CreatedAtAction("GetProducts", new { id = created.PrdId });
             }
@@ -192,7 +192,7 @@ namespace NHD.Web.UI.Portal.Controllers
                 existingProduct.CreatedAt = DateTime.UtcNow;
 
                 // Use the transactional method to update product and dates
-                var updated = await _productService.SaveProductWithDatesAsync(existingProduct, dto.Dates);
+                var updated = await _productService.SaveProductWithDatesAsync(existingProduct, dto.Dates, dto.Collections);
 
                 // Delete old image file only after successful database update
                 if (dto.ImageUrl != null && dto.ImageUrl.Length > 0 && !string.IsNullOrEmpty(oldImagePath))
@@ -419,6 +419,17 @@ namespace NHD.Web.UI.Portal.Controllers
             }
 
             return NoContent();
+        }
+
+
+        [HttpGet]
+        [Route("Collections/Active")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetActiveCollections()
+        {
+            var data = await _productService.GetActiveCollectionsAsync();
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
         }
         #endregion Products
 

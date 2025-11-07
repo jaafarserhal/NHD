@@ -40,6 +40,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<ProductCollection> ProductCollections { get; set; }
+
     public virtual DbSet<Section> Sections { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -130,7 +132,6 @@ public partial class AppDbContext : DbContext
             entity.ToTable("dates");
 
             entity.Property(e => e.DateId).HasColumnName("date_id");
-            entity.Property(e => e.CollectionId).HasColumnName("collection_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
@@ -153,11 +154,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.WeightPrice)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("weight_price");
-
-            entity.HasOne(d => d.Collection).WithMany(p => p.Dates)
-                .HasForeignKey(d => d.CollectionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_dates_collection");
         });
 
         modelBuilder.Entity<DatesCollection>(entity =>
@@ -493,6 +489,27 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.PrdLookupTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_product_type");
+        });
+
+        modelBuilder.Entity<ProductCollection>(entity =>
+        {
+            entity.HasKey(e => new { e.ProductId, e.CollectionId }).HasName("PK__product___F23F47A925CDD665");
+
+            entity.ToTable("product_collection");
+
+            entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.CollectionId).HasColumnName("collection_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.Collection).WithMany(p => p.ProductCollections)
+                .HasForeignKey(d => d.CollectionId)
+                .HasConstraintName("FK_product_collection_collection");
+
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductCollections)
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("FK_product_collection_product");
         });
 
         modelBuilder.Entity<Section>(entity =>

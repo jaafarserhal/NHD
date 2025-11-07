@@ -56,10 +56,6 @@ class dateService extends apiService {
         return this.delete(`${apiUrls.deleteDateCollection}${collectionId}`);
     }
 
-    async getActiveCollections() {
-        return this.get(apiUrls.activeCollections);
-    }
-
     async addDate(date) {
         return this.post(date, apiUrls.addDate);
     }

@@ -47,6 +47,7 @@ namespace NHD.Core.Repository.Products
                 .Include(p => p.PrdLookupType)
                 .Include(p => p.PrdLookupSize)
                 .Include(p => p.DatesProducts)
+                .Include(p => p.ProductCollections)
                 .FirstOrDefaultAsync(p => p.PrdId == productId);
         }
 

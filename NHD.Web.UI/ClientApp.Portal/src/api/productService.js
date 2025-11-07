@@ -37,6 +37,14 @@ class productService extends apiService {
             });
         }
 
+        if (product.collections && product.collections.length > 0) {
+            product.collections.forEach((collection, index) => {
+                formData.append(`Collections[${index}].Id`, String(collection.id || 0));
+                formData.append(`Collections[${index}].ProductId`, String(collection.productId || 0));
+                formData.append(`Collections[${index}].CollectionId`, String(collection.collectionId));
+            });
+        }
+
         if (product.imageFile && product.imageFile instanceof File) {
             formData.append('ImageUrl', product.imageFile, product.imageFile.name);
         }
@@ -68,6 +76,14 @@ class productService extends apiService {
                 formData.append(`Dates[${index}].IsFilled`, String(date.isFilled || false));
                 formData.append(`Dates[${index}].Quantity`, String(date.quantity || 0));
                 formData.append(`Dates[${index}].IsPerWeight`, String(date.isPerWeight || false));
+            });
+        }
+
+        if (product.collections && product.collections.length > 0) {
+            product.collections.forEach((collection, index) => {
+                formData.append(`Collections[${index}].Id`, String(collection.id || 0));
+                formData.append(`Collections[${index}].ProductId`, String(collection.productId || 0));
+                formData.append(`Collections[${index}].CollectionId`, String(collection.collectionId));
             });
         }
 
@@ -124,6 +140,10 @@ class productService extends apiService {
     }
     async deleteGallery(galleryId) {
         return this.delete(`${apiUrls.deleteGallery}${galleryId}`);
+    }
+
+    async getActiveCollections() {
+        return this.get(apiUrls.activeCollections);
     }
 }
 

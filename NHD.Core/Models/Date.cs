@@ -25,10 +25,6 @@ public partial class Date
 
     public string DescriptionSv { get; set; }
 
-    public int CollectionId { get; set; }
-
-    public virtual DatesCollection Collection { get; set; }
-
     public virtual ICollection<DatesProduct> DatesProducts { get; set; } = new List<DatesProduct>();
 
     public virtual ICollection<Gallery> Galleries { get; set; } = new List<Gallery>();

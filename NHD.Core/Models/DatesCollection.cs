@@ -21,5 +21,5 @@ public partial class DatesCollection
 
     public bool IsActive { get; set; }
 
-    public virtual ICollection<Date> Dates { get; set; } = new List<Date>();
+    public virtual ICollection<ProductCollection> ProductCollections { get; set; } = new List<ProductCollection>();
 }

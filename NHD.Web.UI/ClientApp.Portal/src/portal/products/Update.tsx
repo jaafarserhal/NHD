@@ -39,6 +39,11 @@ export default function UpdateProduct() {
         []
     );
 
+    const { data: activeCollections, loading: activeCollectionsLoading } = useApiCall(
+        () => productService.getActiveCollections(),
+        []
+    );
+
     const [totalPrice, setTotalPrice] = useState(0);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [pendingCategoryChange, setPendingCategoryChange] = useState<number | undefined>(undefined);
@@ -83,7 +88,8 @@ export default function UpdateProduct() {
         isActive: true,
         isCarousel: false,
         imageUrl: "",
-        dates: []
+        dates: [],
+        collections: []
     });
 
     const [image, setImage] = useState<File | null>(null);
@@ -119,7 +125,8 @@ export default function UpdateProduct() {
                 isActive: product.isActive,
                 isCarousel: product.isCarousel,
                 imageUrl: product.imageUrl || "",
-                dates: product.dates || []
+                dates: product.dates || [],
+                collections: product.collections || []
             });
 
             // Set preview to existing image if available
@@ -383,6 +390,11 @@ export default function UpdateProduct() {
             validationErrors.push("Image is required");
         }
 
+        // Add validation for collections
+        if (form.collections.length === 0) {
+            validationErrors.push("At least one collection is required");
+        }
+
         // Add validation for Classic Date Pouches
         if (form.categoryId === BoxCategoryEnum.ClassicDatePouches) {
             if (!selectedDateId) {
@@ -433,6 +445,7 @@ export default function UpdateProduct() {
                     ...d,
                     isPerWeight: form.categoryId === Number(BoxCategoryEnum.ClassicDatePouches) ? true : d.isPerWeight
                 })),
+                collections: form.collections || [],
                 imageFile: image
             };
 
@@ -837,6 +850,48 @@ export default function UpdateProduct() {
                                 </Card>
                             </Grid>
                         )}
+
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Collections" />
+                                <Divider />
+                                <CardContent>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                        {activeCollectionsLoading ? (
+                                            <Box sx={{ color: 'text.secondary' }}>Loading collections...</Box>
+                                        ) : activeCollections?.data && activeCollections.data.length > 0 ? (
+                                            activeCollections.data.map((collection) => (
+                                                <FormControlLabel
+                                                    key={collection.id}
+                                                    control={
+                                                        <Switch
+                                                            checked={form.collections?.some(c => c.collectionId === collection.id) || false}
+                                                            onChange={(e) => {
+                                                                const isChecked = e.target.checked;
+                                                                setForm((prev) => ({
+                                                                    ...prev,
+                                                                    collections: isChecked
+                                                                        ? [...(prev.collections || []), {
+                                                                            id: 0,
+                                                                            productId: prev.id,
+                                                                            collectionId: collection.id
+                                                                        }]
+                                                                        : (prev.collections || []).filter(c => c.collectionId !== collection.id)
+                                                                }));
+                                                            }}
+                                                            name={`collection-${collection.id}`}
+                                                        />
+                                                    }
+                                                    label={collection.nameEn}
+                                                />
+                                            ))
+                                        ) : (
+                                            <Box sx={{ color: 'text.secondary' }}>No collections available</Box>
+                                        )}
+                                    </Box>
+                                </CardContent>
+                            </Card>
+                        </Grid>
 
                         <Grid item xs={12}>
                             <Card>
