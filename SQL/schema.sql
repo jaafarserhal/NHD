@@ -44,6 +44,18 @@ CREATE TABLE dbo.[user] (
         CONSTRAINT DF_user_created DEFAULT SYSUTCDATETIME()
 );
 
+CREATE TABLE dbo.sections (
+    section_id INT IDENTITY(1,1) PRIMARY KEY,
+    title_en NVARCHAR(255) NOT NULL,
+    title_sv NVARCHAR(255) NOT NULL,
+    description_en NVARCHAR(MAX) NULL,
+    description_sv NVARCHAR(MAX) NULL,
+    image_url NVARCHAR(500) NULL,
+    is_active BIT NULL DEFAULT 1,
+    created_at DATETIME2 NOT NULL 
+        CONSTRAINT DF_section_created DEFAULT SYSUTCDATETIME()
+);
+
 -- =============================================
 -- LOOKUP TYPE
 -- =============================================

@@ -58,3 +58,13 @@ export interface LookupItem {
     nameEn: string;
     nameSv: string;
 }
+
+export interface Section {
+    id?: number;
+    titleEn: string;
+    titleSv: string;
+    descriptionEn: string;
+    descriptionSv: string;
+    ImageFile: string;
+    isActive: boolean;
+}

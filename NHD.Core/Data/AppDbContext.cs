@@ -40,6 +40,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<Section> Sections { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer($"Name=ConnectionStrings:{Utilities.AppConstants.CONNECTION_NAME}");
@@ -491,6 +493,34 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.PrdLookupTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_product_type");
+        });
+
+        modelBuilder.Entity<Section>(entity =>
+        {
+            entity.HasKey(e => e.SectionId).HasName("PK__sections__F842676AAF9F9743");
+
+            entity.ToTable("sections");
+
+            entity.Property(e => e.SectionId).HasColumnName("section_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.DescriptionEn).HasColumnName("description_en");
+            entity.Property(e => e.DescriptionSv).HasColumnName("description_sv");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(500)
+                .HasColumnName("image_url");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.TitleEn)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("title_en");
+            entity.Property(e => e.TitleSv)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("title_sv");
         });
 
         modelBuilder.Entity<User>(entity =>

@@ -17,6 +17,9 @@ import ProtectedRoute from './protectedRoutes/Index';
 import Collections from './portal/collections/Index';
 import AddCollection from './portal/collections/Add';
 import UpdateCollection from './portal/collections/Update';
+import Sections from './portal/sections/Index';
+import UpdateSection from './portal/sections/Update';
+import AddSection from './portal/sections/Add';
 
 const Loader = (Component) => (props) => (
   <Suspense fallback={<SuspenseLoader />}>
@@ -57,6 +60,9 @@ const routes: RouteObject[] = [
       { path: RouterUrls.collectionsList, element: <Collections /> },
       { path: RouterUrls.collectionAdd, element: <AddCollection /> },
       { path: RouterUrls.collectionEdit, element: <UpdateCollection /> },
+      { path: RouterUrls.sectionsList, element: <Sections /> },
+      { path: RouterUrls.sectionAdd, element: <AddSection /> },
+      { path: RouterUrls.sectionEdit, element: <UpdateSection /> },
     ]
   },
   {

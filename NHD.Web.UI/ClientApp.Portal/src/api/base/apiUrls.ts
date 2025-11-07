@@ -25,4 +25,9 @@ export const apiUrls = {
     getDateCollectionById: '/Collections/',
     deleteDateCollection: '/Collections/Delete/',
     activeCollections: '/Collections/Active',
+    sections: '/Sections',
+    addSection: '/Add',
+    updateSection: '/Update',
+    getSectionById: '/GetById/',
+    deleteSection: '/Delete/',
 };

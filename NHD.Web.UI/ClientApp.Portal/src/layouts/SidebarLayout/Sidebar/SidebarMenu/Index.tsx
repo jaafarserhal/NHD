@@ -20,6 +20,7 @@ import MmsTwoToneIcon from '@mui/icons-material/MmsTwoTone';
 import EmergencyShareIcon from '@mui/icons-material/EmergencyShare';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
 
 import { RouterUrls } from 'src/common/RouterUrls';
 
@@ -84,6 +85,20 @@ function SidebarMenu() {
       <List component="div">
         <SubMenuWrapper>
           <List component="div">
+            {/* SECTIONS */}
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to={RouterUrls.sectionsList}
+                startIcon={<AutoAwesomeMosaicIcon />}
+              >
+                Sections
+              </Button>
+            </ListItem>
+
+
             {/* PRODUCTS */}
             <ListItem component="div">
               <Button
