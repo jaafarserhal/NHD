@@ -545,6 +545,7 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.TypeLookup).WithMany(p => p.Sections)
                 .HasForeignKey(d => d.TypeLookupId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_sections_type_lookup");
         });
 

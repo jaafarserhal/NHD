@@ -313,7 +313,7 @@ export default function AddSection() {
                                         disabled={typesLoading}
                                     >
                                         <option value="">Select Type</option>
-                                        {types.map(option => (
+                                        {types?.data?.map((option) => (
                                             <option key={option.id} value={option.id}>
                                                 {option.nameEn}
                                             </option>

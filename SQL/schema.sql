@@ -55,7 +55,7 @@ CREATE TABLE dbo.sections (
     is_active BIT NULL DEFAULT 1,
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_section_created DEFAULT SYSUTCDATETIME(),
-    type_lookup_id INT NULL,  -- new column
+    type_lookup_id INT NOT NULL,  -- new column
 
     CONSTRAINT FK_sections_type_lookup FOREIGN KEY (type_lookup_id)
         REFERENCES dbo.gen_lookup(lookup_id)

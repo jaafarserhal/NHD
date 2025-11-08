@@ -146,8 +146,8 @@ namespace NHD.Core.Services.Sections
                 DescriptionEn = section.DescriptionEn,
                 DescriptionSv = section.DescriptionSv,
                 ImageUrl = section.ImageUrl,
-                TypeId = section.TypeLookupId.HasValue ? section.TypeLookupId.Value : 0,
-                TypeName = section.TypeLookupId.HasValue ? section.TypeLookup.NameEn : string.Empty,
+                TypeId = section.TypeLookupId,
+                TypeName = section.TypeLookup.NameEn,
                 IsActive = section.IsActive ?? false,
                 CreatedAt = section.CreatedAt
             };

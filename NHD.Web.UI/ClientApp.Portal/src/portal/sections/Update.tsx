@@ -389,7 +389,7 @@ export default function UpdateSection() {
                                         disabled={typesLoading}
                                     >
                                         <option value="">Select Type</option>
-                                        {types.data.map(option => (
+                                        {types?.data?.map((option) => (
                                             <option key={option.id} value={option.id}>
                                                 {option.nameEn}
                                             </option>
