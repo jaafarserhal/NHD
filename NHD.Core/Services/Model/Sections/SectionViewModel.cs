@@ -15,7 +15,8 @@ namespace NHD.Core.Services.Model.Sections
         public string DescriptionSv { get; set; }
         public string ImageUrl { get; set; }
         public IFormFile ImageFile { get; set; }
-        public bool IsHomeSlider { get; set; }
+        public int TypeId { get; set; }
+        public string TypeName { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
     }

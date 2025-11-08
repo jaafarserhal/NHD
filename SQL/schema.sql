@@ -44,6 +44,7 @@ CREATE TABLE dbo.[user] (
         CONSTRAINT DF_user_created DEFAULT SYSUTCDATETIME()
 );
 
+
 CREATE TABLE dbo.sections (
     section_id INT IDENTITY(1,1) PRIMARY KEY,
     title_en NVARCHAR(255) NOT NULL,
@@ -53,8 +54,13 @@ CREATE TABLE dbo.sections (
     image_url NVARCHAR(500) NULL,
     is_active BIT NULL DEFAULT 1,
     created_at DATETIME2 NOT NULL 
-        CONSTRAINT DF_section_created DEFAULT SYSUTCDATETIME()
+        CONSTRAINT DF_section_created DEFAULT SYSUTCDATETIME(),
+    type_lookup_id INT NULL,  -- new column
+
+    CONSTRAINT FK_sections_type_lookup FOREIGN KEY (type_lookup_id)
+        REFERENCES dbo.gen_lookup(lookup_id)
 );
+
 
 -- =============================================
 -- LOOKUP TYPE

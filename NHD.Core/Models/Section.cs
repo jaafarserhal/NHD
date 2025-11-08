@@ -21,5 +21,7 @@ public partial class Section
 
     public DateTime CreatedAt { get; set; }
 
-    public bool? IsHomeSlider { get; set; }
+    public int? TypeLookupId { get; set; }
+
+    public virtual GenLookup TypeLookup { get; set; }
 }

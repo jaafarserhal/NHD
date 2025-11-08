@@ -20,6 +20,8 @@ namespace NHD.Core.Utilities
         ProductCategory = 100,
         ProductType = 200,
         ProductSize = 300,
+        BoxCategory = 400,
+        SectionType = 500
     }
 
     public enum ProductSizeEnum
@@ -84,6 +86,13 @@ namespace NHD.Core.Utilities
         Processed = 201,
         Canceled = 202
 
+    }
+
+    public enum SectionTypeEnum
+    {
+        HomeSlider = 500,
+        HomeComeWithUs = 501,
+        AboutUs = 502
     }
 
 

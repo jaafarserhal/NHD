@@ -26,4 +26,6 @@ public partial class GenLookup
     public virtual ICollection<Product> ProductPrdLookupSizes { get; set; } = new List<Product>();
 
     public virtual ICollection<Product> ProductPrdLookupTypes { get; set; } = new List<Product>();
+
+    public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
 }

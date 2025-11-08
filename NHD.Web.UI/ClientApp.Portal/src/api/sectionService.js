@@ -19,7 +19,7 @@ class sectionService extends apiService {
         formData.append('DescriptionEn', section.descriptionEn || '');
         formData.append('DescriptionSv', section.descriptionSv || '');
         formData.append('IsActive', String(section.isActive));
-        formData.append('IsHomeSlider', String(section.isHomeSlider));
+        formData.append('TypeId', String(section.typeId));
 
         if (section.imageFile && section.imageFile instanceof File) {
             formData.append('ImageFile', section.imageFile, section.imageFile.name);
@@ -37,7 +37,7 @@ class sectionService extends apiService {
         formData.append('DescriptionEn', section.descriptionEn || '');
         formData.append('DescriptionSv', section.descriptionSv || '');
         formData.append('IsActive', String(section.isActive));
-        formData.append('IsHomeSlider', String(section.isHomeSlider));
+        formData.append('TypeId', String(section.typeId));
 
         if (section.imageFile && section.imageFile instanceof File) {
             formData.append('ImageFile', section.imageFile, section.imageFile.name);
@@ -52,6 +52,10 @@ class sectionService extends apiService {
 
     async deleteSection(sectionId) {
         return this.delete(`${apiUrls.deleteSection}${sectionId}`);
+    }
+
+    async getTypes() {
+        return this.get(apiUrls.getSectionTypes);
     }
 }
 

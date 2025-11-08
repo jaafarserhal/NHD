@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ProductsWithGallery } from "../../api/common/Types";
-import productService from "../../api/productService";
+import homeService from "../../api/homeService";
 import QuickView from "./QuickView";
 
 const CategoryTopProduct: React.FC = () => {
@@ -14,7 +14,7 @@ const CategoryTopProduct: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await productService.getSignatureGiftsProducts();
+                const response = await homeService.getSignatureGiftsProducts();
 
                 if (Array.isArray(response)) {
                     const mapped = response.map((product: ProductsWithGallery) => ({

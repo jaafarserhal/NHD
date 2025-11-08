@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NHD.Core.Common.Models;
 using NHD.Core.Models;
+using NHD.Core.Repository.Lookup;
 using NHD.Core.Repository.Sections;
+using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Sections;
 
 namespace NHD.Core.Services.Sections
@@ -14,11 +16,20 @@ namespace NHD.Core.Services.Sections
     {
         private readonly ISectionRepository _sectionRepository;
         private readonly ILogger<SectionService> _logger;
+        private readonly ILookupRepository _lookupRepository;
 
-        public SectionService(ISectionRepository sectionRepository, ILogger<SectionService> logger)
+        public SectionService(ISectionRepository sectionRepository, ILogger<SectionService> logger, ILookupRepository lookupRepository)
         {
             _sectionRepository = sectionRepository;
             _logger = logger;
+            _lookupRepository = lookupRepository;
+        }
+
+        public async Task<ServiceResult<IEnumerable<SectionViewModel>>> GetHomeSliderSectionsAsync(int take)
+        {
+            var sections = await _sectionRepository.GetHomeSliderSectionAsync(take);
+            var sectionDtos = sections.Select(MapToSection).ToList();
+            return ServiceResult<IEnumerable<SectionViewModel>>.Success(sectionDtos);
         }
 
         public async Task<PagedServiceResult<IEnumerable<SectionViewModel>>> GetSectionsAsync(int page = 1, int limit = 10)
@@ -51,7 +62,7 @@ namespace NHD.Core.Services.Sections
         {
             try
             {
-                var section = await _sectionRepository.GetByIdAsync(id);
+                var section = await _sectionRepository.GetSectionByIdAsync(id);
                 if (section == null)
                 {
                     return ServiceResult<SectionViewModel>.Failure($"Section with ID {id} not found.");
@@ -104,6 +115,26 @@ namespace NHD.Core.Services.Sections
             }
         }
 
+        public async Task<ServiceResult<IEnumerable<LookupItemDto>>> GetTypesAsync()
+        {
+            try
+            {
+                var types = await _lookupRepository.GetSectionTypesAsync();
+                var typeDtos = types.Select(t => new LookupItemDto
+                {
+                    Id = t.LookupId,
+                    NameEn = t.NameEn,
+                    NameSv = t.NameSv
+                });
+                return ServiceResult<IEnumerable<LookupItemDto>>.Success(typeDtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving section types");
+                return ServiceResult<IEnumerable<LookupItemDto>>.Failure("An error occurred while retrieving section types");
+            }
+        }
+
         #region Private Methods
         private SectionViewModel MapToSection(Section section)
         {
@@ -115,7 +146,8 @@ namespace NHD.Core.Services.Sections
                 DescriptionEn = section.DescriptionEn,
                 DescriptionSv = section.DescriptionSv,
                 ImageUrl = section.ImageUrl,
-                IsHomeSlider = section.IsHomeSlider ?? false,
+                TypeId = section.TypeLookupId.HasValue ? section.TypeLookupId.Value : 0,
+                TypeName = section.TypeLookupId.HasValue ? section.TypeLookup.NameEn : string.Empty,
                 IsActive = section.IsActive ?? false,
                 CreatedAt = section.CreatedAt
             };

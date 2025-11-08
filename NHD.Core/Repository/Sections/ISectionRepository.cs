@@ -12,5 +12,6 @@ namespace NHD.Core.Repository.Sections
     {
         Task<PagedResult<Section>> GetSectionsAsync(int page, int limit);
         Task<Section> GetSectionByIdAsync(int sectionId);
+        Task<IEnumerable<Section>> GetHomeSliderSectionAsync(int take);
     }
 }

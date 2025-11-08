@@ -6,7 +6,8 @@ VALUES
     (100, 'Product Category', 'Produktkategori', SYSUTCDATETIME(), 1),
     (200, 'Product Type', 'Produkttyp', SYSUTCDATETIME(), 1),
     (300, 'Product Size', 'Produktstorlek', SYSUTCDATETIME(), 1),
-    (400, 'Order Status', 'Orderstatus', SYSUTCDATETIME(), 1);
+    (400, 'Order Status', 'Orderstatus', SYSUTCDATETIME(), 1),
+	(500, N'Sections Type', N'Sections Type',SYSUTCDATETIME(), 1);
 
 -- =============================================
 -- INSERT INTO gen_lookup
@@ -44,7 +45,10 @@ VALUES
 (402, 400, 'Processing', 'Bearbetas', SYSUTCDATETIME(), 1),
 (403, 400, 'Shipped', 'Skickad', SYSUTCDATETIME(), 1),
 (404, 400, 'Delivered', 'Levererad', SYSUTCDATETIME(), 1),
-(405, 400, 'Cancelled', 'Avbruten', SYSUTCDATETIME(), 1);
+(405, 400, 'Cancelled', 'Avbruten', SYSUTCDATETIME(), 1),
+(500, 500, 'Carousel', 'Carousel', SYSUTCDATETIME(), 1),
+(501, 500, 'Home - Come with us', 'Bekräftad', SYSUTCDATETIME(), 1),
+(502, 500, 'About us', 'Bearbetas', SYSUTCDATETIME(), 1);
 
 
 

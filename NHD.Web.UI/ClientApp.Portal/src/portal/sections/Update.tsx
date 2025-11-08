@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 import { RouterUrls } from "src/common/RouterUrls";
 import { getImageSrc } from "src/common/getImageSrc";
+import { useApiCall } from "src/api/hooks/useApi";
 
 export default function UpdateSection() {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function UpdateSection() {
         descriptionSv: "",
         ImageFile: "",
         isActive: true,
-        isHomeSlider: false,
+        typeId: 0,
     });
 
     const [image, setImage] = useState<File | null>(null);
@@ -34,6 +35,11 @@ export default function UpdateSection() {
     const [loadingSection, setLoadingSection] = useState(true);
     const [errors, setErrors] = useState<string[]>([]);
     const errorBoxRef = React.useRef<HTMLDivElement>(null);
+
+    const { data: types, loading: typesLoading } = useApiCall(
+        () => sectionsService.getTypes(),
+        []
+    );
 
     // Load existing section data
     const loadSection = async () => {
@@ -56,7 +62,7 @@ export default function UpdateSection() {
                 descriptionSv: section.descriptionSv || "",
                 ImageFile: section.imageUrl || "",
                 isActive: section.isActive,
-                isHomeSlider: section.isHomeSlider,
+                typeId: section.typeId || 0,
             });
 
             // Set preview to existing image if available
@@ -205,7 +211,7 @@ export default function UpdateSection() {
                 descriptionSv: form.descriptionSv,
                 isActive: form.isActive,
                 imageFile: image,
-                isHomeSlider: form.isHomeSlider,
+                typeId: form.typeId,
             };
 
             await sectionsService.updateSection(sectionData);
@@ -369,19 +375,26 @@ export default function UpdateSection() {
                         </Grid>
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Home Slider" />
+                                <CardHeader title="Section Type" />
                                 <Divider />
                                 <CardContent>
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={form.isHomeSlider}
-                                                onChange={handleHomeSliderChange}
-                                                name="isHomeSlider"
-                                            />
-                                        }
-                                        label=''
-                                    />
+                                    <TextField
+                                        required
+                                        name="typeId"
+                                        select
+                                        value={form.typeId || ''}
+                                        onChange={handleChange}
+                                        SelectProps={{ native: true }}
+                                        variant="standard"
+                                        disabled={typesLoading}
+                                    >
+                                        <option value="">Select Type</option>
+                                        {types.data.map(option => (
+                                            <option key={option.id} value={option.id}>
+                                                {option.nameEn}
+                                            </option>
+                                        ))}
+                                    </TextField>
                                 </CardContent>
                             </Card>
                         </Grid>

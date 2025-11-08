@@ -30,4 +30,5 @@ export const apiUrls = {
     updateSection: '/Update',
     getSectionById: '/GetById/',
     deleteSection: '/Delete/',
+    getSectionTypes: '/Types',
 };

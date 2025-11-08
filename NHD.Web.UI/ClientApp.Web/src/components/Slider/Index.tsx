@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
-import productService from "../../api/productService";
+import homeService from "../../api/homeService";
 
 interface SliderItem {
     backgroundImage: string;
@@ -14,7 +14,7 @@ const Slider: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await productService.getCarouselProducts();
+                const response = await homeService.getCarousel();
 
                 // Make sure it's an array before mapping
                 if (Array.isArray(response)) {
@@ -53,14 +53,6 @@ const Slider: React.FC = () => {
                         className="single-slider swiper-slide animation-style-01"
                         style={{ backgroundImage: `url(${slide.backgroundImage})` }}
                     >
-                        <div className="container">
-                            <div className="slider-content text-center mx-auto">
-                                <h1 className="slider-content__title text-white">{slide.title}</h1>
-                                <a className="slider-content__btn btn btn-primary btn-hover-black">
-                                    Order Now
-                                </a>
-                            </div>
-                        </div>
                     </SwiperSlide>
                 ))}
             </Swiper>

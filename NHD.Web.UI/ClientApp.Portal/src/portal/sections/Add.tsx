@@ -9,6 +9,7 @@ import Editor from "src/components/Editor/Index";
 import { useNavigate } from 'react-router-dom';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 import { RouterUrls } from "src/common/RouterUrls";
+import { useApiCall } from "src/api/hooks/useApi";
 
 export default function AddSection() {
 
@@ -19,7 +20,7 @@ export default function AddSection() {
         titleSv: "",
         descriptionEn: "",
         descriptionSv: "",
-        isHomeSlider: false,
+        typeId: 0,
         isActive: true
     });
 
@@ -28,6 +29,11 @@ export default function AddSection() {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<string[]>([]);
     const errorBoxRef = React.useRef<HTMLDivElement>(null);
+
+    const { data: types, loading: typesLoading } = useApiCall(
+        () => sectionsService.getTypes(),
+        []
+    );
 
 
     const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,7 +169,7 @@ export default function AddSection() {
                 descriptionEn: "",
                 descriptionSv: "",
                 isActive: true,
-                isHomeSlider: false
+                typeId: 0,
             });
             setImage(null);
             setPreview(null);
@@ -293,19 +299,26 @@ export default function AddSection() {
                         </Grid>
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Home Slider" />
+                                <CardHeader title="Section Type" />
                                 <Divider />
                                 <CardContent>
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={form.isHomeSlider}
-                                                onChange={handleHomeSliderChange}
-                                                name="isHomeSlider"
-                                            />
-                                        }
-                                        label=''
-                                    />
+                                    <TextField
+                                        required
+                                        name="typeId"
+                                        select
+                                        value={form.typeId || ''}
+                                        onChange={handleChange}
+                                        SelectProps={{ native: true }}
+                                        variant="standard"
+                                        disabled={typesLoading}
+                                    >
+                                        <option value="">Select Type</option>
+                                        {types.map(option => (
+                                            <option key={option.id} value={option.id}>
+                                                {option.nameEn}
+                                            </option>
+                                        ))}
+                                    </TextField>
                                 </CardContent>
                             </Card>
                         </Grid>

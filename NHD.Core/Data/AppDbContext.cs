@@ -533,7 +533,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
-            entity.Property(e => e.IsHomeSlider).HasColumnName("is_home_slider");
             entity.Property(e => e.TitleEn)
                 .IsRequired()
                 .HasMaxLength(255)
@@ -542,6 +541,11 @@ public partial class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(255)
                 .HasColumnName("title_sv");
+            entity.Property(e => e.TypeLookupId).HasColumnName("type_lookup_id");
+
+            entity.HasOne(d => d.TypeLookup).WithMany(p => p.Sections)
+                .HasForeignKey(d => d.TypeLookupId)
+                .HasConstraintName("FK_sections_type_lookup");
         });
 
         modelBuilder.Entity<User>(entity =>

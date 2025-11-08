@@ -24,6 +24,7 @@ namespace NHD.Core.Repository.Sections
             var total = await query.CountAsync();
 
             var sections = await query
+                .Include(p => p.TypeLookup)
                 .Skip((page - 1) * limit)
                 .Take(limit)
                 .ToListAsync();
@@ -39,8 +40,17 @@ namespace NHD.Core.Repository.Sections
 
         public async Task<Section> GetSectionByIdAsync(int sectionId)
         {
-            return await _context.Sections
+            return await _context.Sections.Include(p => p.TypeLookup)
                 .FirstOrDefaultAsync(p => p.SectionId == sectionId);
+        }
+
+        public async Task<IEnumerable<Section>> GetHomeSliderSectionAsync(int take)
+        {
+            return await _context.Sections.Include(p => p.TypeLookup)
+                .Where(p => p.IsActive == true)
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(take)
+                .ToListAsync();
         }
     }
 }

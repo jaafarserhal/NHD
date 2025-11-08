@@ -36,5 +36,10 @@ namespace NHD.Core.Repository.Lookup
         {
             return await GetLookupsByTypeAsync(LookupType.ProductSize.AsInt());
         }
+
+        public async Task<List<GenLookup>> GetSectionTypesAsync()
+        {
+            return await GetLookupsByTypeAsync(LookupType.SectionType.AsInt());
+        }
     }
 }

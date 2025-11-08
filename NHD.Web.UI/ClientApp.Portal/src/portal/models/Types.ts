@@ -66,7 +66,7 @@ export interface Section {
     descriptionEn: string;
     descriptionSv: string;
     ImageFile: string;
-    isHomeSlider: boolean;
+    typeId: number;
     isActive: boolean;
 }
 

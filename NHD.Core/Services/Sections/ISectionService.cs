@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NHD.Core.Common.Models;
 using NHD.Core.Models;
+using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Sections;
 
 namespace NHD.Core.Services.Sections
@@ -16,5 +17,8 @@ namespace NHD.Core.Services.Sections
         Task<Section> AddSectionAsync(Section section);
         Task<Section> UpdateSectionAsync(Section section);
         Task<ServiceResult<bool>> DeleteSectionAsync(int sectionId);
+
+        Task<ServiceResult<IEnumerable<SectionViewModel>>> GetHomeSliderSectionsAsync(int take);
+        Task<ServiceResult<IEnumerable<LookupItemDto>>> GetTypesAsync();
     }
 }

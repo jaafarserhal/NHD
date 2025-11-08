@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NHD.Core.Common.Models;
 using NHD.Core.Models;
+using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Sections;
 using NHD.Core.Services.Sections;
 
@@ -97,7 +98,7 @@ namespace NHD.Web.UI.Controllers.Portal
                     DescriptionEn = dto.DescriptionEn,
                     DescriptionSv = dto.DescriptionSv,
                     ImageUrl = fileName,
-                    IsHomeSlider = dto.IsHomeSlider,
+                    TypeLookupId = dto.TypeId,
                     IsActive = dto.IsActive,
                     CreatedAt = DateTime.UtcNow
                 };
@@ -174,7 +175,7 @@ namespace NHD.Web.UI.Controllers.Portal
                 existingSection.TitleSv = dto.TitleSv;
                 existingSection.DescriptionEn = dto.DescriptionEn;
                 existingSection.DescriptionSv = dto.DescriptionSv;
-                existingSection.IsHomeSlider = dto.IsHomeSlider;
+                existingSection.TypeLookupId = dto.TypeId;
                 existingSection.IsActive = dto.IsActive;
                 existingSection.CreatedAt = DateTime.UtcNow;
 
@@ -269,6 +270,16 @@ namespace NHD.Web.UI.Controllers.Portal
             }
 
             return NoContent();
+        }
+
+        [HttpGet]
+        [Route("Types")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetTypes()
+        {
+            var data = await _sectionService.GetTypesAsync();
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
         }
     }
 }
