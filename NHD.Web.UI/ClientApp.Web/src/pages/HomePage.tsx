@@ -4,6 +4,7 @@ import Footer from '../components/layout/Footer';
 import GiftCategory from '../components/CategoryTopProduct/Index';
 import HomeContent from '../components/HomeContent/Index';
 import Slider from '../components/Slider/Index';
+import CallToActionSection from '../components/CallToActionSection/Index';
 
 
 const HomePage: React.FC = () => {
@@ -12,6 +13,7 @@ const HomePage: React.FC = () => {
             <Header />
             <Slider />
             <GiftCategory />
+            <CallToActionSection />
             <HomeContent />
             <Footer />
         </>

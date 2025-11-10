@@ -368,7 +368,7 @@ function Gallery() {
                                                     <Switch
                                                         checked={form.isPrimary}
                                                         onChange={handlePrimarySwitchChange}
-                                                        name="primary"
+                                                        name="isPrimary"
                                                     />
                                                 }
                                                 label='Primary'

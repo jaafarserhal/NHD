@@ -589,6 +589,7 @@ namespace NHD.Core.Services.Products
                 Type = gallery.DateId != null ? "date" : "product",
                 AltText = gallery.AltText,
                 ImageUrl = gallery.ImageUrl,
+                IsPrimary = gallery.IsPrimary,
                 SortOrder = gallery.SortOrder,
                 CreatedAt = gallery.CreatedAt
             };

@@ -24,40 +24,6 @@ const HomeContent: React.FC = () => {
 
     return (
         <>
-            {/* Call to Action Section Start */}
-            <div className="call-to-action" style={{ backgroundImage: 'url(assets/images/call-to-action-bg.jpg)' }}>
-                <div className="container">
-                    <div className="row align-items-center gy-8 gx-0">
-                        <div className="col-lg-6">
-                            <div className="call-to-action-box">
-                                <h3 className="call-to-action-box__title text-white">
-                                    <span>Come with us</span>
-                                </h3>
-                                <ul className="call-to-action-box__list text-white">
-                                    <li>
-                                        Aliquam pulvinar vestibulum blandit. Donec sed nisl libero. Fusce dignissim{' '}
-                                        <u>luctus sem eu dapibus.</u>
-                                    </li>
-                                    <li>
-                                        Pellentesque vulputate quam a quam volutpat, sed ullamcorper erat commodo. Vestibulum sit amet ipsum vitae mauris mattis vulputate lacinia nec neque.
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="col-lg-6">
-                            <div className="call-to-action-more text-center position-relative">
-                                <a className="call-to-action-more__arrow text-white lh-1" href="contact.html">
-                                    <i className="lastudioicon-arrow-right"></i>
-                                </a>
-                                <div className="position-absolute top-50 start-50 translate-middle">
-                                    <img className="call-to-action-more__svg" src="assets/images/svg-text.svg" alt="Svg Text" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {/* Brand Section Start */}
             <div className="brand-section">
                 <div className="container">

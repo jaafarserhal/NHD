@@ -44,10 +44,10 @@ namespace NHD.Core.Repository.Sections
                 .FirstOrDefaultAsync(p => p.SectionId == sectionId);
         }
 
-        public async Task<IEnumerable<Section>> GetHomeSliderSectionAsync(int take)
+        public async Task<IEnumerable<Section>> GetTopSectionsByTypeAsync(int typeId, int take)
         {
             return await _context.Sections.Include(p => p.TypeLookup)
-                .Where(p => p.IsActive == true)
+                .Where(p => p.IsActive == true && p.TypeLookupId == typeId)
                 .OrderByDescending(p => p.CreatedAt)
                 .Take(take)
                 .ToListAsync();

@@ -47,7 +47,7 @@ VALUES
 (404, 400, 'Delivered', 'Levererad', SYSUTCDATETIME(), 1),
 (405, 400, 'Cancelled', 'Avbruten', SYSUTCDATETIME(), 1),
 (500, 500, 'Carousel', 'Carousel', SYSUTCDATETIME(), 1),
-(501, 500, 'Home - Come with us', 'Bekräftad', SYSUTCDATETIME(), 1),
+(501, 500, 'Call To Action', 'Call To Action', SYSUTCDATETIME(), 1),
 (502, 500, 'About us', 'Bearbetas', SYSUTCDATETIME(), 1);
 
 

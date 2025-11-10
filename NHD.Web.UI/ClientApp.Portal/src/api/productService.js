@@ -133,6 +133,7 @@ class productService extends apiService {
         }
         formData.append('AltText', gallery.altText || '');
         formData.append('SortOrder', String(gallery.sortOrder || 0));
+        formData.append('IsPrimary', String(gallery.isPrimary || false));
         if (gallery.imageFile && gallery.imageFile instanceof File) {
             formData.append('ImageUrl', gallery.imageFile, gallery.imageFile.name);
         }

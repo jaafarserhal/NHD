@@ -9,6 +9,7 @@ using NHD.Core.Repository.Lookup;
 using NHD.Core.Repository.Sections;
 using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Sections;
+using NHD.Core.Utilities;
 
 namespace NHD.Core.Services.Sections
 {
@@ -25,9 +26,16 @@ namespace NHD.Core.Services.Sections
             _lookupRepository = lookupRepository;
         }
 
-        public async Task<ServiceResult<IEnumerable<SectionViewModel>>> GetHomeSliderSectionsAsync(int take)
+        public async Task<ServiceResult<IEnumerable<SectionViewModel>>> GetHomeSliderSectionsAsync()
         {
-            var sections = await _sectionRepository.GetHomeSliderSectionAsync(take);
+            var sections = await _sectionRepository.GetTopSectionsByTypeAsync(SectionType.HomeSlider.AsInt(), 3);
+            var sectionDtos = sections.Select(MapToSection).ToList();
+            return ServiceResult<IEnumerable<SectionViewModel>>.Success(sectionDtos);
+        }
+
+        public async Task<ServiceResult<IEnumerable<SectionViewModel>>> GetHomeCallToActionSectionAsync()
+        {
+            var sections = await _sectionRepository.GetTopSectionsByTypeAsync(SectionType.HomeCallToAction.AsInt(), 1);
             var sectionDtos = sections.Select(MapToSection).ToList();
             return ServiceResult<IEnumerable<SectionViewModel>>.Success(sectionDtos);
         }

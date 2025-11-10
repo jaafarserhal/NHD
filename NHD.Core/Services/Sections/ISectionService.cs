@@ -18,7 +18,9 @@ namespace NHD.Core.Services.Sections
         Task<Section> UpdateSectionAsync(Section section);
         Task<ServiceResult<bool>> DeleteSectionAsync(int sectionId);
 
-        Task<ServiceResult<IEnumerable<SectionViewModel>>> GetHomeSliderSectionsAsync(int take);
+        Task<ServiceResult<IEnumerable<SectionViewModel>>> GetHomeSliderSectionsAsync();
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetTypesAsync();
+
+        Task<ServiceResult<IEnumerable<SectionViewModel>>> GetHomeCallToActionSectionAsync();
     }
 }

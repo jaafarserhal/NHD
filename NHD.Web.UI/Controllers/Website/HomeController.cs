@@ -28,10 +28,22 @@ namespace NHD.Web.UI.Website.Controllers
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
         }
 
-        [HttpGet("Carousel")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<SectionViewModel>>>> GetCarousel()
+        [HttpGet("HomeSlider")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<SectionViewModel>>>> GetHomeSlider()
         {
-            var result = await _sectionService.GetHomeSliderSectionsAsync(2);
+            var result = await _sectionService.GetHomeSliderSectionsAsync();
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.ErrorMessage);
+        }
+
+
+        [HttpGet("HomeCallToActionSection")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<SectionViewModel>>>> GetHomeCallToActionSection()
+        {
+            var result = await _sectionService.GetHomeCallToActionSectionAsync();
             if (result.IsSuccess)
             {
                 return Ok(result.Data);

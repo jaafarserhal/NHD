@@ -14,13 +14,13 @@ const Slider: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await homeService.getCarousel();
+                const response = await homeService.getHomeSlider();
 
                 // Make sure it's an array before mapping
                 if (Array.isArray(response)) {
-                    const mapped = response.map((product: any) => ({
-                        backgroundImage: (process.env.REACT_APP_BASE_URL || "") + `/uploads/products/${product.imageUrl}`,
-                        title: product.nameEn,
+                    const mapped = response.map((section: any) => ({
+                        backgroundImage: (process.env.REACT_APP_BASE_URL || "") + `/uploads/sections/${section.imageUrl}`,
+                        title: section.titleEn,
                     }));
 
                     setSliderData(mapped);
@@ -53,6 +53,11 @@ const Slider: React.FC = () => {
                         className="single-slider swiper-slide animation-style-01"
                         style={{ backgroundImage: `url(${slide.backgroundImage})` }}
                     >
+                        <div className="container">
+                            <div className="slider-content text-center mx-auto">
+                                <h1 className="slider-content__title text-white">{slide.title}</h1>
+                            </div>
+                        </div>
                     </SwiperSlide>
                 ))}
             </Swiper>
