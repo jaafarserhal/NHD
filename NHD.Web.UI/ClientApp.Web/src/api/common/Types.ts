@@ -31,11 +31,18 @@ export interface GalleryViewModel {
     altText: string;
     imageUrl: string;
 }
-export interface SectionViewModel {
+
+export interface BrandItem {
     id: number;
-    titleEn: string;
-    titleSv: string;
-    descriptionEn?: string;
-    descriptionSv?: string;
+    nameEn: string;
+    nameSv: string;
+    imageUrl: string;
+    altText: string;
+}
+
+export interface CollectionItem {
+    id: number;
+    nameEn: string;
+    nameSv: string;
     imageUrl: string;
 }

@@ -16,6 +16,13 @@ class homeService extends apiService {
     async getCallToActionSection() {
         return this.get('HomeCallToActionSection');
     }
+
+    async getBrands() {
+        return this.get('TopFiveDatesWithGalleries');
+    }
+    async getTop4Collections() {
+        return this.get('Top4Collections');
+    }
 }
 
 export default new homeService();

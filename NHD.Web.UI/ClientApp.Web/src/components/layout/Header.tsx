@@ -37,7 +37,7 @@ const Header: React.FC = () => {
                         <div className="col-lg-3 col-xl-3 col-7">
                             {/* Header Logo Start */}
                             <div className="header-logo">
-                                <a href="index.html">
+                                <a href="/">
                                     <img
                                         className="white-logo"
                                         src={isSticky ? "assets/images/logo.svg" : "assets/images/logo-white.svg"}

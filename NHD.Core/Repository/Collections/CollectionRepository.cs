@@ -42,5 +42,10 @@ namespace NHD.Core.Repository.Collections
         {
             return await _context.Collections.Where(c => c.IsActive).ToListAsync();
         }
+
+        public async Task<IEnumerable<Collection>> GetTopCollectionsAsync(int take)
+        {
+            return await _context.Collections.Where(c => c.IsActive).Take(take).ToListAsync();
+        }
     }
 }

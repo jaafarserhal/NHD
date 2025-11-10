@@ -3,6 +3,7 @@ using NHD.Core.Common.Models;
 using NHD.Core.Models;
 using NHD.Core.Services.Dates;
 using NHD.Core.Services.Model;
+using NHD.Core.Services.Model.Collections;
 using NHD.Core.Services.Model.Dates;
 
 
@@ -168,7 +169,7 @@ namespace NHD.Web.UI.Portal.Controllers
         }
 
         [HttpGet("Collections/{id}")]
-        public async Task<ActionResult<ServiceResult<DatesCollectionViewModel>>> GetCollectionById(int id)
+        public async Task<ActionResult<ServiceResult<CollectionViewModel>>> GetCollectionById(int id)
         {
             var data = await _datesService.GetCollectionByViewModel(id);
             if (data.IsSuccess)
@@ -222,7 +223,7 @@ namespace NHD.Web.UI.Portal.Controllers
         }
 
         [HttpPost("Collections/Add")]
-        public async Task<IActionResult> AddCollection([FromForm] DatesCollectionViewModel dto)
+        public async Task<IActionResult> AddCollection([FromForm] CollectionViewModel dto)
         {
             try
             {
@@ -271,7 +272,7 @@ namespace NHD.Web.UI.Portal.Controllers
 
         [HttpPut]
         [Route("Collections/Update")]
-        public async Task<IActionResult> UpdateCollection([FromForm] DatesCollectionViewModel dto)
+        public async Task<IActionResult> UpdateCollection([FromForm] CollectionViewModel dto)
         {
             try
             {

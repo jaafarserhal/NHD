@@ -12,5 +12,6 @@ namespace NHD.Core.Repository.Collections
     {
         Task<PagedResult<Collection>> GetCollectionsAsync(int page, int limit);
         Task<IEnumerable<Collection>> GetActiveCollectionsAsync();
+        Task<IEnumerable<Collection>> GetTopCollectionsAsync(int take);
     }
 }

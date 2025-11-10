@@ -6,6 +6,7 @@ using NHD.Core.Repository.ImageGallery;
 using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Dates;
 using NHD.Core.Repository.Collections;
+using NHD.Core.Services.Model.Collections;
 
 namespace NHD.Core.Services.Dates
 {
@@ -24,6 +25,64 @@ namespace NHD.Core.Services.Dates
             _galleryRepository = galleryRepository ?? throw new ArgumentNullException(nameof(galleryRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+        #region Website Methods
+
+        public async Task<ServiceResult<IEnumerable<DatesWithGalleryViewModel>>> GetHomePageTopFiveDatesWithGalleriesAsync()
+        {
+            try
+            {
+                var datesData = await _datesRepository.GetTopDatesWithGalleriesAsync(5);
+                var dateDtos = datesData
+                .Select(d =>
+                {
+                    var primaryGallery = d.Galleries?.FirstOrDefault(x => x.IsPrimary);
+
+                    return new DatesWithGalleryViewModel
+                    {
+                        Id = d.DateId,
+                        NameEn = d.NameEn,
+                        NameSv = d.NameSv,
+                        ImageUrl = primaryGallery?.ImageUrl,
+                        AltText = primaryGallery?.AltText
+                    };
+                })
+                .ToList();
+
+                return ServiceResult<IEnumerable<DatesWithGalleryViewModel>>.Success(dateDtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving active dates with gallery");
+                return ServiceResult<IEnumerable<DatesWithGalleryViewModel>>.Failure("An error occurred while retrieving active dates");
+            }
+        }
+
+        public async Task<ServiceResult<IEnumerable<CollectionViewModel>>> GetTop4CollectionsAsync()
+        {
+            try
+            {
+                var collectionsData = await _collectionRepository.GetTopCollectionsAsync(4);
+                var collectionDtos = collectionsData
+                .Select(c => new CollectionViewModel
+                {
+                    Id = c.CollectionId,
+                    NameEn = c.NameEn,
+                    NameSv = c.NameSv,
+                    ImageUrl = c.ImageUrl
+                })
+                .ToList();
+
+                return ServiceResult<IEnumerable<CollectionViewModel>>.Success(collectionDtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving top collections");
+                return ServiceResult<IEnumerable<CollectionViewModel>>.Failure("An error occurred while retrieving top collections");
+            }
+        }
+
+        #endregion Website Methods
 
         #region Dates
 
@@ -53,19 +112,19 @@ namespace NHD.Core.Services.Dates
             }
         }
 
-        public async Task<PagedServiceResult<IEnumerable<DatesCollectionViewModel>>> GetDatesCollectionAsync(int page = 1, int limit = 10)
+        public async Task<PagedServiceResult<IEnumerable<CollectionViewModel>>> GetDatesCollectionAsync(int page = 1, int limit = 10)
         {
             try
             {
                 if (page <= 0 || limit <= 0)
                 {
-                    return PagedServiceResult<IEnumerable<DatesCollectionViewModel>>.Failure("Page and limit must be greater than 0");
+                    return PagedServiceResult<IEnumerable<CollectionViewModel>>.Failure("Page and limit must be greater than 0");
                 }
 
                 var pagedResult = await _collectionRepository.GetCollectionsAsync(page, limit);
                 var collectionDtos = pagedResult.Data.Select(MapToDatesCollectionDto).ToList();
 
-                return PagedServiceResult<IEnumerable<DatesCollectionViewModel>>.Success(
+                return PagedServiceResult<IEnumerable<CollectionViewModel>>.Success(
                     collectionDtos,
                     pagedResult.Total,
                     pagedResult.Page,
@@ -75,7 +134,7 @@ namespace NHD.Core.Services.Dates
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving dates collections");
-                return PagedServiceResult<IEnumerable<DatesCollectionViewModel>>.Failure("An error occurred while retrieving dates collections");
+                return PagedServiceResult<IEnumerable<CollectionViewModel>>.Failure("An error occurred while retrieving dates collections");
             }
         }
 
@@ -104,23 +163,23 @@ namespace NHD.Core.Services.Dates
             }
         }
 
-        public async Task<ServiceResult<DatesCollectionViewModel>> GetCollectionByViewModel(int id)
+        public async Task<ServiceResult<CollectionViewModel>> GetCollectionByViewModel(int id)
         {
             try
             {
                 var collection = await _collectionRepository.GetByIdAsync(id);
                 if (collection == null)
                 {
-                    return ServiceResult<DatesCollectionViewModel>.Failure($"Collection with ID {id} not found.");
+                    return ServiceResult<CollectionViewModel>.Failure($"Collection with ID {id} not found.");
                 }
 
                 var collectionDto = MapToDatesCollectionDto(collection);
-                return ServiceResult<DatesCollectionViewModel>.Success(collectionDto);
+                return ServiceResult<CollectionViewModel>.Success(collectionDto);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error retrieving collection with ID {id}");
-                return ServiceResult<DatesCollectionViewModel>.Failure("An error occurred while retrieving the collection");
+                return ServiceResult<CollectionViewModel>.Failure("An error occurred while retrieving the collection");
             }
         }
 
@@ -230,9 +289,9 @@ namespace NHD.Core.Services.Dates
             };
         }
 
-        private DatesCollectionViewModel MapToDatesCollectionDto(Collection collection)
+        private CollectionViewModel MapToDatesCollectionDto(Collection collection)
         {
-            return new DatesCollectionViewModel
+            return new CollectionViewModel
             {
                 Id = collection.CollectionId,
                 NameEn = collection.NameEn,

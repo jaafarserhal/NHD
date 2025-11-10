@@ -24,40 +24,6 @@ const HomeContent: React.FC = () => {
 
     return (
         <>
-            {/* Brand Section Start */}
-            <div className="brand-section">
-                <div className="container">
-                    <div className="brand-active">
-                        <div className="swiper">
-                            <div className="swiper-wrapper align-items-center">
-                                {[1, 2, 3, 4, 5].map((num) => (
-                                    <div key={num} className="swiper-slide brand-item">
-                                        <img src={`assets/images/brand/partner-${num}.png`} alt="Brand" />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Banner Section Start */}
-            <div className="banner-section">
-                <div className="row row-cols-1 row-cols-md-2 g-0">
-                    {['Cupcake', 'Pastry', 'Muffin', 'Waffle'].map((item, idx) => (
-                        <div key={item} className="col">
-                            <a href="shop.html" className="banner-item" style={{ backgroundImage: `url(assets/images/banner-0${idx + 1}.jpg)` }}>
-                                <div className="banner-item__content">
-                                    <h3 className="banner-item__title text-white">{item}</h3>
-                                    <span className="banner-item__btn text-white">Shop Now</span>
-                                </div>
-                                <div className="banner-item__badge text-white">01.</div>
-                            </a>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
             {/* Product Section Start */}
             <div className="section-padding-01">
                 <div className="container">

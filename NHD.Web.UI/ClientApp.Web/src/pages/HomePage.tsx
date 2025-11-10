@@ -5,6 +5,8 @@ import GiftCategory from '../components/CategoryTopProduct/Index';
 import HomeContent from '../components/HomeContent/Index';
 import Slider from '../components/Slider/Index';
 import CallToActionSection from '../components/CallToActionSection/Index';
+import Brands from '../components/Brands/Index';
+import Collections from '../components/Collections/Index';
 
 
 const HomePage: React.FC = () => {
@@ -14,6 +16,8 @@ const HomePage: React.FC = () => {
             <Slider />
             <GiftCategory />
             <CallToActionSection />
+            <Brands />
+            <Collections />
             <HomeContent />
             <Footer />
         </>
