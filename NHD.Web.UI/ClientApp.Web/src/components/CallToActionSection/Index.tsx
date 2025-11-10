@@ -1,30 +1,19 @@
 import React from "react";
-import homeService from "../../api/homeService";
 
-const CallToActionSection: React.FC = () => {
-    const [sectionData, setSectionData] = React.useState<any | null>(null);
+interface CallToActionSectionProps {
+    callToActionData: any[]; // You can replace `any` with your SectionViewModel type if available
+}
 
-    React.useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // ✅ response IS the SectionViewModel object
-                const response = await homeService.getCallToActionSection();
-                setSectionData(response);
-            } catch (error) {
-                console.error("Error fetching call to action section:", error);
-            }
-        };
+const CallToActionSection: React.FC<CallToActionSectionProps> = ({ callToActionData }) => {
+    if (!callToActionData || callToActionData.length === 0) return null; // or show a loader
 
-        fetchData();
-    }, []);
-
-    if (!sectionData) return null; // or show a loader
+    const section = callToActionData[0];
 
     return (
         <section
             className="call-to-action"
             style={{
-                backgroundImage: `url(${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${sectionData[0].imageUrl})`,
+                backgroundImage: `url(${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${section.imageUrl})`,
             }}
         >
             <div className="container">
@@ -33,11 +22,9 @@ const CallToActionSection: React.FC = () => {
                     <div className="col-lg-6">
                         <div className="call-to-action-box">
                             <h3 className="call-to-action-box__title text-white">
-                                <span>{sectionData[0].titleEn}</span>
+                                <span>{section.titleEn}</span>
                             </h3>
-                            <p className="call-to-action-box__text text-white">
-                                {sectionData[0].descriptionEn}
-                            </p>
+                            <p className="call-to-action-box__text text-white">{section.descriptionEn}</p>
                         </div>
                     </div>
 

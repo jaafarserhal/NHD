@@ -124,10 +124,6 @@ export default function AddSection() {
         if (!form.titleSv.trim()) {
             validationErrors.push("Swedish title is required");
         }
-        if (!image) {
-            validationErrors.push("Image is required");
-        }
-
 
         setErrors(validationErrors);
 
@@ -154,7 +150,6 @@ export default function AddSection() {
         setLoading(true);
 
         try {
-            if (!image) throw new Error("Please select an image.");
 
             const sectionData = { ...form, imageFile: image };
 
@@ -280,10 +275,9 @@ export default function AddSection() {
                                         accept="image/*"
                                         onChange={handleFileChange}
                                         style={{ marginBottom: '1rem' }}
-                                        required
                                     />
                                     {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
-                                        * Image is required (max size: 1MB)
+                                        * (max size: 1MB)
                                     </Box>}
                                     {preview && (
                                         <Box sx={{ mt: 2 }}>

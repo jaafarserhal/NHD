@@ -72,22 +72,23 @@ namespace NHD.Web.UI.Controllers.Portal
                 if (dto == null)
                     return BadRequest("Section data is required");
 
-                if (dto.ImageFile == null || dto.ImageFile.Length == 0)
-                    return BadRequest("Image is required");
+                string? fileName = null;
 
-                // Create unique file name
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
-                var folderPath = Path.Combine("wwwroot/uploads", "sections");
-
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-
-                var filePath = Path.Combine(folderPath, fileName);
-
-                // Save the uploaded file
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                // Handle optional image upload
+                if (dto.ImageFile != null && dto.ImageFile.Length > 0)
                 {
-                    await dto.ImageFile.CopyToAsync(stream);
+                    fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
+                    var folderPath = Path.Combine("wwwroot/uploads", "sections");
+
+                    if (!Directory.Exists(folderPath))
+                        Directory.CreateDirectory(folderPath);
+
+                    var filePath = Path.Combine(folderPath, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await dto.ImageFile.CopyToAsync(stream);
+                    }
                 }
 
                 // Create Section entity
@@ -97,33 +98,35 @@ namespace NHD.Web.UI.Controllers.Portal
                     TitleSv = dto.TitleSv,
                     DescriptionEn = dto.DescriptionEn,
                     DescriptionSv = dto.DescriptionSv,
-                    ImageUrl = fileName,
+                    ImageUrl = fileName, // null if no image uploaded
                     TypeLookupId = dto.TypeId,
                     IsActive = dto.IsActive,
                     CreatedAt = DateTime.UtcNow
                 };
 
-                // Use the transactional method instead of separate calls
                 var created = await _sectionService.AddSectionAsync(section);
 
-                return CreatedAtAction("GetSections", new { id = created.SectionId });
+                return CreatedAtAction("GetSections", new { id = created.SectionId }, created);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error adding section");
 
-                // Clean up uploaded file if database operation failed
-                try
+                // Only attempt cleanup if an image was actually uploaded
+                if (dto?.ImageFile != null)
                 {
-                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
-                    var folderPath = Path.Combine("wwwroot/uploads", "sections");
-                    var filePath = Path.Combine(folderPath, fileName);
-                    if (System.IO.File.Exists(filePath))
-                        System.IO.File.Delete(filePath);
-                }
-                catch (Exception cleanupEx)
-                {
-                    _logger.LogWarning(cleanupEx, "Failed to clean up uploaded file after database error");
+                    try
+                    {
+                        var folderPath = Path.Combine("wwwroot/uploads", "sections");
+                        var filePath = Path.Combine(folderPath, $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}");
+
+                        if (System.IO.File.Exists(filePath))
+                            System.IO.File.Delete(filePath);
+                    }
+                    catch (Exception cleanupEx)
+                    {
+                        _logger.LogWarning(cleanupEx, "Failed to clean up uploaded file after database error");
+                    }
                 }
 
                 return StatusCode(500, "An error occurred while adding the section.");
@@ -137,40 +140,35 @@ namespace NHD.Web.UI.Controllers.Portal
             try
             {
                 if (dto == null || dto.Id <= 0)
-                {
-                    return BadRequest("Valid product data is required.");
-                }
+                    return BadRequest("Valid section data is required.");
 
                 var existingSection = await _sectionService.GetSectionByIdAsync(dto.Id);
                 if (existingSection == null)
-                {
                     return NotFound("Section not found.");
-                }
 
-                string oldImagePath = existingSection.ImageUrl;
+                string? oldImageFileName = existingSection.ImageUrl;
+                string? newFileName = null;
 
                 // Handle new image upload if provided
                 if (dto.ImageFile != null && dto.ImageFile.Length > 0)
                 {
-                    // Create unique file name
-                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
+                    newFileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
                     var folderPath = Path.Combine("wwwroot/uploads", "sections");
 
                     if (!Directory.Exists(folderPath))
                         Directory.CreateDirectory(folderPath);
 
-                    var filePath = Path.Combine(folderPath, fileName);
+                    var newFilePath = Path.Combine(folderPath, newFileName);
 
-                    // Save the uploaded file
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    using (var stream = new FileStream(newFilePath, FileMode.Create))
                     {
                         await dto.ImageFile.CopyToAsync(stream);
                     }
 
-                    existingSection.ImageUrl = fileName;
+                    existingSection.ImageUrl = newFileName;
                 }
 
-                // Update section properties
+                // Update other section properties
                 existingSection.TitleEn = dto.TitleEn;
                 existingSection.TitleSv = dto.TitleSv;
                 existingSection.DescriptionEn = dto.DescriptionEn;
@@ -179,13 +177,12 @@ namespace NHD.Web.UI.Controllers.Portal
                 existingSection.IsActive = dto.IsActive;
                 existingSection.CreatedAt = DateTime.UtcNow;
 
-                // Use the transactional method to update section and dates
                 var updated = await _sectionService.UpdateSectionAsync(existingSection);
 
-                // Delete old image file only after successful database update
-                if (dto.ImageFile != null && dto.ImageFile.Length > 0 && !string.IsNullOrEmpty(oldImagePath))
+                // If update succeeded and a new image was uploaded, delete the old one
+                if (newFileName != null && !string.IsNullOrEmpty(oldImageFileName))
                 {
-                    var oldFilePath = Path.Combine("wwwroot/uploads/sections", oldImagePath);
+                    var oldFilePath = Path.Combine("wwwroot/uploads/sections", oldImageFileName);
                     if (System.IO.File.Exists(oldFilePath))
                     {
                         try
@@ -195,27 +192,26 @@ namespace NHD.Web.UI.Controllers.Portal
                         catch (Exception ex)
                         {
                             _logger.LogWarning(ex, "Failed to delete old image file: {FilePath}", oldFilePath);
-                            // Continue execution - this is not critical
                         }
                     }
                 }
 
                 return Ok(updated.SectionId);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating section");
 
                 // Clean up newly uploaded file if database operation failed
-                if (dto.ImageFile != null && dto.ImageFile.Length > 0)
+                if (dto?.ImageFile != null && dto.ImageFile.Length > 0)
                 {
                     try
                     {
-                        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
                         var folderPath = Path.Combine("wwwroot/uploads", "sections");
-                        var filePath = Path.Combine(folderPath, fileName);
-                        if (System.IO.File.Exists(filePath))
-                            System.IO.File.Delete(filePath);
+                        var newFilePath = Path.Combine(folderPath, $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}");
+
+                        if (System.IO.File.Exists(newFilePath))
+                            System.IO.File.Delete(newFilePath);
                     }
                     catch (Exception cleanupEx)
                     {
@@ -223,7 +219,7 @@ namespace NHD.Web.UI.Controllers.Portal
                     }
                 }
 
-                return StatusCode(500, "An error occurred while updating the product.");
+                return StatusCode(500, "An error occurred while updating the section.");
             }
         }
 

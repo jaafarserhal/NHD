@@ -175,10 +175,6 @@ export default function UpdateSection() {
             validationErrors.push("Swedish title is required");
         }
 
-        if (!image && !form.ImageFile) {
-            validationErrors.push("Image is required");
-        }
-
         setErrors(validationErrors);
 
         // Scroll to error box if there are validation errors
@@ -356,10 +352,9 @@ export default function UpdateSection() {
                                         accept="image/*"
                                         onChange={handleFileChange}
                                         style={{ marginBottom: '1rem' }}
-                                        required
                                     />
                                     {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
-                                        * Image is required (max size: 1MB)
+                                        * (max size: 1MB)
                                     </Box>}
                                     {preview && (
                                         <Box sx={{ mt: 2 }}>

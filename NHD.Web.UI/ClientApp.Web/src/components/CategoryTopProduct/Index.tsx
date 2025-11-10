@@ -3,9 +3,16 @@ import { ProductsWithGallery } from "../../api/common/Types";
 import homeService from "../../api/homeService";
 import QuickView from "./QuickView";
 
-const CategoryTopProduct: React.FC = () => {
+
+interface CategoryTopProductProps {
+    informativeData: any[];
+}
+
+const CategoryTopProduct: React.FC<CategoryTopProductProps> = ({ informativeData }) => {
     const [data, setData] = useState<ProductsWithGallery[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<ProductsWithGallery | null>(null);
+
+    console.log("Informative Data:", informativeData);
 
     const handleQuickView = (product: ProductsWithGallery) => {
         setSelectedProduct(product);
@@ -48,9 +55,9 @@ const CategoryTopProduct: React.FC = () => {
         <div className="section-padding-01">
             <div className="container">
                 <div className="section-title text-center max-width-720 mx-auto">
-                    <h2 className="section-title__title">LUXURY GIFTS</h2>
+                    <h2 className="section-title__title">{informativeData?.[0]?.titleEn}</h2>
                     <p>
-                        Nulla Lorem mollit cupidatat irure. Laborum magna nulla duis ullamco cillum dolor.
+                        {informativeData?.[0]?.descriptionEn}
                     </p>
                 </div>
 

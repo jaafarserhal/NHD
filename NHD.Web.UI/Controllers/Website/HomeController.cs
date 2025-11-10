@@ -34,22 +34,10 @@ namespace NHD.Web.UI.Website.Controllers
             _datesService = datesService ?? throw new ArgumentNullException(nameof(datesService));
         }
 
-        [HttpGet("HomeSlider")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<SectionViewModel>>>> GetHomeSlider()
+        [HttpGet("Section/{typeId}/{top}")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<SectionViewModel>>>> GetSectionByType(int typeId, int top)
         {
-            var result = await _sectionService.GetHomeSliderSectionsAsync();
-            if (result.IsSuccess)
-            {
-                return Ok(result.Data);
-            }
-            return BadRequest(result.ErrorMessage);
-        }
-
-
-        [HttpGet("HomeCallToActionSection")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<SectionViewModel>>>> GetHomeCallToActionSection()
-        {
-            var result = await _sectionService.GetHomeCallToActionSectionAsync();
+            var result = await _sectionService.GetSectionByTypeAsync(typeId, top);
             if (result.IsSuccess)
             {
                 return Ok(result.Data);

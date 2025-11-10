@@ -6,15 +6,12 @@ class homeService extends apiService {
         super(apiUrls.homepage);
     }
 
-    async getHomeSlider() {
-        return this.get('HomeSlider');
-    }
-    async getSignatureGiftsProducts() {
-        return this.get(`SignatureGiftsProducts`);
+    async getSectionsByType(typeId, top) {
+        return this.get(`Section/${typeId}/${top}`);
     }
 
-    async getCallToActionSection() {
-        return this.get('HomeCallToActionSection');
+    async getSignatureGiftsProducts() {
+        return this.get(`SignatureGiftsProducts`);
     }
 
     async getBrands() {

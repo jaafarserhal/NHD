@@ -26,19 +26,15 @@ namespace NHD.Core.Services.Sections
             _lookupRepository = lookupRepository;
         }
 
-        public async Task<ServiceResult<IEnumerable<SectionViewModel>>> GetHomeSliderSectionsAsync()
+        #region Web Methods
+        public async Task<ServiceResult<IEnumerable<SectionViewModel>>> GetSectionByTypeAsync(int typeId, int top)
         {
-            var sections = await _sectionRepository.GetTopSectionsByTypeAsync(SectionType.HomeSlider.AsInt(), 3);
+            var sections = await _sectionRepository.GetTopSectionsByTypeAsync(typeId, top);
             var sectionDtos = sections.Select(MapToSection).ToList();
             return ServiceResult<IEnumerable<SectionViewModel>>.Success(sectionDtos);
         }
 
-        public async Task<ServiceResult<IEnumerable<SectionViewModel>>> GetHomeCallToActionSectionAsync()
-        {
-            var sections = await _sectionRepository.GetTopSectionsByTypeAsync(SectionType.HomeCallToAction.AsInt(), 1);
-            var sectionDtos = sections.Select(MapToSection).ToList();
-            return ServiceResult<IEnumerable<SectionViewModel>>.Success(sectionDtos);
-        }
+        #endregion Web Methods
 
         public async Task<PagedServiceResult<IEnumerable<SectionViewModel>>> GetSectionsAsync(int page = 1, int limit = 10)
         {

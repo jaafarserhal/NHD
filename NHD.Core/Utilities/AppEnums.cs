@@ -90,9 +90,10 @@ namespace NHD.Core.Utilities
 
     public enum SectionType
     {
-        HomeSlider = 500,
+        HomeCarousel = 500,
         HomeCallToAction = 501,
-        AboutUs = 502
+        HomeGifts = 502,
+        HomeOurProducts = 503
     }
 
 

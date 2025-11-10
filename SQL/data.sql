@@ -46,9 +46,10 @@ VALUES
 (403, 400, 'Shipped', 'Skickad', SYSUTCDATETIME(), 1),
 (404, 400, 'Delivered', 'Levererad', SYSUTCDATETIME(), 1),
 (405, 400, 'Cancelled', 'Avbruten', SYSUTCDATETIME(), 1),
-(500, 500, 'Carousel', 'Carousel', SYSUTCDATETIME(), 1),
-(501, 500, 'Call To Action', 'Call To Action', SYSUTCDATETIME(), 1),
-(502, 500, 'About us', 'Bearbetas', SYSUTCDATETIME(), 1);
+(500, 500, 'Home - Carousel', 'Home - Carousel', SYSUTCDATETIME(), 1),
+(501, 500, 'Home - Call To Action', 'Home - Call To Action', SYSUTCDATETIME(), 1),
+(502, 500, 'Home - Gifts', 'Home - Gifts', SYSUTCDATETIME(), 1),
+(503, 500, 'Home - Our Products', 'Home - Our Products', SYSUTCDATETIME(), 1);
 
 
 
