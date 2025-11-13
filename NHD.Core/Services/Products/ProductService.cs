@@ -96,6 +96,39 @@ namespace NHD.Core.Services.Products
                 return ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Failure("An error occurred while retrieving products by category");
             }
         }
+
+        public async Task<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetHomeProductsByCategoryAsync(int categoryId = 0)
+        {
+            try
+            {
+                var products = await _productRepository.GetHomeProductsByCategoryAsync(categoryId);
+                var productDtos = products.Select(p => new ProductsWithGalleryViewModel()
+                {
+                    Id = p.PrdId,
+                    TitleEn = p.NameEn,
+                    TitleSv = p.NameSv,
+                    DescriptionEn = p.DescriptionEn,
+                    DescriptionSv = p.DescriptionSv,
+                    ImageUrl = $"/uploads/products/{p.ImageUrl}",
+                    FromPrice = p.FromPrice ?? 0,
+                    Type = p.PrdLookupType?.NameEn,
+                    Size = p.PrdLookupSize?.NameEn,
+                    Galleries = p.Galleries != null ? p.Galleries.Select(g => new GalleryViewModel
+                    {
+                        Id = g.GalleryId,
+                        AltText = g.AltText,
+                        ImageUrl = $"/uploads/products/{g.ImageUrl}",
+                    }).ToList() : new List<GalleryViewModel>()
+
+                }).ToList();
+                return ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Success(productDtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving home products by category");
+                return ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Failure("An error occurred while retrieving home products by category");
+            }
+        }
         #endregion Homepage
 
         #region Products

@@ -37,5 +37,7 @@ namespace NHD.Core.Services.Products
         Task<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetProductsByCategoryAsync(int categoryId, bool isCarousel, int take);
 
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetActiveCollectionsAsync();
+
+        Task<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetHomeProductsByCategoryAsync(int categoryId = 0);
     }
 }

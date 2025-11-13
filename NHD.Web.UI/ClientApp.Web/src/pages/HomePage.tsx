@@ -9,6 +9,7 @@ import Brands from '../components/Brands/Index';
 import Collections from '../components/Collections/Index';
 import homeService from '../api/homeService';
 import { SectionType } from '../api/common/Enums';
+import OurProducts from '../components/OurProducts/Index';
 
 
 const HomePage: React.FC = () => {
@@ -17,18 +18,26 @@ const HomePage: React.FC = () => {
     React.useEffect(() => {
         const fetchData = async () => {
             try {
-                const [callToActionData, carouselData, giftData] = await Promise.all([
-                    homeService.getSectionsByType(SectionType.HomeCallToAction, 1),
+                const [carouselData, giftProductData, homeGiftIntro, callToActionData, homeProductsInformative, homeProductsCategories, homeProductsData] = await Promise.all([
                     homeService.getSectionsByType(SectionType.HomeCarousel, 3),
-                    homeService.getSectionsByType(SectionType.HomeGifts, 1)
+                    homeService.getSignatureGiftsProducts(),
+                    homeService.getSectionsByType(SectionType.HomeGifts, 1),
+                    homeService.getSectionsByType(SectionType.HomeCallToAction, 1),
+                    homeService.getSectionsByType(SectionType.HomeOurProducts, 1),
+                    homeService.getCategories(),
+                    homeService.getHomeProductsByCategory(0),
 
                 ]);
 
                 // Combine or store both responses as needed
                 setHomeData({
-                    callToAction: callToActionData,
                     carousel: carouselData,
-                    gifts: giftData
+                    giftProducts: giftProductData,
+                    giftIntro: homeGiftIntro,
+                    callToAction: callToActionData,
+                    homeProductsInformative: homeProductsInformative,
+                    homeProductsCategories: homeProductsCategories,
+                    homeProducts: homeProductsData
                 });
             } catch (error) {
                 console.error("Error fetching home page data:", error);
@@ -43,10 +52,11 @@ const HomePage: React.FC = () => {
         <>
             <Header />
             <Slider sliderData={homeData?.carousel} />
-            <GiftCategory informativeData={homeData?.gifts} />
+            <GiftCategory informativeData={homeData?.giftIntro} products={homeData?.giftProducts} />
             <CallToActionSection callToActionData={homeData?.callToAction} />
             <Brands />
             <Collections />
+            <OurProducts informativeData={homeData?.homeProductsInformative} categories={homeData?.homeProductsCategories} products={homeData?.homeProducts} />
             <HomeContent />
             <Footer />
         </>

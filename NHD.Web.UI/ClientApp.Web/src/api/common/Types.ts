@@ -46,3 +46,9 @@ export interface CollectionItem {
     nameSv: string;
     imageUrl: string;
 }
+
+export interface LookupItem {
+    id: number;
+    nameEn: string;
+    nameSv: string;
+}

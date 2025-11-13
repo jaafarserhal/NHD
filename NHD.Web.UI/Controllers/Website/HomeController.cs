@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using NHD.Core.Common.Models;
 using NHD.Core.Models;
 using NHD.Core.Services.Dates;
+using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Collections;
 using NHD.Core.Services.Model.Dates;
 using NHD.Core.Services.Model.Products;
@@ -71,6 +72,32 @@ namespace NHD.Web.UI.Website.Controllers
         public async Task<ActionResult<ServiceResult<IEnumerable<CollectionViewModel>>>> GetTop4Collections()
         {
             var result = await _datesService.GetTop4CollectionsAsync();
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpGet]
+        [Route("Categories")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<LookupItemDto>>>> GetCategories()
+        {
+            var data = await _productService.GetCategoriesAsync();
+            if (data.IsSuccess)
+            {
+                data.Data = new[] { new LookupItemDto { Id = 0, NameEn = "All", NameSv = "Alla" } }
+                            .Concat(data.Data);
+
+                return Ok(data.Data);
+            }
+            return BadRequest(data);
+        }
+
+        [HttpGet("HomeProducts/{categoryId?}")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>>> GetHomeProductsByCategory(int categoryId = 0)
+        {
+            var result = await _productService.GetHomeProductsByCategoryAsync(categoryId);
             if (result.IsSuccess)
             {
                 return Ok(result.Data);

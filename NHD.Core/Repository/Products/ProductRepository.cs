@@ -7,6 +7,7 @@ using NHD.Core.Common.Models;
 using NHD.Core.Data;
 using NHD.Core.Models;
 using NHD.Core.Repository.Base;
+using NHD.Core.Utilities;
 
 namespace NHD.Core.Repository.Products
 {
@@ -69,6 +70,51 @@ namespace NHD.Core.Repository.Products
                 .OrderByDescending(p => p.CreatedAt)
                 .Take(take)
                 .ToListAsync();
+        }
+        public async Task<IEnumerable<Product>> GetHomeProductsByCategoryAsync(int categoryId = 0)
+        {
+            IQueryable<Product> BuildBaseQuery() => _context.Products
+            .Where(p => p.IsActive == true)
+            .Include(p => p.Galleries)
+            .Include(p => p.PrdLookupType)
+            .Include(p => p.PrdLookupSize)
+            .OrderByDescending(p => p.CreatedAt)
+            .AsQueryable();
+
+            // Specific category — filter and return
+            if (categoryId != 0)
+            {
+                return await BuildBaseQuery()
+                    .Where(p => p.PrdLookupCategoryId == categoryId)
+                    .ToListAsync();
+            }
+
+            // Use BuildBaseQuery for consistency
+            async Task<List<Product>> GetRandomProductsAsync(int catId, int count) =>
+                await BuildBaseQuery()
+                    .Where(p => p.PrdLookupCategoryId == catId)
+                    .OrderBy(p => Guid.NewGuid()) // Randomize
+                    .Take(count)
+                    .ToListAsync();
+
+            var products = new List<Product>();
+
+            // Define which categories to sample from and how many
+            var categorySelections = new (int CategoryId, int Count)[]
+            {
+                (BoxCategoryEnum.SignatureDates.AsInt(), 2),
+                (BoxCategoryEnum.ClassicDatePouches.AsInt(), 2),
+                (BoxCategoryEnum.DateSnacks.AsInt(), 2),
+                (BoxCategoryEnum.SignatureDateGifts.AsInt(), 1),
+                (BoxCategoryEnum.DateSweetners.AsInt(), 1)
+            };
+
+            foreach (var (catId, count) in categorySelections)
+            {
+                products.AddRange(await GetRandomProductsAsync(catId, count));
+            }
+
+            return products;
         }
     }
 }

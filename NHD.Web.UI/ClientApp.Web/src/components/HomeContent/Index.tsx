@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Product } from "../../api/common/Types";
-import Item from "../CategoryTopProduct/Item";
 
 const HomeContent: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -25,7 +24,7 @@ const HomeContent: React.FC = () => {
     return (
         <>
             {/* Product Section Start */}
-            <div className="section-padding-01">
+            {/* <div className="section-padding-01">
                 <div className="container">
                     <div className="section-title text-center max-width-720 mx-auto">
                         <h2 className="section-title__title">OUR PRODUCTS</h2>
@@ -54,7 +53,7 @@ const HomeContent: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* Call to Action Section 2 Start */}
             <div className="call-to-action-02" style={{ backgroundImage: 'url(assets/images/call-to-action-bg-02.jpg)' }}>

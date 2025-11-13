@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import Swiper from "swiper";
-import { Navigation, Thumbs, FreeMode } from "swiper/modules"; // ✅ Correct for v12
+import { Navigation, Thumbs, FreeMode } from "swiper/modules";
 import { ProductsWithGallery } from "../../api/common/Types";
 
 interface QuickViewProps {
@@ -11,18 +11,28 @@ const QuickView: React.FC<QuickViewProps> = ({ product }) => {
     const thumbSwiperRef = useRef<Swiper | null>(null);
     const mainSwiperRef = useRef<Swiper | null>(null);
 
+    // DOM element refs
+    const thumbContainerRef = useRef<HTMLDivElement>(null);
+    const mainContainerRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         if (!product?.galleries || product.galleries.length < 2) return;
 
         const modalElement = document.getElementById("exampleProductModal");
 
         const initializeSwiper = () => {
+            // Check if refs are available
+            if (!thumbContainerRef.current || !mainContainerRef.current) {
+                console.warn("Swiper containers not ready");
+                return;
+            }
+
             // Destroy previous instances if they exist
             thumbSwiperRef.current?.destroy(true, true);
             mainSwiperRef.current?.destroy(true, true);
 
-            // Initialize thumbnails swiper
-            thumbSwiperRef.current = new Swiper(".product-thumb-vertical", {
+            // Initialize thumbnails swiper using ref
+            thumbSwiperRef.current = new Swiper(thumbContainerRef.current, {
                 modules: [FreeMode],
                 direction: "vertical",
                 slidesPerView: 4,
@@ -32,8 +42,8 @@ const QuickView: React.FC<QuickViewProps> = ({ product }) => {
                 slideToClickedSlide: true,
             });
 
-            // Initialize main swiper
-            mainSwiperRef.current = new Swiper(".single-product-vertical-tab", {
+            // Initialize main swiper using ref
+            mainSwiperRef.current = new Swiper(mainContainerRef.current, {
                 modules: [Navigation, Thumbs],
                 spaceBetween: 10,
                 navigation: {
@@ -49,18 +59,25 @@ const QuickView: React.FC<QuickViewProps> = ({ product }) => {
         };
 
         if (modalElement) {
-            modalElement.addEventListener("shown.bs.modal", () => {
-                setTimeout(initializeSwiper, 50); // ensure DOM is ready
-            });
+            const handleModalShown = () => {
+                setTimeout(initializeSwiper, 100);
+            };
 
+            modalElement.addEventListener("shown.bs.modal", handleModalShown);
+
+            // Check if modal is already open
             if (modalElement.classList.contains("show")) {
-                setTimeout(initializeSwiper, 50);
+                setTimeout(initializeSwiper, 100);
             }
-        } else {
-            setTimeout(initializeSwiper, 50);
+
+            // Cleanup
+            return () => {
+                modalElement.removeEventListener("shown.bs.modal", handleModalShown);
+                thumbSwiperRef.current?.destroy(true, true);
+                mainSwiperRef.current?.destroy(true, true);
+            };
         }
 
-        // Cleanup on unmount
         return () => {
             thumbSwiperRef.current?.destroy(true, true);
             mainSwiperRef.current?.destroy(true, true);
@@ -85,7 +102,10 @@ const QuickView: React.FC<QuickViewProps> = ({ product }) => {
                                 <div className="col-lg-6 offset-lg-0 col-md-10 offset-md-1">
                                     <div className="product-details-img d-flex overflow-hidden flex-row">
                                         {/* Main Swiper */}
-                                        <div className="swiper single-product-vertical-tab order-2">
+                                        <div
+                                            ref={mainContainerRef}
+                                            className="swiper single-product-vertical-tab order-2"
+                                        >
                                             <div className="swiper-wrapper">
                                                 {product?.galleries?.map((galleryItem) => (
                                                     <div className="swiper-slide" key={galleryItem.id}>
@@ -97,14 +117,13 @@ const QuickView: React.FC<QuickViewProps> = ({ product }) => {
                                                     </div>
                                                 ))}
                                             </div>
-                                            {/* <div className="swiper-button-next swiper-button-vertical-next" style={{ backgroundColor: "transparent", color: "#BC8157" }}>
-                                            </div>
-                                            <div className="swiper-button-prev swiper-button-vertical-prev" style={{ backgroundColor: "transparent", color: "#BC8157" }}>
-                                            </div> */}
                                         </div>
 
                                         {/* Thumbnails Swiper */}
-                                        <div className="swiper product-thumb-vertical overflow-hidden order-1">
+                                        <div
+                                            ref={thumbContainerRef}
+                                            className="swiper product-thumb-vertical overflow-hidden order-1"
+                                        >
                                             <div className="swiper-wrapper">
                                                 {product?.galleries?.map((galleryItem) => (
                                                     <div
