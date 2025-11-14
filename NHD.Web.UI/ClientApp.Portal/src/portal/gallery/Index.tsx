@@ -22,7 +22,7 @@ import GenericTable from 'src/components/GenericTable/index';
 import ConfirmDialog from 'src/components/ConfirmDialog/Index';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RouterUrls } from 'src/common/RouterUrls';
-import { getImageSrc } from 'src/common/getImageSrc';
+import { getImageSrc } from 'src/common/Utils';
 import { Gallery as GalleryItem } from 'src/portal/models/Types';
 import { PortalToastContainer } from 'src/components/Toaster/Index';
 import PageTitle from 'src/components/PageTitle';
@@ -347,6 +347,10 @@ function Gallery() {
                                                 style={{ marginBottom: '1rem' }}
                                                 required
                                             />
+                                            <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
+                                                * Image Resolution <span style={{ color: "red" }}>{(isProductMode ? "500 x 625" : form.isPrimary ? "192 x 148" : "350 x 350")}</span>
+                                            </Box>
+
                                             {!preview && (
                                                 <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
                                                     * Image is required (max size: 1MB)

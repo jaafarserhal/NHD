@@ -10,6 +10,9 @@ import { useNavigate } from 'react-router-dom';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 import { RouterUrls } from "src/common/RouterUrls";
 import { useApiCall } from "src/api/hooks/useApi";
+import { SectionType } from "src/common/Enums";
+import { set } from "date-fns";
+import { getImageResolutionLabel } from "src/common/Utils";
 
 export default function AddSection() {
 
@@ -29,6 +32,7 @@ export default function AddSection() {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<string[]>([]);
     const errorBoxRef = React.useRef<HTMLDivElement>(null);
+    const [imageResolutionLabel, setImageResolutionLabel] = useState<string>('');
 
     const { data: types, loading: typesLoading } = useApiCall(
         () => sectionsService.getTypes(),
@@ -57,6 +61,10 @@ export default function AddSection() {
             ...prev,
             [name]: value,
         }));
+
+        if (name == "typeId") {
+            setImageResolutionLabel(getImageResolutionLabel(value));
+        }
 
         // Clear validation errors when the user types
         if (errors.length) setErrors([]);
@@ -263,34 +271,6 @@ export default function AddSection() {
                                 </CardContent>
                             </Card>
                         </Grid>
-
-
-                        <Grid item xs={12}>
-                            <Card>
-                                <CardHeader title="Image Upload" />
-                                <Divider />
-                                <CardContent>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleFileChange}
-                                        style={{ marginBottom: '1rem' }}
-                                    />
-                                    {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
-                                        * (max size: 1MB)
-                                    </Box>}
-                                    {preview && (
-                                        <Box sx={{ mt: 2 }}>
-                                            <img
-                                                src={preview}
-                                                alt="Preview"
-                                                style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
-                                            />
-                                        </Box>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </Grid>
                         <Grid item xs={12}>
                             <Card>
                                 <CardHeader title="Section Type" />
@@ -313,6 +293,38 @@ export default function AddSection() {
                                             </option>
                                         ))}
                                     </TextField>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader
+                                    title={
+                                        <>
+                                            Image Upload <span style={{ color: "red" }}>{imageResolutionLabel}</span>
+                                        </>
+                                    }
+                                />
+                                <Divider />
+                                <CardContent>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        style={{ marginBottom: '1rem' }}
+                                    />
+                                    {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
+                                        * (max size: 1MB)
+                                    </Box>}
+                                    {preview && (
+                                        <Box sx={{ mt: 2 }}>
+                                            <img
+                                                src={preview}
+                                                alt="Preview"
+                                                style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
+                                            />
+                                        </Box>
+                                    )}
                                 </CardContent>
                             </Card>
                         </Grid>

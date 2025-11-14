@@ -9,7 +9,8 @@ import PageHeader from '../PageHeader';
 import ConfirmDialog from 'src/components/ConfirmDialog/Index';
 import { useNavigate } from 'react-router-dom';
 import { RouterUrls } from 'src/common/RouterUrls';
-import { getImageSrc } from 'src/common/getImageSrc';
+import { getImageSrc } from 'src/common/Utils';
+
 
 function Collections() {
     const [page, setPage] = useState(0);

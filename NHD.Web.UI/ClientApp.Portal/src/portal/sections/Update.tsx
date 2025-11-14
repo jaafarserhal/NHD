@@ -11,8 +11,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 import { RouterUrls } from "src/common/RouterUrls";
-import { getImageSrc } from "src/common/getImageSrc";
+import { getImageSrc } from 'src/common/Utils';
 import { useApiCall } from "src/api/hooks/useApi";
+import { getImageResolutionLabel } from "src/common/Utils";
 
 export default function UpdateSection() {
     const navigate = useNavigate();
@@ -35,6 +36,7 @@ export default function UpdateSection() {
     const [loadingSection, setLoadingSection] = useState(true);
     const [errors, setErrors] = useState<string[]>([]);
     const errorBoxRef = React.useRef<HTMLDivElement>(null);
+    const [imageResolutionLabel, setImageResolutionLabel] = useState<string>('');
 
     const { data: types, loading: typesLoading } = useApiCall(
         () => sectionsService.getTypes(),
@@ -64,6 +66,9 @@ export default function UpdateSection() {
                 isActive: section.isActive,
                 typeId: section.typeId || 0,
             });
+
+            // Set image resolution label based on typeId
+            setImageResolutionLabel(getImageResolutionLabel(section.typeId?.toString() || ''));
 
             // Set preview to existing image if available
             if (section.imageUrl) {
@@ -158,6 +163,10 @@ export default function UpdateSection() {
             ...prev,
             [name]: value,
         }));
+
+        if (name == "typeId") {
+            setImageResolutionLabel(getImageResolutionLabel(value));
+        }
 
         // Clear validation errors when the user types
         if (errors.length) setErrors([]);
@@ -341,33 +350,6 @@ export default function UpdateSection() {
                                 </CardContent>
                             </Card>
                         </Grid>
-
-                        <Grid item xs={12}>
-                            <Card>
-                                <CardHeader title="Image Upload" />
-                                <Divider />
-                                <CardContent>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleFileChange}
-                                        style={{ marginBottom: '1rem' }}
-                                    />
-                                    {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
-                                        * (max size: 1MB)
-                                    </Box>}
-                                    {preview && (
-                                        <Box sx={{ mt: 2 }}>
-                                            <img
-                                                src={getImageSrc(preview, 'sections')}
-                                                alt="Preview"
-                                                style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
-                                            />
-                                        </Box>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </Grid>
                         <Grid item xs={12}>
                             <Card>
                                 <CardHeader title="Section Type" />
@@ -390,6 +372,38 @@ export default function UpdateSection() {
                                             </option>
                                         ))}
                                     </TextField>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader
+                                    title={
+                                        <>
+                                            Image Upload <span style={{ color: "red" }}>{imageResolutionLabel}</span>
+                                        </>
+                                    }
+                                />
+                                <Divider />
+                                <CardContent>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        style={{ marginBottom: '1rem' }}
+                                    />
+                                    {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
+                                        * (max size: 1MB)
+                                    </Box>}
+                                    {preview && (
+                                        <Box sx={{ mt: 2 }}>
+                                            <img
+                                                src={getImageSrc(preview, 'sections')}
+                                                alt="Preview"
+                                                style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
+                                            />
+                                        </Box>
+                                    )}
                                 </CardContent>
                             </Card>
                         </Grid>

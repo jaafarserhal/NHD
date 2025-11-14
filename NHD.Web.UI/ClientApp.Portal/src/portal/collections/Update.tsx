@@ -11,7 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 import { RouterUrls } from "src/common/RouterUrls";
-import { getImageSrc } from "src/common/getImageSrc";
+import { getImageSrc } from 'src/common/Utils';
 
 export default function UpdateCollection() {
     const navigate = useNavigate();
@@ -332,7 +332,13 @@ export default function UpdateCollection() {
 
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Image Upload" />
+                                <CardHeader
+                                    title={
+                                        <>
+                                            Image Upload <span style={{ color: "red" }}>(960 x 476)</span>
+                                        </>
+                                    }
+                                />
                                 <Divider />
                                 <CardContent>
                                     <input

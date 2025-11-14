@@ -15,7 +15,7 @@ import { BoxCategoryEnum, BoxSizeEnum, BoxTypeEnum } from "src/common/Enums";
 import DatesTable from "src/components/DataTable/Index";
 import ConfirmDialog from "src/components/ConfirmDialog/Index";
 import { RouterUrls } from "src/common/RouterUrls";
-import { getImageSrc } from "src/common/getImageSrc";
+import { getImageSrc } from 'src/common/Utils';
 
 export default function UpdateProduct() {
     const navigate = useNavigate();
@@ -895,7 +895,14 @@ export default function UpdateProduct() {
 
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Image Upload" />
+                                <CardHeader
+                                    title={
+                                        <>
+                                            Image Upload <span style={{ color: "red" }}>(500 x 625)</span>
+                                        </>
+                                    }
+                                />
+
                                 <Divider />
                                 <CardContent>
                                     <input

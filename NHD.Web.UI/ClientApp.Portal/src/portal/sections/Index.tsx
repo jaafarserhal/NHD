@@ -8,7 +8,7 @@ import PageHeader from '../PageHeader';
 import ConfirmDialog from 'src/components/ConfirmDialog/Index';
 import { useNavigate } from 'react-router-dom';
 import { RouterUrls } from 'src/common/RouterUrls';
-import { getImageSrc } from 'src/common/getImageSrc';
+import { getImageSrc } from 'src/common/Utils';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import sectionService from 'src/api/sectionService';
@@ -74,11 +74,7 @@ function Sections() {
         },
         {
             key: 'titleEn',
-            label: 'Title (EN)',
-        },
-        {
-            key: 'titleSv',
-            label: 'Title (SV)'
+            label: 'Title',
         },
         {
             key: 'imageUrl',

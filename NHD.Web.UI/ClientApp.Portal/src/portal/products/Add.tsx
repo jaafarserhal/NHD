@@ -766,7 +766,13 @@ export default function AddProduct() {
                         </Grid>
                         <Grid item xs={12}>
                             <Card>
-                                <CardHeader title="Image Upload" />
+                                <CardHeader
+                                    title={
+                                        <>
+                                            Image Upload <span style={{ color: "red" }}>(500 x 625)</span>
+                                        </>
+                                    }
+                                />
                                 <Divider />
                                 <CardContent>
                                     <input
