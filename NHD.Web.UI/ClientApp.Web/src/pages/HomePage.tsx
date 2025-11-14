@@ -18,16 +18,28 @@ const HomePage: React.FC = () => {
     React.useEffect(() => {
         const fetchData = async () => {
             try {
-                const [carouselData, giftProductData, homeGiftIntro, callToActionData, homeProductsInformative, homeProductsCategories, homeProductsData] = await Promise.all([
-                    homeService.getSectionsByType(SectionType.HomeCarousel, 3),
-                    homeService.getSignatureGiftsProducts(),
-                    homeService.getSectionsByType(SectionType.HomeGifts, 1),
-                    homeService.getSectionsByType(SectionType.HomeCallToAction, 1),
-                    homeService.getSectionsByType(SectionType.HomeOurProducts, 1),
-                    homeService.getCategories(),
-                    homeService.getHomeProductsByCategory(0),
+                const [carouselData,
+                    giftProductData,
+                    homeGiftIntro,
+                    callToActionData,
+                    brandsData,
+                    top4CollectionsData,
+                    homeProductsInformative,
+                    homeProductsCategories,
+                    homeProductsData] =
+                    await Promise.all([
+                        homeService.getSectionsByType(SectionType.HomeCarousel, 3),
+                        homeService.getSignatureGiftsProducts(),
+                        homeService.getSectionsByType(SectionType.HomeGifts, 1),
+                        homeService.getSectionsByType(SectionType.HomeCallToAction, 1),
+                        homeService.getBrands(),
+                        homeService.getTop4Collections(),
+                        homeService.getSectionsByType(SectionType.HomeOurProducts, 1),
+                        homeService.getCategories(),
+                        homeService.getHomeProductsByCategory(0),
 
-                ]);
+
+                    ]);
 
                 // Combine or store both responses as needed
                 setHomeData({
@@ -35,6 +47,8 @@ const HomePage: React.FC = () => {
                     giftProducts: giftProductData,
                     giftIntro: homeGiftIntro,
                     callToAction: callToActionData,
+                    brands: brandsData,
+                    top4Collections: top4CollectionsData,
                     homeProductsInformative: homeProductsInformative,
                     homeProductsCategories: homeProductsCategories,
                     homeProducts: homeProductsData
@@ -54,8 +68,8 @@ const HomePage: React.FC = () => {
             <Slider sliderData={homeData?.carousel} />
             <GiftCategory informativeData={homeData?.giftIntro} products={homeData?.giftProducts} />
             <CallToActionSection callToActionData={homeData?.callToAction} />
-            <Brands />
-            <Collections />
+            <Brands brands={homeData?.brands} />
+            <Collections collections={homeData?.top4Collections} />
             <OurProducts informativeData={homeData?.homeProductsInformative} categories={homeData?.homeProductsCategories} products={homeData?.homeProducts} />
             <HomeContent />
             <Footer />
