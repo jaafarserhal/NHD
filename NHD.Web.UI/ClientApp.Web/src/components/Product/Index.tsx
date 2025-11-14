@@ -5,9 +5,10 @@ interface ProductProps {
     product: ProductsWithGallery;
     onQuickView: (product: ProductsWithGallery) => void;
     isByCategory: boolean;
+    modalId: string;
 }
 //product-item border text-center
-const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory }) => {
+const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, modalId }) => {
     return (
         <div className={isByCategory ? 'col mb-50' : 'col-lg-4 col-md-6'}>
             <div className={`product-item ${isByCategory ? '' : 'border'} text-center`}>
@@ -30,7 +31,7 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory })
                                 data-bs-placement="top"
                                 title="Quick View"
                                 data-bs-toggle="modal"
-                                data-bs-target="#exampleProductModal"
+                                data-bs-target={`#${modalId}`}
                                 onClick={(e) => {
                                     e.preventDefault();
                                     onQuickView(product);

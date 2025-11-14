@@ -5,9 +5,10 @@ import { ProductsWithGallery } from "../../api/common/Types";
 
 interface QuickViewProps {
     product: ProductsWithGallery | null;
+    modalId: string;
 }
 
-const QuickView: React.FC<QuickViewProps> = ({ product }) => {
+const QuickView: React.FC<QuickViewProps> = ({ product, modalId }) => {
     const thumbSwiperRef = useRef<Swiper | null>(null);
     const mainSwiperRef = useRef<Swiper | null>(null);
 
@@ -18,7 +19,7 @@ const QuickView: React.FC<QuickViewProps> = ({ product }) => {
     useEffect(() => {
         if (!product?.galleries || product.galleries.length < 2) return;
 
-        const modalElement = document.getElementById("exampleProductModal");
+        const modalElement = document.getElementById(modalId);
 
         const initializeSwiper = () => {
             // Check if refs are available
@@ -47,8 +48,8 @@ const QuickView: React.FC<QuickViewProps> = ({ product }) => {
                 modules: [Navigation, Thumbs],
                 spaceBetween: 10,
                 navigation: {
-                    nextEl: ".swiper-button-vertical-next",
-                    prevEl: ".swiper-button-vertical-prev",
+                    nextEl: `#${modalId} .swiper-button-vertical-next`,
+                    prevEl: `#${modalId} .swiper-button-vertical-prev`,
                 },
                 thumbs: {
                     swiper: thumbSwiperRef.current,
@@ -82,10 +83,10 @@ const QuickView: React.FC<QuickViewProps> = ({ product }) => {
             thumbSwiperRef.current?.destroy(true, true);
             mainSwiperRef.current?.destroy(true, true);
         };
-    }, [product]);
+    }, [product, modalId]);
 
     return (
-        <div className="quickview-product-modal modal fade" id="exampleProductModal">
+        <div className="quickview-product-modal modal fade" id={modalId}>
             <div className="modal-dialog modal-dialog-centered mw-100">
                 <div className="container">
                     <div className="modal-content">

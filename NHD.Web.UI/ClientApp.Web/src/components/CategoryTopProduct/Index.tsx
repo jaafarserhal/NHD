@@ -26,7 +26,7 @@ const CategoryTopProduct: React.FC<CategoryTopProductProps> = ({
         <div className="section-padding-01">
             <div className="container">
                 <div className="section-title text-center max-width-720 mx-auto">
-                    <h2 className="section-title__title">{informativeData?.[0]?.titleEn}</h2>
+                    <h2 className="section-title__title text-uppercase">{informativeData?.[0]?.titleEn}</h2>
                     <p>
                         {informativeData?.[0]?.descriptionEn}
                     </p>
@@ -34,14 +34,14 @@ const CategoryTopProduct: React.FC<CategoryTopProductProps> = ({
 
                 <div className="row g-6 gx-lg-10">
                     {products.slice(0, 3).map((product) => (
-                        <Product key={product.id} product={product} onQuickView={handleQuickView} isByCategory={true} />
+                        <Product key={product.id} product={product} onQuickView={handleQuickView} isByCategory={true} modalId="categoryProductModal" />
                     ))}
 
                     {products.length === 0 && <p className="text-center">Loading products...</p>}
                 </div>
             </div>
 
-            <QuickView product={selectedProduct} />
+            <QuickView product={selectedProduct} modalId="categoryProductModal" />
         </div>
     );
 };
