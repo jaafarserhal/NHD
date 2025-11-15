@@ -39,5 +39,6 @@ namespace NHD.Core.Services.Products
         Task<ServiceResult<IEnumerable<LookupItemDto>>> GetActiveCollectionsAsync();
 
         Task<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetHomeProductsByCategoryAsync(int categoryId = 0);
+        Task<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetFillDatesProducts();
     }
 }

@@ -97,6 +97,40 @@ namespace NHD.Core.Services.Products
             }
         }
 
+
+        public async Task<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetFillDatesProducts()
+        {
+            try
+            {
+                var products = await _productRepository.GetProductsByTypeAsync(BoxTypeEnum.FilledDate.AsInt(), 3);
+                var productDtos = products.Select(p => new ProductsWithGalleryViewModel()
+                {
+                    Id = p.PrdId,
+                    TitleEn = p.NameEn,
+                    TitleSv = p.NameSv,
+                    DescriptionEn = p.DescriptionEn,
+                    DescriptionSv = p.DescriptionSv,
+                    ImageUrl = $"/uploads/products/{p.ImageUrl}",
+                    FromPrice = p.FromPrice ?? 0,
+                    Type = p.PrdLookupType?.NameEn,
+                    Size = p.PrdLookupSize?.NameEn,
+                    Galleries = p.Galleries != null ? p.Galleries.Where(ga => ga.IsPrimary == false).Select(g => new GalleryViewModel
+                    {
+                        Id = g.GalleryId,
+                        AltText = g.AltText,
+                        ImageUrl = $"/uploads/products/{g.ImageUrl}",
+                    }).ToList() : new List<GalleryViewModel>()
+
+                }).ToList();
+                return ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Success(productDtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving products by category");
+                return ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Failure("An error occurred while retrieving products by category");
+            }
+        }
+
         public async Task<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetHomeProductsByCategoryAsync(int categoryId = 0)
         {
             try
@@ -113,7 +147,7 @@ namespace NHD.Core.Services.Products
                     FromPrice = p.FromPrice ?? 0,
                     Type = p.PrdLookupType?.NameEn,
                     Size = p.PrdLookupSize?.NameEn,
-                    Galleries = p.Galleries != null ? p.Galleries.Select(g => new GalleryViewModel
+                    Galleries = p.Galleries != null ? p.Galleries.Where(ga => ga.IsPrimary == false).Select(g => new GalleryViewModel
                     {
                         Id = g.GalleryId,
                         AltText = g.AltText,

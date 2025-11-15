@@ -132,6 +132,9 @@ export default function AddSection() {
         if (!form.titleSv.trim()) {
             validationErrors.push("Swedish title is required");
         }
+        if (!form.typeId) {
+            validationErrors.push("Type is required");
+        }
 
         setErrors(validationErrors);
 

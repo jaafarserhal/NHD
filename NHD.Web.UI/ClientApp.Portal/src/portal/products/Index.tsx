@@ -82,6 +82,10 @@ function Products() {
             label: 'Category'
         },
         {
+            key: 'type',
+            label: 'Type'
+        },
+        {
             key: 'fromPrice',
             label: 'Price'
         },

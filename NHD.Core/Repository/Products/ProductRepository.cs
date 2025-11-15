@@ -60,6 +60,18 @@ namespace NHD.Core.Repository.Products
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Product>> GetProductsByTypeAsync(int typeId, int take)
+        {
+            return await _context.Products
+                .Where(p => p.PrdLookupTypeId == typeId && p.IsActive == true)
+                .Include(p => p.Galleries)
+                .Include(p => p.PrdLookupCategory)
+                .Include(p => p.PrdLookupSize)
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(take)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId, bool IsCarousel, int take)
         {
             return await _context.Products

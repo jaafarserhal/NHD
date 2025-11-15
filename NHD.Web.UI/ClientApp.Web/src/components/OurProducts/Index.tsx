@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { LookupItem, ProductsWithGallery } from "../../api/common/Types";
 import Product from "../Product/Index";
-import QuickView from "../CategoryTopProduct/QuickView";
+import QuickView from "../QuickView/Index";
 import homeService from "../../api/homeService";
 
 interface OurProductsProps {

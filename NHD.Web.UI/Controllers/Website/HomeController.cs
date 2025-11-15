@@ -104,5 +104,16 @@ namespace NHD.Web.UI.Website.Controllers
             }
             return BadRequest(result.ErrorMessage);
         }
+
+        [HttpGet("FillDatesProducts")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>>> GetFillDatesProducts()
+        {
+            var result = await _productService.GetFillDatesProducts();
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.ErrorMessage);
+        }
     }
 }

@@ -26,6 +26,9 @@ class homeService extends apiService {
     async getHomeProductsByCategory(categoryId = 0) {
         return this.get(`HomeProducts/${categoryId}`);
     }
+    async getFillDatesProducts() {
+        return this.get('FillDatesProducts');
+    }
 }
 
 export default new homeService();

@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { ProductsWithGallery } from "../../api/common/Types";
-import QuickView from "./QuickView";
+import QuickView from "../QuickView/Index";
 import Product from "../Product/Index";
 
 interface CategoryTopProductProps {
     informativeData: any[];
     products: ProductsWithGallery[];
+    modalId: string;
 }
 
 const CategoryTopProduct: React.FC<CategoryTopProductProps> = ({
     informativeData,
-    products
+    products,
+    modalId
 }) => {
     if (!products || products.length === 0) {
         return null; // or a loading indicator / message
@@ -34,14 +36,14 @@ const CategoryTopProduct: React.FC<CategoryTopProductProps> = ({
 
                 <div className="row g-6 gx-lg-10">
                     {products.slice(0, 3).map((product) => (
-                        <Product key={product.id} product={product} onQuickView={handleQuickView} isByCategory={true} modalId="categoryProductModal" />
+                        <Product key={product.id} product={product} onQuickView={handleQuickView} isByCategory={true} modalId={modalId} />
                     ))}
 
                     {products.length === 0 && <p className="text-center">Loading products...</p>}
                 </div>
             </div>
 
-            <QuickView product={selectedProduct} modalId="categoryProductModal" />
+            <QuickView product={selectedProduct} modalId={modalId} />
         </div>
     );
 };

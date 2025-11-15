@@ -49,7 +49,10 @@ VALUES
 (500, 500, 'Home - Carousel', 'Home - Carousel', SYSUTCDATETIME(), 1),
 (501, 500, 'Home - Call To Action', 'Home - Call To Action', SYSUTCDATETIME(), 1),
 (502, 500, 'Home - Gifts', 'Home - Gifts', SYSUTCDATETIME(), 1),
-(503, 500, 'Home - Our Products', 'Home - Our Products', SYSUTCDATETIME(), 1);
+(503, 500, 'Home - Our Products', 'Home - Our Products', SYSUTCDATETIME(), 1),
+(504, 500, 'Home - Custom Gifts', 'Home - Our Products', SYSUTCDATETIME(), 1),
+(505, 500, 'Home - Subscribe', 'Home - Our Products', SYSUTCDATETIME(), 1),
+(506, 500, 'Home - Fill Dates', 'Home - Fill Dates', SYSUTCDATETIME(), 1);
 
 
 
