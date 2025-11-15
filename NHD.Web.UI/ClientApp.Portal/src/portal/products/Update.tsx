@@ -84,6 +84,8 @@ export default function UpdateProduct() {
         nameSv: "",
         descriptionEn: "",
         descriptionSv: "",
+        badgeTextEn: "",
+        badgeTextSv: "",
         fromPrice: 0,
         isActive: true,
         isCarousel: false,
@@ -121,6 +123,8 @@ export default function UpdateProduct() {
                 nameSv: product.nameSv || "",
                 descriptionEn: product.descriptionEn || "",
                 descriptionSv: product.descriptionSv || "",
+                badgeTextEn: product.badgeTextEn || "",
+                badgeTextSv: product.badgeTextSv || "",
                 fromPrice: product.fromPrice || 0,
                 isActive: product.isActive,
                 isCarousel: product.isCarousel,
@@ -438,6 +442,8 @@ export default function UpdateProduct() {
                 nameSv: form.nameSv,
                 descriptionEn: form.descriptionEn,
                 descriptionSv: form.descriptionSv,
+                badgeTextEn: form.badgeTextEn,
+                badgeTextSv: form.badgeTextSv,
                 fromPrice: form.fromPrice,
                 isActive: form.isActive,
                 isCarousel: false,
@@ -609,7 +615,7 @@ export default function UpdateProduct() {
                                         <TextField
                                             required
                                             name="nameEn"
-                                            label="English Name"
+                                            label="Name (English)"
                                             value={form.nameEn}
                                             onChange={handleChange}
                                             variant="standard"
@@ -617,15 +623,24 @@ export default function UpdateProduct() {
                                         />
                                         <Box sx={{ m: 1 }}>
                                             <Editor
-                                                label="English Description"
+                                                label="Description (English)"
                                                 value={form.descriptionEn}
                                                 onChange={(content) => handleEditorChange('descriptionEn', content)}
                                             />
                                         </Box>
                                         <TextField
                                             required
+                                            name="badgeTextEn"
+                                            label="Badge (English)"
+                                            value={form.badgeTextEn}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                        <TextField
+                                            required
                                             name="nameSv"
-                                            label="Swedish Name"
+                                            label="Name (Swedish)"
                                             value={form.nameSv}
                                             onChange={handleChange}
                                             variant="standard"
@@ -633,11 +648,20 @@ export default function UpdateProduct() {
                                         />
                                         <Box sx={{ m: 1 }}>
                                             <Editor
-                                                label="Swedish Description"
+                                                label="Description (Swedish)"
                                                 value={form.descriptionSv}
                                                 onChange={(content) => handleEditorChange('descriptionSv', content)}
                                             />
                                         </Box>
+                                        <TextField
+                                            required
+                                            name="badgeTextSv"
+                                            label="Badge (Swedish)"
+                                            value={form.badgeTextSv}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
                                     </Box>
                                 </CardContent>
                             </Card>

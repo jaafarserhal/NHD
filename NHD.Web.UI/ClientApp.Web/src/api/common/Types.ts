@@ -19,6 +19,8 @@ export interface ProductsWithGallery {
     titleSv: string;
     descriptionEn: string;
     descriptionSv: string;
+    badgeTextEn: string;
+    badgeTextSv: string;
     fromPrice: number;
     imageUrl: string;
     type: string;

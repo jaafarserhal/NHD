@@ -22,6 +22,8 @@ class productService extends apiService {
         formData.append('FromPrice', String(product.fromPrice));
         formData.append('DescriptionEn', product.descriptionEn || '');
         formData.append('DescriptionSv', product.descriptionSv || '');
+        formData.append('BadgeTextEn', product.badgeTextEn || '');
+        formData.append('BadgeTextSv', product.badgeTextSv || '');
         formData.append('IsCarousel', String(product.isCarousel));
         formData.append('IsActive', String(product.isActive));
 
@@ -64,6 +66,8 @@ class productService extends apiService {
         formData.append('FromPrice', String(product.fromPrice));
         formData.append('DescriptionEn', product.descriptionEn || '');
         formData.append('DescriptionSv', product.descriptionSv || '');
+        formData.append('BadgeTextEn', product.badgeTextEn || '');
+        formData.append('BadgeTextSv', product.badgeTextSv || '');
         formData.append('IsActive', String(product.isActive));
         formData.append('IsCarousel', String(product.isCarousel));
 

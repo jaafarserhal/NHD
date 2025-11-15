@@ -449,6 +449,12 @@ public partial class AppDbContext : DbContext
             entity.HasIndex(e => e.PrdLookupTypeId, "IX_product_type");
 
             entity.Property(e => e.PrdId).HasColumnName("prd_id");
+            entity.Property(e => e.BadgeEn)
+                .HasMaxLength(100)
+                .HasColumnName("badge_en");
+            entity.Property(e => e.BadgeSv)
+                .HasMaxLength(100)
+                .HasColumnName("badge_sv");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");

@@ -104,6 +104,8 @@ namespace NHD.Web.UI.Portal.Controllers
                     NameSv = dto.NameSv,
                     DescriptionEn = dto.DescriptionEn,
                     DescriptionSv = dto.DescriptionSv,
+                    BadgeEn = dto.BadgeTextEn,
+                    BadgeSv = dto.BadgeTextSv,
                     FromPrice = dto.FromPrice,
                     IsCarousel = dto.IsCarousel,
                     IsActive = dto.IsActive,
@@ -186,6 +188,8 @@ namespace NHD.Web.UI.Portal.Controllers
                 existingProduct.NameSv = dto.NameSv;
                 existingProduct.DescriptionEn = dto.DescriptionEn;
                 existingProduct.DescriptionSv = dto.DescriptionSv;
+                existingProduct.BadgeEn = dto.BadgeTextEn;
+                existingProduct.BadgeSv = dto.BadgeTextSv;
                 existingProduct.FromPrice = dto.FromPrice;
                 existingProduct.IsCarousel = dto.IsCarousel;
                 existingProduct.IsActive = dto.IsActive;

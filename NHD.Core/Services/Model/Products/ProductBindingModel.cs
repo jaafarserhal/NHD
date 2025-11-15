@@ -18,6 +18,9 @@ namespace NHD.Core.Services.Model.Products
         public int CategoryId { get; set; }
         public int TypeId { get; set; }
         public int SizeId { get; set; }
+
+        public string BadgeTextEn { get; set; }
+        public string BadgeTextSv { get; set; }
         public bool IsCarousel { get; set; }
         public IFormFile ImageUrl { get; set; }
         public bool IsActive { get; set; }

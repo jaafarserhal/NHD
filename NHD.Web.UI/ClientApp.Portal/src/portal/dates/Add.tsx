@@ -189,7 +189,7 @@ export default function AddDate() {
                                         <TextField
                                             required
                                             name="nameEn"
-                                            label="English Name"
+                                            label="Name (English)"
                                             value={form.nameEn}
                                             onChange={handleChange}
                                             variant="standard"
@@ -199,7 +199,7 @@ export default function AddDate() {
                                         <TextField
                                             required
                                             name="nameSv"
-                                            label="Swedish Name"
+                                            label="Name (Swedish)"
                                             value={form.nameSv}
                                             onChange={handleChange}
                                             variant="standard"

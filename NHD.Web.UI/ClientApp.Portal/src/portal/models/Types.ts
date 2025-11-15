@@ -4,6 +4,8 @@ export interface Product {
     nameSv: string;
     descriptionEn: string;
     descriptionSv: string;
+    badgeTextEn: string;
+    badgeTextSv: string;
     fromPrice: number;
     categoryId: number;
     typeId: number;

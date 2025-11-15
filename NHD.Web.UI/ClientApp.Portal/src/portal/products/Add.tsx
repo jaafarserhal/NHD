@@ -51,6 +51,8 @@ export default function AddProduct() {
         nameSv: "",
         descriptionEn: "",
         descriptionSv: "",
+        badgeTextEn: "",
+        badgeTextSv: "",
         fromPrice: 0,
         isActive: true,
         isCarousel: false,
@@ -357,6 +359,8 @@ export default function AddProduct() {
                 nameSv: "",
                 descriptionEn: "",
                 descriptionSv: "",
+                badgeTextEn: "",
+                badgeTextSv: "",
                 fromPrice: 0,
                 isActive: true,
                 isCarousel: false,
@@ -489,7 +493,7 @@ export default function AddProduct() {
                                         <TextField
                                             required
                                             name="nameEn"
-                                            label="English Name"
+                                            label="Name (English)"
                                             value={form.nameEn}
                                             onChange={handleChange}
                                             variant="standard"
@@ -497,15 +501,24 @@ export default function AddProduct() {
                                         />
                                         <Box sx={{ m: 1 }}>
                                             <Editor
-                                                label="English Description"
+                                                label="Description (English)"
                                                 value={form.descriptionEn}
                                                 onChange={(content) => handleEditorChange('descriptionEn', content)}
                                             />
                                         </Box>
                                         <TextField
                                             required
+                                            name="badgeTextEn"
+                                            label="Badge (English)"
+                                            value={form.badgeTextEn}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
+                                        <TextField
+                                            required
                                             name="nameSv"
-                                            label="Swedish Name"
+                                            label="Name (Swedish)"
                                             value={form.nameSv}
                                             onChange={handleChange}
                                             variant="standard"
@@ -513,11 +526,20 @@ export default function AddProduct() {
                                         />
                                         <Box sx={{ m: 1 }}>
                                             <Editor
-                                                label="Swedish Description"
+                                                label="Description (Swedish)"
                                                 value={form.descriptionSv}
                                                 onChange={(content) => handleEditorChange('descriptionSv', content)}
                                             />
                                         </Box>
+                                        <TextField
+                                            required
+                                            name="badgeTextSv"
+                                            label="Badge (Swedish)"
+                                            value={form.badgeTextSv}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                        />
                                     </Box>
                                 </CardContent>
                             </Card>

@@ -220,7 +220,7 @@ export default function AddCollection() {
                                         <TextField
                                             required
                                             name="nameEn"
-                                            label="English Name"
+                                            label="Name (English)"
                                             value={form.nameEn}
                                             onChange={handleChange}
                                             variant="standard"
@@ -228,7 +228,7 @@ export default function AddCollection() {
                                         />
                                         <Box sx={{ m: 1 }}>
                                             <Editor
-                                                label="English Description"
+                                                label="Description (English)"
                                                 value={form.descriptionEn}
                                                 onChange={(content) => handleEditorChange('descriptionEn', content)}
                                             />
@@ -236,7 +236,7 @@ export default function AddCollection() {
                                         <TextField
                                             required
                                             name="nameSv"
-                                            label="Swedish Name"
+                                            label="Name (Swedish)"
                                             value={form.nameSv}
                                             onChange={handleChange}
                                             variant="standard"
@@ -244,7 +244,7 @@ export default function AddCollection() {
                                         />
                                         <Box sx={{ m: 1 }}>
                                             <Editor
-                                                label="Swedish Description"
+                                                label="Description (Swedish)"
                                                 value={form.descriptionSv}
                                                 onChange={(content) => handleEditorChange('descriptionSv', content)}
                                             />

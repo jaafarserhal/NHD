@@ -18,6 +18,8 @@ namespace NHD.Core.Services.Model.Products
         public int TypeId { get; set; }
         public string Size { get; set; }
         public int SizeId { get; set; }
+        public string BadgeTextEn { get; set; }
+        public string BadgeTextSv { get; set; }
         public string ImageUrl { get; set; }
         public decimal FromPrice { get; set; }
 
