@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { LookupItem } from "../../api/common/Types";
+import homeService from "../../api/homeService";
 
 interface FooterProps {
     isDark?: boolean; // Optional prop, defaults to false (light mode)
@@ -7,6 +9,20 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
     const [showScrollTop, setShowScrollTop] = useState(false);
     const [lastScrollTop, setLastScrollTop] = useState(0);
+    const [Categories, setCategories] = useState<LookupItem[]>([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const categories = await homeService.getCategories();
+                setCategories(Array.isArray(categories) ? categories.filter(c => c.id !== 0) : []);
+            } catch (error) {
+                console.error("Failed to fetch categories", error);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -87,10 +103,11 @@ const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
                                         <div className="footer-widget flex-grow-1">
                                             <h4 className="footer-widget__title">Categories</h4>
                                             <ul className="footer-widget__link">
-                                                <li><a href="shop.html">Cupcake</a></li>
-                                                <li><a href="shop.html">Pastry</a></li>
-                                                <li><a href="shop.html">Muffin</a></li>
-                                                <li><a href="shop.html">Waffle</a></li>
+                                                {Categories.map((category) => (
+                                                    <li key={category.id}>
+                                                        <a href="/coming-soon">{category.nameEn}</a>
+                                                    </li>
+                                                ))}
                                             </ul>
                                         </div>
                                         {/* Footer Widget End */}
@@ -99,10 +116,10 @@ const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
                                         <div className="footer-widget flex-grow-1">
                                             <h4 className="footer-widget__title">Services</h4>
                                             <ul className="footer-widget__link">
-                                                <li><a href="contact.html">Delivery</a></li>
-                                                <li><a href="contact.html">Payment</a></li>
-                                                <li><a href="contact.html">Returns</a></li>
-                                                <li><a href="contact.html">Privacy</a></li>
+                                                <li><a href="/coming-soon">Delivery</a></li>
+                                                <li><a href="/coming-soon">Payment</a></li>
+                                                <li><a href="/coming-soon">Returns</a></li>
+                                                <li><a href="/coming-soon">Privacy</a></li>
                                             </ul>
                                         </div>
                                         {/* Footer Widget End */}
@@ -111,10 +128,10 @@ const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
                                         <div className="footer-widget flex-grow-1">
                                             <h4 className="footer-widget__title">Information</h4>
                                             <ul className="footer-widget__link">
-                                                <li><a href="about.html">About Us</a></li>
-                                                <li><a href="contact.html">Contact Us</a></li>
-                                                <li><a href="blog-details.html">Latest Post</a></li>
-                                                <li><a href="about.html">Selling Tips</a></li>
+                                                <li><a href="/about">About Us</a></li>
+                                                <li><a href="/coming-soon">Shop</a></li>
+                                                <li><a href="/coming-soon">Our Dates</a></li>
+                                                <li><a href="/coming-soon">Contact Us</a></li>
                                             </ul>
                                         </div>
                                         {/* Footer Widget End */}
