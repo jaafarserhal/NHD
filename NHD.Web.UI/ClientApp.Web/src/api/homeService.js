@@ -29,6 +29,9 @@ class homeService extends apiService {
     async getFillDatesProducts() {
         return this.get('FillDatesProducts');
     }
+    async subscribeEmail(email) {
+        return this.post(email, 'SubscribeEmail');
+    }
 }
 
 export default new homeService();

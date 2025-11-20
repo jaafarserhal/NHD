@@ -24,6 +24,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<DatesProduct> DatesProducts { get; set; }
 
+    public virtual DbSet<EmailSubscription> EmailSubscriptions { get; set; }
+
     public virtual DbSet<Gallery> Galleries { get; set; }
 
     public virtual DbSet<GenLookup> GenLookups { get; set; }
@@ -208,6 +210,38 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Prd).WithMany(p => p.DatesProducts)
                 .HasForeignKey(d => d.PrdId)
                 .HasConstraintName("FK_dates_product_product");
+        });
+
+        modelBuilder.Entity<EmailSubscription>(entity =>
+        {
+            entity.HasKey(e => e.SubscriptionId).HasName("PK__email_su__863A7EC141F07CC8");
+
+            entity.ToTable("email_subscription");
+
+            entity.HasIndex(e => e.EmailAddress, "UQ__email_su__20C6DFF534CD1B5C").IsUnique();
+
+            entity.Property(e => e.SubscriptionId).HasColumnName("subscription_id");
+            entity.Property(e => e.DateSubscribed)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("date_subscribed");
+            entity.Property(e => e.DateUnsubscribed)
+                .HasColumnType("datetime")
+                .HasColumnName("date_unsubscribed");
+            entity.Property(e => e.EmailAddress)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("email_address");
+            entity.Property(e => e.IpAddress)
+                .HasMaxLength(45)
+                .HasColumnName("ip_address");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.IsUnsubscribed).HasColumnName("is_unsubscribed");
+            entity.Property(e => e.UserAgent)
+                .HasMaxLength(500)
+                .HasColumnName("user_agent");
         });
 
         modelBuilder.Entity<Gallery>(entity =>

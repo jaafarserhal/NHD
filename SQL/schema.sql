@@ -319,6 +319,18 @@ CREATE TABLE dbo.payment_transaction (
         REFERENCES dbo.payment_gateway(payment_gateway_id)
 );
 
+CREATE TABLE email_subscription (
+    subscription_id INT IDENTITY(1,1) PRIMARY KEY,
+    email_address NVARCHAR(255) NOT NULL UNIQUE,
+    is_unsubscribed BIT NOT NULL DEFAULT 0,
+    date_subscribed DATETIME NOT NULL DEFAULT GETDATE(),
+    date_unsubscribed DATETIME NULL,
+    ip_address NVARCHAR(45) NULL,
+    user_agent NVARCHAR(500) NULL,
+	is_active BIT NOT NULL DEFAULT 1,
+);
+
+
 -- =============================================
 -- CREATE INDEXES FOR PERFORMANCE
 -- =============================================

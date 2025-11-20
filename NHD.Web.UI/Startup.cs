@@ -18,6 +18,8 @@ using Microsoft.Extensions.FileProviders;
 using NHD.Core.Services.Sections;
 using NHD.Core.Repository.Sections;
 using NHD.Core.Repository.Collections;
+using NHD.Core.Repository.Subscribe;
+using NHD.Core.Services.Subscribe;
 
 
 namespace NHD.Web.UI
@@ -58,6 +60,7 @@ namespace NHD.Web.UI
             services.AddAuthorization();
             services.AddControllers();
             services.AddEndpointsApiExplorer();
+            services.AddHttpContextAccessor();
 
             services.AddCors(options =>
             {
@@ -176,11 +179,13 @@ namespace NHD.Web.UI
             services.AddScoped<IDateProductsRepository, DateProductsRepository>();
             services.AddScoped<ICollectionRepository, CollectionRepository>();
             services.AddScoped<IProductCollectionRepository, ProductCollectionRepository>();
+            services.AddScoped<IEmailSubscriptionRepository, EmailSubscriptionRepository>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IDatesService, DatesService>();
+            services.AddScoped<IEmailSubscriptionService, EmailSubscriptionService>();
         }
     }
 }

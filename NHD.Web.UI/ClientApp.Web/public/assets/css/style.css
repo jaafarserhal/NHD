@@ -19591,6 +19591,10 @@ only screen and (max-width: 767px) {
   text-transform: uppercase;
 }
 
+.text-red-500 {
+  color: #f56565;
+}
+
 @media only screen and (min-width: 1200px) and (max-width: 1599px),
 only screen and (min-width: 992px) and (max-width: 1199px) {
   .sidebar-right .sidebars {

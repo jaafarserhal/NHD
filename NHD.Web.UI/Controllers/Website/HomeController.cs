@@ -13,6 +13,7 @@ using NHD.Core.Services.Model.Products;
 using NHD.Core.Services.Model.Sections;
 using NHD.Core.Services.Products;
 using NHD.Core.Services.Sections;
+using NHD.Core.Services.Subscribe;
 using NHD.Core.Utilities;
 
 namespace NHD.Web.UI.Website.Controllers
@@ -27,12 +28,15 @@ namespace NHD.Web.UI.Website.Controllers
 
         private readonly IDatesService _datesService;
 
-        public HomeController(ILogger<HomeController> logger, IProductService productService, ISectionService sectionService, IDatesService datesService)
+        private readonly IEmailSubscriptionService _emailSubscriptionService;
+
+        public HomeController(ILogger<HomeController> logger, IProductService productService, ISectionService sectionService, IDatesService datesService, IEmailSubscriptionService emailSubscriptionService)
         {
             _logger = logger;
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
             _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
             _datesService = datesService ?? throw new ArgumentNullException(nameof(datesService));
+            _emailSubscriptionService = emailSubscriptionService ?? throw new ArgumentNullException(nameof(emailSubscriptionService));
         }
 
         [HttpGet("Section/{typeId}/{top}")]
@@ -109,6 +113,18 @@ namespace NHD.Web.UI.Website.Controllers
         public async Task<ActionResult<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>>> GetFillDatesProducts()
         {
             var result = await _productService.GetFillDatesProducts();
+            if (result.IsSuccess)
+            {
+                return Ok(result.Data);
+            }
+            return BadRequest(result.ErrorMessage);
+        }
+
+        [HttpPost("SubscribeEmail")]
+        public async Task<ActionResult<ServiceResult<EmailSubscription>>> SubscribeEmail([FromBody] string email)
+        {
+
+            var result = await _emailSubscriptionService.SubscribeAsync(email);
             if (result.IsSuccess)
             {
                 return Ok(result.Data);
