@@ -13,7 +13,7 @@ const CallToActionSection: React.FC<CallToActionSectionProps> = ({ callToActionD
         <section
             className="call-to-action"
             style={{
-                backgroundImage: `url(${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${section.imageUrl})`,
+                backgroundImage: `url(${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${section.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center center'
             }}
         >
             <div className="container">

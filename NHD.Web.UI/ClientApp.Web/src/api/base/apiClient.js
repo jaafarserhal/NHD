@@ -5,26 +5,14 @@ const apiClient = axios.create({
   timeout: 60000,
 });
 
-// Request interceptor: Add auth token or redirect if missing
+// Request interceptor: add token if it exists
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
 
-    // ✅ Allow login request without token
-    const isLoginRequest = config.url?.includes('/users/login');
-    const isAuthRoute = window.location.pathname.includes('/auth/login');
-
+    // Add Authorization header only if token exists
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    } else if (!isLoginRequest) {
-      // No token and not a login request → redirect
-      if (!isAuthRoute) {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-        window.location.href = '/auth/login';
-      }
-
-      return Promise.reject(new Error('No auth token found'));
     }
 
     if (process.env.NODE_ENV === 'development') {
@@ -36,22 +24,21 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: Handle common errors
+// Response interceptor: do not redirect
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    if (error.response?.status === 401 && !error.config.url?.includes('/users/login')) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      window.location.href = '/auth/login';
+    if (error.response?.status === 401) {
+      // Optional: log but do NOT redirect or remove token
+      console.warn("Unauthorized (401): token missing/expired");
     }
 
     if (error.response?.status === 403) {
-      console.error('Access forbidden');
+      console.warn("Forbidden (403)");
     }
 
     if (!error.response) {
-      console.error('Network error or server is down');
+      console.error("Network error or server unreachable");
     }
 
     return Promise.reject(error);

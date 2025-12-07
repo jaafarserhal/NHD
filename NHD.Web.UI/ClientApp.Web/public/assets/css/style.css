@@ -58,6 +58,29 @@
 /*  01 - 01 Template default CSS
 /*----------------------------------------*/
 /* Common Style */
+
+@font-face {
+  font-family: "salom-regular";
+  src: url("../fonts/salom/salom-regular.woff2") format("woff2"),
+    url("../fonts/salom/salom-regular.woff") format("woff"),
+    url("../fonts/salom/salom-regular.ttf") format("truetype");
+  font-display: swap;
+  unicode-range: U+0041-005A, U+0061-007A;
+  /* recommended for web performance */
+  /* optional: unicode-range: U+000-5FF; */
+}
+
+@font-face {
+  font-family: "salom-semibold";
+  src: url("../fonts/salom/salom-semibold.woff2") format("woff2"),
+    url("../fonts/salom/salom-semibold.woff") format("woff"),
+    url("../fonts/salom/salom-semibold.ttf") format("truetype");
+  font-display: swap;
+  unicode-range: U+0041-005A, U+0061-007A;
+  /* recommended for web performance */
+  /* optional: unicode-range: U+000-5FF; */
+}
+
 *,
 *::after,
 *::before {
@@ -75,7 +98,7 @@ body {
 }
 
 body {
-  font-family: "Inter", sans-serif, Arial, Helvetica, sans-serif;
+  font-family: "salom-regular", sans-serif, Arial, Helvetica, sans-serif;
   font-size: 1rem;
   font-weight: 400;
   font-style: normal;
@@ -93,7 +116,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", serif;
   font-weight: 400;
   line-height: 1.2;
   margin-bottom: 0;
@@ -167,7 +190,7 @@ a:focus {
 
 a:hover {
   text-decoration: none;
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 button,
@@ -576,7 +599,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 .section-title p {
   color: #858585;
   font-size: 19px;
-  font-family: "Montaga", serif;
+  font-family: "salom-regular", serif;
   margin-top: 10px;
   margin-bottom: -5px;
 }
@@ -615,7 +638,7 @@ only screen and (max-width: 767px) {
 .section-title-02__sub-title {
   font-size: 16px;
   font-weight: 700;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   text-transform: uppercase;
   line-height: 1;
   letter-spacing: 1px;
@@ -766,7 +789,7 @@ only screen and (max-width: 767px) {
 
 .section-title-04__sub-title {
   color: #F6F6F6;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 64px;
   font-weight: 700;
   text-transform: uppercase;
@@ -812,7 +835,7 @@ only screen and (max-width: 767px) {
 
 .section-title-04__title {
   color: #212121;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 36px;
   font-weight: 700;
   text-transform: uppercase;
@@ -860,7 +883,7 @@ only screen and (max-width: 767px) {
 
 .section-title-05__title {
   color: #212121;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 30px;
   font-weight: 700;
   text-transform: capitalize;
@@ -924,7 +947,7 @@ only screen and (max-width: 767px) {
   background-color: white;
   font-size: 16px;
   color: #212121;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 500;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -968,7 +991,7 @@ only screen and (max-width: 767px) {
 
 .section-title-06__subtitle {
   color: #212121;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 22px;
   font-weight: 400;
   text-transform: capitalize;
@@ -1055,7 +1078,7 @@ only screen and (max-width: 767px) {
 
 .section-title-07__subtitle {
   color: #F8A969;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 14px;
   font-weight: 400;
   text-transform: uppercase;
@@ -1138,7 +1161,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 
 .section-title-09__subtitle {
   color: #FF9457;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
@@ -1147,7 +1170,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 }
 
 .section-title-09__title {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 64px;
   font-weight: 400;
   text-transform: uppercase;
@@ -1194,7 +1217,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
   text-transform: uppercase;
   line-height: 60px;
   font-size: 16px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 600;
   height: auto;
   text-align: center;
@@ -1254,8 +1277,8 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .section-title-10__subtitle {
-  color: #BC8157;
-  font-family: "Inter", sans-serif;
+  color: #DAAC00;
+  font-family: "salom-regular", sans-serif;
   font-size: 16px;
   font-weight: 400;
   text-transform: capitalize;
@@ -1264,7 +1287,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .section-title-10__title {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 36px;
   font-weight: 400;
   text-transform: uppercase;
@@ -1441,7 +1464,7 @@ only screen and (max-width: 767px) {
 }
 
 .more-btn_two {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 14px;
   font-weight: 400;
   text-transform: uppercase;
@@ -1572,7 +1595,7 @@ only screen and (max-width: 767px) {
   width: 100%;
   cursor: pointer;
   pointer-events: all;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   color: white;
   top: 0;
   font-size: 20px;
@@ -1581,7 +1604,7 @@ only screen and (max-width: 767px) {
 
 .quickview-product-modal .custom-content .btn-close:hover {
   background: #212121;
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .quickview-product-modal .custom-content .btn-close:focus {
@@ -1606,7 +1629,7 @@ only screen and (max-width: 767px) {
   width: 40px;
   height: 40px;
   cursor: pointer;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   -webkit-transition: 0.3s;
   transition: 0.3s;
   border: 1px solid #adb5bd;
@@ -1616,7 +1639,7 @@ only screen and (max-width: 767px) {
 
 .scroll-top:hover {
   background-color: #212121;
-  border: 1px solid #BC8157;
+  border: 1px solid #DAAC00;
 }
 
 .scroll-top:hover i {
@@ -1680,7 +1703,7 @@ only screen and (max-width: 767px) {
 }
 
 .btn {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
@@ -1726,7 +1749,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 
 .btn-arrow {
   font-size: 37px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   height: 52px;
   width: 120px;
   font-weight: 400;
@@ -1783,16 +1806,16 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .btn-primary {
-  background-color: #BC8157;
-  border-color: #BC8157;
+  background-color: #DAAC00;
+  border-color: #DAAC00;
   color: #fff;
 }
 
 .btn-primary:focus,
 .btn-primary:active,
 .btn-primary:hover {
-  background-color: #BC8157;
-  border-color: #BC8157;
+  background-color: #DAAC00;
+  border-color: #DAAC00;
   color: #fff;
 }
 
@@ -1897,7 +1920,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 .btn-white {
   background-color: #fff;
   border-color: #fff;
-  color: #BC8157;
+  color: #DAAC00;
   -webkit-box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
 }
@@ -1907,7 +1930,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 .btn-white:hover {
   background-color: #fff;
   border-color: #fff;
-  color: #BC8157;
+  color: #DAAC00;
   -webkit-box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
 }
@@ -1941,14 +1964,14 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .btn-outline-primary {
-  border-color: #BC8157;
-  color: #BC8157;
+  border-color: #DAAC00;
+  color: #DAAC00;
 }
 
 .btn-outline-primary:focus,
 .btn-outline-primary:active,
 .btn-outline-primary:hover {
-  background-color: #BC8157;
+  background-color: #DAAC00;
   color: #fff;
 }
 
@@ -2045,7 +2068,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 
 .btn-outline-white:hover {
   background-color: #fff;
-  color: #BC8157;
+  color: #DAAC00;
   -webkit-box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
 }
@@ -2116,8 +2139,8 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .btn-hover-primary:hover {
-  background-color: #BC8157;
-  border-color: #BC8157;
+  background-color: #DAAC00;
+  border-color: #DAAC00;
   color: #fff;
 }
 
@@ -2170,7 +2193,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 .btn-hover-white:hover {
   background-color: #fff;
   border-color: #fff;
-  color: #BC8157;
+  color: #DAAC00;
   -webkit-box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
 }
@@ -2221,7 +2244,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 
 .form-select:focus,
 .form-control:focus {
-  border-color: #BC8157;
+  border-color: #DAAC00;
   -webkit-box-shadow: none;
   box-shadow: none;
   color: #212121;
@@ -2543,13 +2566,13 @@ only screen and (max-width: 767px) {
 }
 
 .header-primary-menu li:hover>.menu-item-link {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-primary-menu li:hover>.menu-item-link>span::before {
   -webkit-transform: scaleX(1);
   transform: scaleX(1);
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .header-primary-menu li:hover>.sub-menu {
@@ -2626,11 +2649,11 @@ only screen and (max-width: 767px) {
   border-left: 0 solid;
   -webkit-transition: padding 0.2s, border-color 0.2s;
   transition: padding 0.2s, border-color 0.2s;
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-primary-menu .sub-menu li:hover>.sub-item-link {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-primary-menu .sub-menu li:hover>.sub-item-link span::before {
@@ -2676,7 +2699,7 @@ only screen and (max-width: 767px) {
 
 .header-primary-menu .sub-menu-mega .mega-menu-item-title {
   font-size: 18px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 600;
   margin-bottom: 15px;
   padding-left: 10px;
@@ -2790,11 +2813,11 @@ only screen and (max-width: 767px) {
 }
 
 .header-primary-menu-05 li:hover>.menu-item-link {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-primary-menu-05 li:hover>.menu-item-link>span::before {
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .header-primary-menu-05 .sub-menu {
@@ -2802,11 +2825,11 @@ only screen and (max-width: 767px) {
 }
 
 .header-primary-menu-05 .sub-menu li .sub-item-link span::before {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-primary-menu-05 .sub-menu li:hover>.sub-item-link {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-primary-menu-05 .sub-menu.sub-menu-mega {
@@ -2868,7 +2891,7 @@ only screen and (max-width: 767px) {
 }
 
 .header-meta__action li:hover .action {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-meta__action-02 li .action {
@@ -2884,7 +2907,7 @@ only screen and (max-width: 767px) {
 }
 
 .header-meta__action-03 li:hover .action {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-meta__action-04 li .action {
@@ -2905,19 +2928,19 @@ only screen and (max-width: 767px) {
 }
 
 .sticky .header-primary-menu li>.menu-item-link.active {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .sticky .header-primary-menu li>.menu-item-link.active>span::before {
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .sticky .header-primary-menu li:hover>.menu-item-link {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .sticky .header-primary-menu li:hover>.menu-item-link>span::before {
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .sticky .header-primary-menu-02 li>.menu-item-link {
@@ -2925,19 +2948,19 @@ only screen and (max-width: 767px) {
 }
 
 .sticky .header-primary-menu-02 li>.menu-item-link.active {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .sticky .header-primary-menu-02 li>.menu-item-link.active>span::before {
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .sticky .header-primary-menu-02 li:hover>.menu-item-link {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .sticky .header-primary-menu-02 li:hover>.menu-item-link>span::before {
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .sticky .header-meta__action li .action {
@@ -2945,7 +2968,7 @@ only screen and (max-width: 767px) {
 }
 
 .sticky .header-meta__action li:hover .action {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-sticky-02.sticky .header-meta__action li .action {
@@ -2981,19 +3004,19 @@ only screen and (max-width: 767px) {
 }
 
 .header-sticky-03.sticky .header-primary-menu li>.menu-item-link.active {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-sticky-03.sticky .header-primary-menu li>.menu-item-link.active>span::before {
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .header-sticky-03.sticky .header-primary-menu li:hover>.menu-item-link {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-sticky-03.sticky .header-primary-menu li:hover>.menu-item-link>span::before {
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .header-sticky-05 {
@@ -3177,7 +3200,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 
 .hotline-wrapper .hotline i {
   font-size: 32px;
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .hotline-wrapper .hotline-content {
@@ -3205,7 +3228,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 }
 
 .hotline-wrapper .hotline-link:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .hotline-wrapper.offcanvas-hotline {
@@ -3276,7 +3299,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 }
 
 .header-seven-top-left li a:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-seven-top__social .social-item {
@@ -3286,7 +3309,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 }
 
 .header-seven-top__social .social-item:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .header-seven .header-transparent {
@@ -3373,7 +3396,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 
 .mini-cart-item__title {
   font-size: 16px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   color: #555555;
 }
 
@@ -3457,7 +3480,7 @@ only screen and (min-width: 1200px) and (max-width: 1599px) {
 }
 
 .search-popup__close:hover {
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .search-form {
@@ -3613,11 +3636,11 @@ only screen and (max-width: 767px) {
   border-left: 0 solid;
   -webkit-transition: padding 0.2s, border-color 0.2s;
   transition: padding 0.2s, border-color 0.2s;
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .mobile-primary-menu .sub-menu li:hover>.sub-item-link {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .mobile-primary-menu .sub-menu li:hover>.sub-item-link span::before {
@@ -3661,7 +3684,7 @@ only screen and (max-width: 767px) {
 
 .mobile-menu-two li>.menu-item-link {
   font-size: 36px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   text-transform: uppercase;
   font-weight: 700;
 }
@@ -3791,7 +3814,7 @@ only screen and (max-width: 575px) {
 }
 
 .footer-widget__social a:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .footer-widget__title {
@@ -3810,7 +3833,7 @@ only screen and (max-width: 575px) {
 
 .footer-widget__title-02 {
   font-size: 18px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   text-transform: uppercase;
   line-height: 2;
   margin-bottom: 10px;
@@ -3896,7 +3919,7 @@ only screen and (max-width: 575px) {
 }
 
 .dark-footer .footer-widget__social a:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .dark-footer .footer-widget__title {
@@ -3931,7 +3954,7 @@ only screen and (max-width: 575px) {
 }
 
 .dark-footer .footer-widget__btn:hover {
-  background-color: #BC8157;
+  background-color: #DAAC00;
   color: white;
 }
 
@@ -3979,11 +4002,11 @@ only screen and (max-width: 575px) {
 }
 
 .footer-copyright-text a:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .footer-copyright-text i {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .footer-payment {
@@ -4033,7 +4056,7 @@ only screen and (max-width: 575px) {
 
 .dark-footer .footer-copyright-text a {
   text-decoration: underline;
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 /*----------------------------------------*/
@@ -5067,7 +5090,7 @@ only screen and (min-width: 1200px) and (max-width: 1599px) {
 .slider-content-05__title {
   font-size: 60px;
   font-weight: 600;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   line-height: 1;
   z-index: 3;
   position: relative;
@@ -5248,7 +5271,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
   width: 170px;
   line-height: 60px;
   font-size: 16px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-weight: 400;
   height: auto;
 }
@@ -5287,7 +5310,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .slider-content-07__text {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   color: #ffffff;
   font-weight: 400;
   font-size: 14px;
@@ -6090,14 +6113,14 @@ only screen and (max-width: 767px) {
   -webkit-transform: translate(0);
   transform: translate(0);
   cursor: pointer;
-  color: #BC8157;
+  color: #DAAC00;
   width: 40px;
   height: 40px;
   line-height: 36px;
   text-align: center;
   font-weight: 400;
   font-size: 15px;
-  border: 1px solid #BC8157;
+  border: 1px solid #DAAC00;
   border-radius: 20px;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
@@ -6110,7 +6133,7 @@ only screen and (max-width: 767px) {
 
 .slider-arrow .swiper-button-next:hover,
 .slider-arrow .swiper-button-prev:hover {
-  background-color: #BC8157;
+  background-color: #DAAC00;
   color: #fff;
 }
 
@@ -6176,9 +6199,9 @@ only screen and (max-width: 767px) {
 
 .slider-arrow-two .swiper-button-next:hover,
 .slider-arrow-two .swiper-button-prev:hover {
-  background-color: #BC8157;
+  background-color: #DAAC00;
   color: #fff;
-  border-color: #BC8157;
+  border-color: #DAAC00;
 }
 
 .slider-arrow-three {
@@ -6420,10 +6443,10 @@ only screen and (max-width: 767px) {
   position: absolute;
   top: 20px;
   left: -20px;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   color: #fff;
   font-size: 12px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   text-transform: uppercase;
   min-width: 60px;
   text-align: center;
@@ -6568,8 +6591,8 @@ only screen and (max-width: 767px) {
 }
 
 .product-item__meta-action a:hover {
-  background-color: #BC8157;
-  border-color: #BC8157;
+  background-color: #DAAC00;
+  border-color: #DAAC00;
   color: #fff;
 }
 
@@ -6668,8 +6691,8 @@ only screen and (max-width: 767px) {
 }
 
 .product-item__meta-round a:hover {
-  background-color: #BC8157;
-  border-color: #BC8157;
+  background-color: #DAAC00;
+  border-color: #DAAC00;
   color: #fff;
 }
 
@@ -6739,7 +6762,7 @@ only screen and (max-width: 767px) {
 .product-item__price {
   color: #212121;
   font-size: 22px;
-  font-family: "Montaga", serif;
+  font-family: "salom-regular", sans-serif;
   text-transform: uppercase;
   display: block;
   line-height: 1.4;
@@ -6785,13 +6808,13 @@ only screen and (max-width: 767px) {
 }
 
 .product-item.product-item-02 .product-item__title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .product-item.product-item-02 .product-item__price {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
 }
 
 .product-item.product-item-02:hover {
@@ -6820,7 +6843,7 @@ only screen and (max-width: 767px) {
 }
 
 .product-item.product-item-03 .product-item__title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -6835,7 +6858,7 @@ only screen and (max-width: 767px) {
 }
 
 .product-item.product-item-03 .product-item__price {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
 }
 
 .product-item.product-item-03:hover {
@@ -6860,8 +6883,8 @@ only screen and (max-width: 767px) {
 }
 
 .product-item.product-item-05 .product-item__meta a:hover {
-  background-color: #BC8157;
-  border-color: #BC8157;
+  background-color: #DAAC00;
+  border-color: #DAAC00;
 }
 
 .product-item.product-item-05 .product-item__content {
@@ -6870,7 +6893,7 @@ only screen and (max-width: 767px) {
 
 .product-item.product-item-05 .product-item__title {
   font-size: 14px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 700;
   text-transform: uppercase;
   line-height: 1;
@@ -6881,7 +6904,7 @@ only screen and (max-width: 767px) {
 }
 
 .product-item.product-item-05 .product-item__price {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   color: #555555;
   font-size: 16px;
 }
@@ -6895,8 +6918,8 @@ only screen and (max-width: 767px) {
 }
 
 .product-item.product-item-06 .product-item__meta a:hover {
-  background-color: #BC8157;
-  border-color: #BC8157;
+  background-color: #DAAC00;
+  border-color: #DAAC00;
 }
 
 .product-item.product-item-06 .product-item__content {
@@ -6913,7 +6936,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 
 .product-item.product-item-06 .product-item__title {
   font-size: 21px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 600;
   text-transform: uppercase;
   line-height: 1.3;
@@ -6931,7 +6954,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .product-item.product-item-06 .product-item__price {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   color: #555555;
   font-size: 20px;
   margin-bottom: 20px;
@@ -6948,7 +6971,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .product-item.product-item-06 .product-item__btn:hover {
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .product-item.product-item-07 .product-item__image {
@@ -7000,7 +7023,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
   color: #93622b;
   font-size: 26px;
   font-weight: 600;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   line-height: 1.2;
 }
 
@@ -7069,7 +7092,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 
 .product-item.product-item-08 .product-item__title {
   font-size: 24px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-weight: 400;
   text-transform: capitalize;
   line-height: 1.1;
@@ -7333,7 +7356,7 @@ only screen and (max-width: 767px) {
   width: 4px;
   height: 4px;
   border-radius: 50px;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
@@ -7345,7 +7368,7 @@ only screen and (max-width: 767px) {
 }
 
 .product-tab-menu .nav li button.active {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .product-tab-menu .nav li button.active::before {
@@ -7366,7 +7389,7 @@ only screen and (max-width: 767px) {
 
 .product-tab-menu-two .nav li button {
   color: #ffffff;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 20px;
   font-weight: 400;
   text-transform: uppercase;
@@ -7454,7 +7477,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
   text-align: center;
   font-size: 16px;
   color: #fff;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
   border-radius: 50%;
@@ -7518,7 +7541,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
   margin-bottom: 4px;
   font-size: 16px;
   font-weight: 600;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
 }
 
 .product-item-style-01__rating {
@@ -7573,7 +7596,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
   text-align: center;
   font-size: 16px;
   color: #fff;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
   border-radius: 50%;
@@ -7716,7 +7739,7 @@ only screen and (max-width: 767px) {
 
 .featured-product-item__title {
   margin-bottom: 15px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 24px;
   font-weight: 600;
 }
@@ -7843,7 +7866,7 @@ only screen and (max-width: 767px) {
 
 /* Product Item  */
 .product-list__title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 30px;
   font-weight: 700;
   position: relative;
@@ -7904,10 +7927,10 @@ only screen and (max-width: 767px) {
   position: absolute;
   top: 15px;
   left: -12px;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   color: #fff;
   font-size: 12px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   text-transform: uppercase;
   min-width: 60px;
   text-align: center;
@@ -8039,8 +8062,8 @@ only screen and (max-width: 767px) {
 }
 
 .product-list-item__meta-action a:hover {
-  background-color: #BC8157;
-  border-color: #BC8157;
+  background-color: #DAAC00;
+  border-color: #DAAC00;
   color: #fff;
 }
 
@@ -8076,7 +8099,7 @@ only screen and (max-width: 767px) {
 }
 
 .product-list-item__title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -8397,7 +8420,7 @@ only screen and (max-width: 767px) {
   font-size: 40px;
   line-height: 1.2;
   font-weight: 500;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   color: #ee6d2c;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -8543,7 +8566,7 @@ only screen and (max-width: 767px) {
 }
 
 .call-to-action-box {
-  background-color: #2F1E12;
+  background-color: rgba(47, 30, 18, 0.5);
   padding: 70px 60px;
   max-width: 720px;
 }
@@ -8776,7 +8799,7 @@ only screen and (min-width: 1200px) and (max-width: 1599px) {
 
 .call-to-action-02-meta-item a {
   font-size: 20px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -8893,7 +8916,7 @@ only screen and (max-width: 767px) {
   font-size: 22px;
   font-weight: 400;
   text-transform: uppercase;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
 }
 
 @media only screen and (min-width: 1200px) and (max-width: 1599px),
@@ -8919,7 +8942,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 
 .callto-action-03__text {
   color: #ffffff;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 14px;
 }
 
@@ -9002,7 +9025,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 }
 
 .brand-item img {
-  width: 100px;
+  width: 280px;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
@@ -9190,7 +9213,7 @@ only screen and (max-width: 767px) {
 
 .boxbanner-subtitle {
   font-size: 16px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   background-color: white;
   border-radius: 10px;
   color: #212121;
@@ -9259,7 +9282,7 @@ only screen and (max-width: 767px) {
   color: white;
   font-size: 12px;
   font-weight: 700;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   line-height: 0.8;
   -webkit-transition: 0.4s;
   transition: 0.4s;
@@ -9272,7 +9295,7 @@ only screen and (max-width: 767px) {
 }
 
 .boxbanner-btn:hover {
-  background-color: #BC8157;
+  background-color: #DAAC00;
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
@@ -9363,7 +9386,7 @@ only screen and (max-width: 767px) {
 
 .sell-banner_subtitle {
   color: #ffffff;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 24px;
   font-weight: 400;
   text-transform: uppercase;
@@ -9640,7 +9663,7 @@ only screen and (max-width: 767px) {
   margin-right: 50px;
   font-size: 14px;
   font-weight: 600;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
 }
 
 .shop-banner_social li a:hover {
@@ -10208,7 +10231,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 }
 
 .instagram-title__sub-title {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 16px;
 }
 
@@ -10690,7 +10713,7 @@ only screen and (max-width: 767px) {
   height: 58px;
   padding: 0 30px;
   font-size: 22px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   color: #212121;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
@@ -10709,7 +10732,7 @@ only screen and (max-width: 767px) {
 }
 
 .newsletter__btn:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .newsletter-two {
@@ -10781,7 +10804,7 @@ only screen and (max-width: 767px) {
   height: 58px;
   padding: 0 30px;
   font-size: 16px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   color: #212121;
   -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
@@ -10801,7 +10824,7 @@ only screen and (max-width: 767px) {
 }
 
 .newsletter-two__btn:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .newsletter-three {
@@ -10875,7 +10898,7 @@ only screen and (max-width: 767px) {
   padding-right: 80px;
   color: #ffffff;
   font-size: 16px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   height: 58px;
   border: 0;
   width: 100%;
@@ -10941,7 +10964,7 @@ only screen and (max-width: 767px) {
 }
 
 .newsletter-three__btn:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 /*----------------------------------------*/
@@ -11102,7 +11125,7 @@ only screen and (max-width: 575px) {
 }
 
 .features-card-item-02__title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 22px;
   text-transform: uppercase;
   line-height: 1;
@@ -11146,7 +11169,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 
 .hot-product-content-title {
   font-size: 16px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 700;
   text-transform: uppercase;
   line-height: 1em;
@@ -11192,14 +11215,14 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 
 .hot-product-content-item__heading-label {
   color: #212121;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 24px;
   line-height: 1;
 }
 
 .hot-product-content-item__heading-value {
   color: #830E0E;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 16px;
   text-transform: capitalize;
   line-height: 1;
@@ -11503,7 +11526,7 @@ only screen and (max-width: 767px) {
 }
 
 .counter-item__label {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 96px;
   font-weight: 400;
   line-height: 1;
@@ -11724,7 +11747,7 @@ only screen and (max-width: 767px) {
 
 .testimonial-item p {
   color: #858585;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 30px;
 }
 
@@ -11788,7 +11811,7 @@ only screen and (max-width: 767px) {
   font-size: 30px;
   padding: 80px 0 10px;
   color: white;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 700;
   text-transform: capitalize;
   line-height: 1;
@@ -12099,7 +12122,7 @@ only screen and (max-width: 767px) {
 
 .testimonial-three .testimonial-active .swiper-pagination .swiper-pagination-bullet.swiper-pagination-bullet-active {
   opacity: 1;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   -webkit-transform: scale(0.9);
   transform: scale(0.9);
   width: 12px;
@@ -12175,7 +12198,7 @@ only screen and (max-width: 767px) {
 .testimonial-four_author {
   position: relative;
   color: #b1b1b1;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 30px;
   margin-top: 30px;
   display: inline-block;
@@ -12358,7 +12381,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 .testimonial-five_author {
   position: relative;
   color: #ee6d2c;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 20px;
   font-weight: 600;
   margin-top: 30px;
@@ -12649,7 +12672,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 
 .blog-itemtwo__title {
   font-size: 18px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 500;
   margin-bottom: 20px;
   color: #212121;
@@ -12836,7 +12859,7 @@ only screen and (max-width: 767px) {
   -ms-flex-pack: center;
   justify-content: center;
   color: #ffffff;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 13px;
   font-weight: 500;
   -webkit-box-orient: horizontal;
@@ -12848,7 +12871,7 @@ only screen and (max-width: 767px) {
 
 .blog-itemfour__title {
   font-size: 20px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-weight: 400;
   text-transform: uppercase;
   margin-bottom: 20px;
@@ -12969,12 +12992,12 @@ only screen and (max-width: 767px) {
   margin-right: 6px;
   color: #858585;
   font-size: 14px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 500;
 }
 
 .blog-post__meta li a {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .blog-post__meta li a:hover {
@@ -13094,7 +13117,7 @@ only screen and (max-width: 767px) {
   bottom: 0;
   right: 0;
   padding: 20px;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   color: white;
 }
 
@@ -13135,12 +13158,12 @@ only screen and (max-width: 767px) {
   margin-right: 6px;
   color: #858585;
   font-size: 14px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 500;
 }
 
 .blog-post-two__meta li a {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .blog-post-two__meta li a:hover {
@@ -13221,7 +13244,7 @@ only screen and (max-width: 767px) {
 }
 
 .single-blog-title {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 28px;
   margin-bottom: 20px;
   line-height: 1;
@@ -13415,7 +13438,7 @@ only screen and (max-width: 767px) {
 }
 
 .pricing-card__sub-title {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 12px;
   line-height: 10px;
   display: block;
@@ -13481,7 +13504,7 @@ only screen and (max-width: 767px) {
 
 .pricing-card__price-value {
   font-size: 45px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   color: #fff;
   padding-right: 5px;
   line-height: 1.3;
@@ -13499,7 +13522,7 @@ only screen and (max-width: 767px) {
   vertical-align: top;
   display: inline-block;
   font-size: 18px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   line-height: 1;
 }
 
@@ -13659,7 +13682,7 @@ only screen and (max-width: 767px) {
   color: #212121;
   font-size: 15px;
   font-weight: 500;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   text-transform: uppercase;
   line-height: 1;
 }
@@ -13871,7 +13894,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 
 .about-two_subtitle {
   color: #F8A969;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 14px;
   font-weight: 400;
   text-transform: uppercase;
@@ -13918,7 +13941,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 
 .about-two_text {
   color: #ffffff;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 20px;
   max-width: 460px;
   width: 100%;
@@ -13950,7 +13973,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .about-two_more {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 14px;
   font-weight: 400;
   text-transform: uppercase;
@@ -13999,7 +14022,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
   height: 50px;
   left: 40px;
   top: -5px;
-  border: 1px solid #BC8157;
+  border: 1px solid #DAAC00;
   content: "";
   z-index: -2;
   display: block;
@@ -14084,7 +14107,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
   height: 50px;
   right: 20px;
   top: -5px;
-  border: 1px solid #BC8157;
+  border: 1px solid #DAAC00;
   content: "";
   z-index: -2;
   display: block;
@@ -14138,14 +14161,14 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 
 .about-schedule_name {
   font-size: 20px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-weight: 400;
   color: #212121;
 }
 
 .about-schedule_time {
   font-size: 16px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-style: italic;
   color: #858585;
 }
@@ -14329,7 +14352,7 @@ only screen and (max-width: 767px) {
 
 .category-box-item__title {
   font-size: 20px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 700;
   color: #858585;
 }
@@ -14429,7 +14452,7 @@ only screen and (max-width: 767px) {
 }
 
 .category-three_more {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 14px;
   font-weight: 400;
   text-transform: uppercase;
@@ -14943,7 +14966,7 @@ only screen and (max-width: 767px) {
 }
 
 .contact-section2__title {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 36px;
   font-weight: 500;
   text-transform: capitalize;
@@ -14960,7 +14983,7 @@ only screen and (max-width: 767px) {
 }
 
 .contact-section2__text {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 14px;
   color: #858585;
   margin-bottom: 50px;
@@ -14996,7 +15019,7 @@ only screen and (max-width: 767px) {
 }
 
 .contact-section2_list__icon {
-  color: #BC8157;
+  color: #DAAC00;
   margin-right: 10px;
   font-size: 24px;
   height: 70px;
@@ -15024,7 +15047,7 @@ only screen and (max-width: 767px) {
 }
 
 .contact-section2_list__text {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #858585;
@@ -15065,7 +15088,7 @@ only screen and (max-width: 767px) {
 }
 
 .contact-section2_form__title {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 24px;
   font-weight: 500;
   color: #212121;
@@ -15145,7 +15168,7 @@ only screen and (max-width: 767px) {
 }
 
 .contact-section3_form__title {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 36px;
   font-weight: 400;
   text-transform: capitalize;
@@ -15162,7 +15185,7 @@ only screen and (max-width: 767px) {
 }
 
 .contact-section3_form__text {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 14px;
   color: #858585;
   margin-bottom: 50px;
@@ -15234,7 +15257,7 @@ only screen and (max-width: 767px) {
 }
 
 .contact-section3_content__icon {
-  color: #BC8157;
+  color: #DAAC00;
   margin-right: 0px;
   font-size: 40px;
   height: 120px;
@@ -15264,7 +15287,7 @@ only screen and (max-width: 767px) {
 
 .contact-section3_content__title {
   font-size: 20px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 400;
   text-transform: uppercase;
   margin: 40px 0 20px;
@@ -15278,7 +15301,7 @@ only screen and (max-width: 767px) {
 }
 
 .contact-section3_content__text {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #858585;
@@ -15429,7 +15452,7 @@ only screen and (max-width: 767px) {
 .best-service-item__title {
   margin: 15px 0 20px 0;
   color: #FF9D87;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 18px;
   font-weight: 800;
   text-transform: uppercase;
@@ -15532,7 +15555,7 @@ only screen and (max-width: 767px) {
 .event_subtitle {
   font-size: 18px;
   font-weight: 500;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   color: #858585;
   letter-spacing: 3px;
   margin-bottom: 20px;
@@ -15562,7 +15585,7 @@ only screen and (max-width: 767px) {
 }
 
 .event_title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 72px;
   font-weight: 700;
   text-transform: uppercase;
@@ -15607,7 +15630,7 @@ only screen and (max-width: 767px) {
 }
 
 .event_discount {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 36px;
   font-weight: 700;
   text-transform: uppercase;
@@ -15891,7 +15914,7 @@ only screen and (max-width: 767px) {
   -webkit-box-shadow: none;
   box-shadow: none;
   color: #333333;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
 }
 
 .why-choose-content .accordion-button.collapsed {
@@ -15938,7 +15961,7 @@ only screen and (max-width: 767px) {
 
 .why-choose-title {
   color: #333333;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 30px;
   font-weight: 700;
   text-transform: capitalize;
@@ -16044,7 +16067,7 @@ only screen and (max-width: 767px) {
 }
 
 .team-name {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 10px;
@@ -16143,7 +16166,7 @@ only screen and (max-width: 767px) {
   height: 100%;
   width: 100%;
   z-index: 9;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   top: 0;
   left: 0;
   content: "";
@@ -16200,7 +16223,7 @@ only screen and (max-width: 767px) {
 }
 
 .team-2-social li a:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .team-2-content {
@@ -16216,7 +16239,7 @@ only screen and (max-width: 767px) {
 }
 
 .team-2-name {
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   font-size: 24px;
   font-weight: 400;
   margin-bottom: 5px;
@@ -16235,7 +16258,7 @@ only screen and (max-width: 767px) {
 
 .team-2-designation {
   font-size: 12px;
-  color: #BC8157;
+  color: #DAAC00;
   font-weight: 600;
   font-style: italic;
   line-height: 1;
@@ -16267,7 +16290,7 @@ only screen and (max-width: 767px) {
   height: 100%;
   width: 100%;
   z-index: 9;
-  background-color: #BC8157;
+  background-color: #DAAC00;
   top: 0;
   left: 0;
   content: "";
@@ -16307,7 +16330,7 @@ only screen and (max-width: 767px) {
 }
 
 .team-3-social li a {
-  color: #BC8157;
+  color: #DAAC00;
   background-color: transparent;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -16362,7 +16385,7 @@ only screen and (max-width: 767px) {
 }
 
 .team-3-name {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 22px;
   font-weight: 600;
   line-height: 1.2;
@@ -16380,7 +16403,7 @@ only screen and (max-width: 767px) {
 
 .team-3-designation {
   font-size: 12px;
-  color: #BC8157;
+  color: #DAAC00;
   font-weight: 600;
   line-height: 1;
 }
@@ -16487,7 +16510,7 @@ only screen and (max-width: 767px) {
   max-width: 290px;
   color: white;
   font-size: 15px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   padding-right: 70px;
 }
 
@@ -16504,7 +16527,7 @@ only screen and (max-width: 767px) {
   max-width: 200px;
   color: white;
   font-size: 15px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
 }
 
 @media only screen and (min-width: 992px) and (max-width: 1199px),
@@ -16572,7 +16595,7 @@ only screen and (max-width: 767px) {
 
 .breadcrumb_title {
   font-size: 48px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   color: #ffffff;
   margin-bottom: 15px;
 }
@@ -16609,7 +16632,7 @@ only screen and (max-width: 767px) {
   gap: 2px;
   position: relative;
   font-size: 14px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
 }
 
 .breadcrumb_list li:not(:last-child)::after {
@@ -16840,7 +16863,7 @@ only screen and (max-width: 767px) {
 }
 
 .cart-totals-inner .title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 20px;
@@ -16897,7 +16920,7 @@ only screen and (max-width: 767px) {
 
 .cart-product-mobile-remove:hover {
   color: #fff;
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .cart-product-mobile-image {
@@ -16918,7 +16941,7 @@ only screen and (max-width: 767px) {
 
 .cart-product-mobile-title {
   font-size: 16px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 500;
   margin-bottom: 15px;
 }
@@ -17092,7 +17115,7 @@ only screen and (max-width: 767px) {
 }
 
 .select-wrapper select.form-field:focus {
-  border-color: #BC8157;
+  border-color: #DAAC00;
 }
 
 @media only screen and (min-width: 992px) and (max-width: 1199px),
@@ -17177,7 +17200,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .compare-table .table tbody tr td.product-image-title .title:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .compare-table .table tbody tr td.pro-desc p {
@@ -17206,7 +17229,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .compare-table .table tbody tr td.pro-remove button:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 /* --------- Order Tracking --------- */
@@ -17381,7 +17404,7 @@ only screen and (min-width: 992px) and (max-width: 1199px) {
 .product-details-img .single-product-thumb .swiper-button-prev i:hover,
 .product-details-img .single-product-thumb .swiper-button-next i:hover {
   color: #fff;
-  background: #BC8157 !important;
+  background: #DAAC00 !important;
   -webkit-transition: 0.3s;
   transition: 0.3s;
 }
@@ -17416,7 +17439,7 @@ only screen and (max-width: 767px) {
 
 .product-summery .product-head-price {
   font-size: 28px;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   color: #212121;
 }
 
@@ -17429,7 +17452,7 @@ only screen and (max-width: 767px) {
 
 .product-summery .product-title {
   font-size: 30px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 600;
 }
 
@@ -17638,8 +17661,8 @@ only screen and (max-width: 767px) {
 }
 
 .product-summery .product-share a:hover {
-  color: #BC8157;
-  border-color: #BC8157;
+  color: #DAAC00;
+  border-color: #DAAC00;
 }
 
 .product-summery .product-group {
@@ -17660,7 +17683,7 @@ only screen and (max-width: 767px) {
 .product-summery .product-group-content .title {
   font-size: 16px;
   line-height: 1.2;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 500;
 }
 
@@ -17997,7 +18020,7 @@ only screen and (max-width: 767px) {
 
 .single-product-tab .nav-tabs .nav-link::after {
   content: "";
-  border-bottom: 2px solid #BC8157;
+  border-bottom: 2px solid #DAAC00;
   width: 0%;
   bottom: 0;
   left: 0;
@@ -18092,7 +18115,7 @@ only screen and (max-width: 767px) {
 
 .product-desc-title {
   font-size: 36px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 500;
   color: #212121;
   margin-bottom: 20px;
@@ -18140,7 +18163,7 @@ only screen and (max-width: 767px) {
 }
 
 .review-title-date .title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 500;
 }
 
@@ -18154,7 +18177,7 @@ only screen and (max-width: 767px) {
 
 .comments-area .title {
   font-size: 24px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 500;
 }
 
@@ -18179,7 +18202,7 @@ only screen and (max-width: 767px) {
 }
 
 .comments-area_input:focus {
-  border-color: #BC8157;
+  border-color: #DAAC00;
   -webkit-transition: 0.3s;
   transition: 0.3s;
 }
@@ -18196,7 +18219,7 @@ only screen and (max-width: 767px) {
 }
 
 .comments-area_textarea:focus {
-  border-color: #BC8157;
+  border-color: #DAAC00;
   -webkit-transition: 0.3s;
   transition: 0.3s;
 }
@@ -18229,7 +18252,7 @@ only screen and (max-width: 767px) {
 
 .product-accordion .accordion-button {
   font-size: 20px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 600;
   color: #212121;
   padding: 18px 40px 18px 40px;
@@ -18328,7 +18351,7 @@ only screen and (max-width: 767px) {
 
 .my-account-tab-list li a.active {
   color: #fff;
-  background-color: #BC8157;
+  background-color: #DAAC00;
 }
 
 .alert-light {
@@ -18338,7 +18361,7 @@ only screen and (max-width: 767px) {
 
 .myaccount-content.address .title {
   font-size: 24px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 600;
 }
 
@@ -18351,7 +18374,7 @@ only screen and (max-width: 767px) {
 
 .myaccount-content.address .name {
   font-size: 18px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 600;
   margin-bottom: 10px;
 }
@@ -18411,7 +18434,7 @@ only screen and (max-width: 767px) {
 }
 
 .faq-top__title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 700;
   font-size: 48px;
   text-transform: uppercase;
@@ -18482,7 +18505,7 @@ only screen and (max-width: 767px) {
 }
 
 .faq-search__btn:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .faq-head {
@@ -18515,7 +18538,7 @@ only screen and (max-width: 767px) {
 }
 
 .faq-head__title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 30px;
   font-weight: 500;
 }
@@ -18544,7 +18567,7 @@ only screen and (max-width: 767px) {
 }
 
 .faq .accordion-button {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 400;
   font-size: 18px;
   display: -webkit-box;
@@ -18559,7 +18582,7 @@ only screen and (max-width: 767px) {
   -webkit-box-shadow: none;
   box-shadow: none;
   line-height: 1.3;
-  color: #BC8157;
+  color: #DAAC00;
   background-color: white;
   padding: 28px;
 }
@@ -18589,7 +18612,7 @@ only screen and (max-width: 767px) {
 
 .faq .accordion-button i {
   font-size: 12px;
-  color: #BC8157;
+  color: #DAAC00;
   margin-left: 15px;
   -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
@@ -18631,7 +18654,7 @@ only screen and (max-width: 767px) {
 }
 
 .error-content__title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 38px;
   font-weight: 700;
   text-transform: uppercase;
@@ -18777,7 +18800,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .coming-title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 700;
   font-size: 70px;
   text-transform: uppercase;
@@ -18932,7 +18955,7 @@ only screen and (max-width: 767px) {
 }
 
 .coming-social a:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 /* Countdown */
@@ -18964,7 +18987,7 @@ only screen and (max-width: 767px) {
 .coming-wrapper .single-countdown .single-countdown_time {
   font-size: 42px;
   font-weight: 500;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   line-height: 1.6;
   color: #8f8f8f;
   background-color: #ffffff;
@@ -19012,9 +19035,9 @@ only screen and (max-width: 767px) {
 .coming-wrapper .single-countdown .single-countdown_text {
   font-size: 18px;
   font-weight: 700;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   line-height: 1;
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 @media only screen and (min-width: 992px) and (max-width: 1199px),
@@ -19117,7 +19140,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 }
 
 .sidebars_search__btn:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .sidebars_widget {
@@ -19145,7 +19168,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 .sidebars_widget__title {
   font-size: 28px;
   font-weight: 400;
-  font-family: "Montaga", serif;
+  font-family: "salom-semibold", sans-serif;
   margin-bottom: 20px;
   color: #212121;
 }
@@ -19176,7 +19199,7 @@ only screen and (max-width: 767px) {
 
 .sidebars_widget .irs--round .irs-bar {
   height: 5px;
-  background: #BC8157;
+  background: #DAAC00;
   top: 6px;
 }
 
@@ -19218,8 +19241,8 @@ only screen and (max-width: 767px) {
 }
 
 .sidebars_widget .extra-controls_btn:hover {
-  border-color: #BC8157;
-  background-color: #BC8157;
+  border-color: #DAAC00;
+  background-color: #DAAC00;
   color: #ffffff;
   -webkit-transition: 0.4s;
   transition: 0.4s;
@@ -19253,7 +19276,7 @@ only screen and (max-width: 767px) {
   text-align: center;
   font-size: 12px;
   color: #555555;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
 }
 
 .sidebars_widget__category li {
@@ -19277,7 +19300,7 @@ only screen and (max-width: 767px) {
 }
 
 .sidebars_widget__category li a:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .sidebars_widget__product {
@@ -19386,14 +19409,14 @@ only screen and (max-width: 767px) {
 }
 
 .sidebars_widget__post .single-post_content__meta {
-  color: #BC8157;
+  color: #DAAC00;
   font-size: 11px;
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-weight: 500;
 }
 
 .sidebars_widget__post .single-post_content__title {
-  font-family: "Inter", sans-serif;
+  font-family: "salom-regular", sans-serif;
   font-size: 15px;
   font-weight: 500;
   line-height: 1.4;
@@ -19401,7 +19424,7 @@ only screen and (max-width: 767px) {
 }
 
 .sidebars_widget__post .single-post_content__title:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .sidebars_widget__instagram {
@@ -19481,7 +19504,7 @@ only screen and (max-width: 767px) {
 
 .sidebars_widget__instagram .instagram-thumb:hover i {
   opacity: 1;
-  color: #BC8157;
+  color: #DAAC00;
   visibility: visible;
   -webkit-transition: 0.4s;
   transition: 0.4s;
@@ -19503,7 +19526,7 @@ only screen and (max-width: 767px) {
 }
 
 .sidebars_widget__tags li a:hover {
-  color: #BC8157;
+  color: #DAAC00;
 }
 
 .sidebars_widget__banner {
@@ -19551,7 +19574,7 @@ only screen and (max-width: 767px) {
 }
 
 .sidebars_widget__banner .banner-content_title:hover {
-  color: #BC8157;
+  color: #DAAC00;
   -webkit-transition: 0.4s;
   transition: 0.4s;
 }
