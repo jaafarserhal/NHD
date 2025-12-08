@@ -4,5 +4,5 @@ export const routeUrls = {
     comingSoon: '/coming-soon',
     createAccount: '/create-account',
     myAccount: '/my-account',
-    emailVerification: '/email-verfictaion/:email'
+    emailVerification: '/verification',
 };

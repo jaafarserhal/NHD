@@ -5,7 +5,7 @@ import Cart from "./components/Cart/Index";
 import ComingSoon from "./components/ComingSoon/Index";
 import CreateAccount from "./pages/CreateAccount";
 import MyAccount from "./pages/MyAccount";
-import EmailVerification from "./pages/EmailVerfication";
+import EmailVerification from "./pages/EmailVerification";
 import { routeUrls } from "./api/base/routeUrls";
 
 

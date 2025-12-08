@@ -39,7 +39,7 @@ namespace NHD.Core.Services.Customers
                 if (existing != null)
                 {
                     await RollbackTransactionAsync();
-                    return ServiceResult<string>.Failure("Customer already exists");
+                    return ServiceResult<string>.Validate("A customer with this email address already exists.");
                 }
 
                 // 2. Create email verification token

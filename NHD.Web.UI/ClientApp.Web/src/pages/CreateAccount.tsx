@@ -4,9 +4,12 @@ import Header from "../components/layout/Header";
 import authService from "../api/authService";
 import { useNavigate } from "react-router-dom";
 import { routeUrls } from "../api/base/routeUrls";
+import encryptParameter from "../api/common/Utils";
+
 
 export default function CreateAccount() {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const validateEmail = (email: string): boolean => {
@@ -35,6 +38,7 @@ export default function CreateAccount() {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        setLoading(true);
         const form = event.target as HTMLFormElement;
         const formData = new FormData(form);
 
@@ -77,6 +81,7 @@ export default function CreateAccount() {
         // If there are validation errors, show them and stop
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
+            setLoading(false);
             return;
         }
 
@@ -91,9 +96,15 @@ export default function CreateAccount() {
         try {
             await authService.register(data);
             setErrors({});
-            navigate(routeUrls.emailVerification.replace(':email', encodeURIComponent(emailAddress)));
+            setLoading(false);
+            navigate(`${routeUrls.emailVerification}?token=${encryptParameter(emailAddress)}`);
         } catch (error) {
-            console.log('Error creating account. Please try again.');
+            if (error && (error as any).status === 409) {
+                setErrors({ emailAddress: (error as any).data });
+            } else {
+                setErrors({ general: "An error occurred while creating the account. Please try again later." });
+            }
+            setLoading(false);
         }
     };
 
@@ -109,6 +120,12 @@ export default function CreateAccount() {
     };
 
     return (<>
+        {loading && (
+            <div className="loader-brand">
+                <img src="/assets/images/logo-new.png" className="loader-logo" alt="logo" />
+                <div className="loader-ring"></div>
+            </div>
+        )}
         <Header />
         <div className="breadcrumb" style={{ backgroundImage: "url(assets/images/bg/breadcrumb1-bg.jpg)" }}>
         </div>

@@ -1,7 +1,18 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { decryptParameter } from "../api/common/Utils";
 
 const EmailVerification: React.FC = () => {
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const encrypted = params.get("token");
+    let email = "";
+
+    if (encrypted) {
+        email = decryptParameter(encrypted);
+    }
+
+    console.log("Decrypted email:", email);
     return (
         <div className="error">
             <div className="container">

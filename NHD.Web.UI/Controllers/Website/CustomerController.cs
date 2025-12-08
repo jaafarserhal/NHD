@@ -47,6 +47,9 @@ namespace NHD.Web.UI.Controllers.Website
 
                 var result = await _customerService.RegisterCustomerAsync(customer);
 
+                if (!result.IsSuccess && result.Status == HttpStatusCodeEnum.Conflict.AsInt())
+                    return Conflict(result.ErrorMessage);
+
                 if (!result.IsSuccess)
                     return BadRequest(result.ErrorMessage);
 
