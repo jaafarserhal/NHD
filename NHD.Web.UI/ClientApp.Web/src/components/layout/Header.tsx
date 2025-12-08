@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 
 const Header: React.FC = () => {
     const [isSticky, setIsSticky] = useState(false);
+    const [showAccountMenu, setShowAccountMenu] = useState(false);
     const location = useLocation();
 
     useEffect(() => {
@@ -17,8 +18,6 @@ const Header: React.FC = () => {
         };
 
         window.addEventListener('scroll', handleScroll);
-
-        // Cleanup
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
@@ -28,14 +27,16 @@ const Header: React.FC = () => {
         return location.pathname === path;
     };
 
+    const toggleAccountMenu = () => {
+        setShowAccountMenu((prev) => !prev);
+    };
+
     return (
         <>
-            {/* Header Start */}
             <div className={`header-section header-transparent header-sticky ${isSticky ? 'sticky' : ''}`}>
                 <div className="container position-relative">
                     <div className="row align-items-center">
                         <div className="col-lg-3 col-xl-3 col-7">
-                            {/* Header Logo Start */}
                             <div className="header-logo">
                                 <a href="/">
                                     <img
@@ -47,95 +48,69 @@ const Header: React.FC = () => {
                                     />
                                 </a>
                             </div>
-                            {/* Header Logo End */}
                         </div>
 
                         <div className="col-lg-7 col-xl-6 d-none d-lg-block">
-                            {/* Header Menu Start */}
                             <div className="header-menu">
                                 <ul className="header-primary-menu d-flex justify-content-center">
                                     <li>
-                                        <Link
-                                            to="/"
-                                            className={`menu-item-link ${isActive('/') ? 'active' : ''}`}
-                                        >
+                                        <Link to="/" className={`menu-item-link ${isActive('/') ? 'active' : ''}`}>
                                             <span>Home</span>
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link
-                                            to="/about"
-                                            className={`menu-item-link ${isActive('/about') ? 'active' : ''}`}
-                                        >
+                                        <Link to="/about" className={`menu-item-link ${isActive('/about') ? 'active' : ''}`}>
                                             <span>About</span>
                                         </Link>
                                     </li>
-
-                                    <li>
-                                        <a href="/coming-soon" className="menu-item-link">
-                                            <span>Shop</span>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="/coming-soon" className="menu-item-link">
-                                            <span>Our Dates</span>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="/coming-soon" className="menu-item-link">
-                                            <span>Contact</span>
-                                        </a>
-                                    </li>
+                                    <li><a href="/coming-soon" className="menu-item-link"><span>Shop</span></a></li>
+                                    <li><a href="/coming-soon" className="menu-item-link"><span>Our Dates</span></a></li>
+                                    <li><a href="/coming-soon" className="menu-item-link"><span>Contact</span></a></li>
                                 </ul>
                             </div>
-                            {/* Header Menu End */}
                         </div>
 
                         <div className="col-lg-2 col-xl-3 col-5">
-                            {/* Header Meta Start */}
-                            <div className="header-meta">
+                            <div className="header-meta position-relative">
                                 <ul className="header-meta__action d-flex justify-content-end">
-                                    {/* <li>
-                                        <button className="action search-open">
-                                            <i className="lastudioicon-zoom-1" />
-                                        </button>
-                                    </li> */}
                                     <li>
-                                        <button
-                                            className="action"
-                                            data-bs-toggle="offcanvas"
-                                            data-bs-target="#offcanvasCart"
-                                        >
+                                        <button className="action" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart">
                                             <i className="lastudioicon-shopping-cart-2" />
-                                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-                                                3
-                                            </span>
+                                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">3</span>
                                         </button>
                                     </li>
-                                    <li>
-                                        <a className="action" href="shop-account.html">
+
+                                    {/* Account Dropdown */}
+                                    <li className="position-relative">
+                                        <button className="action" onClick={toggleAccountMenu}>
                                             <i className="lastudioicon-single-01-2" />
-                                        </a>
+                                        </button>
+
+                                        {showAccountMenu && (
+                                            <div className="account-dropdown-menu position-absolute end-0 mt-2 p-3 bg-white shadow rounded" style={{ minWidth: '150px', zIndex: 1000 }}>
+                                                <ul className="list-unstyled m-0 p-0">
+                                                    <li className="py-1">
+                                                        <Link to="/my-account" className="dropdown-item">My Account</Link>
+                                                    </li>
+                                                    <li className="py-1">
+                                                        <Link to="/create-account" className="dropdown-item">Create Account</Link>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        )}
                                     </li>
+
                                     <li className="d-lg-none">
-                                        <button
-                                            className="action"
-                                            data-bs-toggle="offcanvas"
-                                            data-bs-target="#offcanvasMenu"
-                                        >
+                                        <button className="action" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
                                             <i className="lastudioicon-menu-8-1" />
                                         </button>
                                     </li>
                                 </ul>
                             </div>
-                            {/* Header Meta End */}
                         </div>
                     </div>
                 </div>
             </div>
-            {/* Header End */}
         </>
     );
 };

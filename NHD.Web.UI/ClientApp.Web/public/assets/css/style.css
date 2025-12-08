@@ -19793,3 +19793,82 @@ only screen and (max-width: 767px) {
     min-width: 100%;
   }
 }
+
+.underlined-header-title {
+  font-size: 1.2rem;
+  border-bottom: 1px solid #e8e8e8;
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+}
+
+.social-text {
+  font-size: 13px;
+  line-height: 16px;
+  margin: 10px auto;
+}
+
+.login-group {
+  display: flex;
+  gap: 15px;
+  /* space between buttons */
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  padding: 11px 12px 11px 45px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-repeat: no-repeat;
+  transition: box-shadow 0.2s ease;
+}
+
+.login-btn:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Replace with your actual icons */
+.apple {
+  background-image: url("../images/apple-social-icon.png");
+  background-size: 20px;
+  background-position: 15px 8px;
+}
+
+.google {
+  background-image: url("../images/google-social-icon.png");
+  background-size: 25px;
+  background-position: 11px 11px;
+}
+
+.login-separator {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.login-separator-line {
+  flex: 1;
+  border-top: 1px solid #ccc;
+}
+
+.login-separator-text {
+  padding: 0 0.75rem;
+  color: #777;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.forgot-password-link {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.forgot-password-link a {
+  text-decoration: underline;
+}
