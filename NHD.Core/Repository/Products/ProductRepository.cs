@@ -114,11 +114,11 @@ namespace NHD.Core.Repository.Products
             // Define which categories to sample from and how many
             var categorySelections = new (int CategoryId, int Count)[]
             {
-                (BoxCategoryEnum.SignatureDates.AsInt(), 2),
-                (BoxCategoryEnum.ClassicDatePouches.AsInt(), 2),
-                (BoxCategoryEnum.DateSnacks.AsInt(), 2),
-                (BoxCategoryEnum.SignatureDateGifts.AsInt(), 1),
-                (BoxCategoryEnum.DateSweetners.AsInt(), 1)
+                (BoxCategoryLookup.SignatureDates.AsInt(), 2),
+                (BoxCategoryLookup.ClassicDatePouches.AsInt(), 2),
+                (BoxCategoryLookup.DateSnacks.AsInt(), 2),
+                (BoxCategoryLookup.SignatureDateGifts.AsInt(), 1),
+                (BoxCategoryLookup.DateSweetners.AsInt(), 1)
             };
 
             foreach (var (catId, count) in categorySelections)

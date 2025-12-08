@@ -224,13 +224,20 @@ CREATE TABLE dbo.customer (
     first_name NVARCHAR(100) NOT NULL,
     last_name NVARCHAR(100) NOT NULL,
     email_address NVARCHAR(150) NOT NULL UNIQUE,
-    password NVARCHAR(255) NULL, -- Guests may have NULL password
+    password NVARCHAR(255) NULL,
     mobile NVARCHAR(50) NULL,
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_customer_created DEFAULT SYSUTCDATETIME(),
     is_active BIT NULL DEFAULT 1,
-    is_guest BIT NOT NULL DEFAULT 0
+    is_guest BIT NOT NULL DEFAULT 0,
+    EmailVerificationToken NVARCHAR(MAX) NULL,
+    EmailVerificationTokenExpires DATETIME2 NULL,
+    status_lookup_id INT NOT NULL,
+    CONSTRAINT FK_customer_status_lookup 
+        FOREIGN KEY (status_lookup_id)
+        REFERENCES dbo.gen_lookup(lookup_id)
 );
+
 
 -- =============================================
 -- ADDRESS

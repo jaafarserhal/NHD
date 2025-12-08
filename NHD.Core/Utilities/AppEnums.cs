@@ -21,10 +21,19 @@ namespace NHD.Core.Utilities
         ProductType = 200,
         ProductSize = 300,
         BoxCategory = 400,
-        SectionType = 500
+        SectionType = 500,
+        CustomerStatus = 600
     }
 
-    public enum ProductSizeEnum
+    public enum CustomerStatusLookup
+    {
+        Pending = 600,
+        Active = 601,
+        InActive = 602,
+        GetCustomer = 603
+    }
+
+    public enum ProductSizeLookup
     {
         Piece_1 = 300,
         Pieces_3 = 301,
@@ -41,7 +50,7 @@ namespace NHD.Core.Utilities
     }
 
 
-    public enum BoxCategoryEnum
+    public enum BoxCategoryLookup
     {
         SignatureDateGifts = 100,
         SignatureDates = 101,
@@ -94,6 +103,7 @@ namespace NHD.Core.Utilities
         HomeCallToAction = 501,
         HomeGifts = 502,
         HomeOurProducts = 503,
+
         HomeCustomeGifts = 504,
         HomeSubscribe = 505,
         HomeFillDates = 506

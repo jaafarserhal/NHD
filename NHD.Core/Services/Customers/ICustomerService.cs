@@ -9,6 +9,8 @@ namespace NHD.Core.Services.Customers
 {
     public interface ICustomerService
     {
-        Task<ServiceResult<Customer>> AddCustomerAsync(Customer customer);
+        Task<ServiceResult<string>> RegisterCustomerAsync(Customer customer);
+        Task<Customer> GetCustomerByVerificationTokenAsync(string token);
+        Task<Customer> UpdateCustomerAsync(Customer customer);
     }
 }

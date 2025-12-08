@@ -1,16 +1,19 @@
 import React, { useState } from "react";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
+import { useNavigate } from 'react-router';
 
 export default function MyAccount() {
     const [loginMethod, setLoginMethod] = useState("otp");
     const [email, setEmail] = useState("");
+    const navigate = useNavigate();
 
     const handleSendOTP = () => {
         console.log("Sending OTP to:", email);
     };
 
     const handleCreateAccount = () => {
+        navigate('/email-verification');
         console.log("Redirecting to create account");
     };
 

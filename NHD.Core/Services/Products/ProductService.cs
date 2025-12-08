@@ -469,7 +469,7 @@ namespace NHD.Core.Services.Products
                     context.Products.Update(product);
                     await SaveChangesAsync();
 
-                    if (product.PrdLookupCategoryId == (int)BoxCategoryEnum.DateSweetners)
+                    if (product.PrdLookupCategoryId == (int)BoxCategoryLookup.DateSweetners)
                     {
                         var existingDatesProducts = await _dateProductsRepository.GetByProductIdAsync(product.PrdId);
                         if (existingDatesProducts.Any())
@@ -557,7 +557,7 @@ namespace NHD.Core.Services.Products
             try
             {
                 var categories = await _lookupRepository.GetProductCategoriesAsync();
-                var categoryDtos = categories.Where(c => c.LookupId != (int)BoxCategoryEnum.ChocolateDates).Select(c => new LookupItemDto
+                var categoryDtos = categories.Where(c => c.LookupId != (int)BoxCategoryLookup.ChocolateDates).Select(c => new LookupItemDto
                 {
                     Id = c.LookupId,
                     NameEn = c.NameEn,

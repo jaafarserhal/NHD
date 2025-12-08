@@ -3,8 +3,10 @@ import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/About";
 import Cart from "./components/Cart/Index";
 import ComingSoon from "./components/ComingSoon/Index";
-import Signup from "./pages/Signup";
+import CreateAccount from "./pages/CreateAccount";
 import MyAccount from "./pages/MyAccount";
+import EmailVerification from "./pages/EmailVerfication";
+import { routeUrls } from "./api/base/routeUrls";
 
 
 const App: React.FC = () => {
@@ -12,11 +14,12 @@ const App: React.FC = () => {
     <Router>
       <Cart />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/coming-soon" element={<ComingSoon />} />
-        <Route path="/create-account" element={<Signup />} />
-        <Route path="/my-account" element={<MyAccount />} />
+        <Route path={routeUrls.home} element={<HomePage />} />
+        <Route path={routeUrls.about} element={<AboutPage />} />
+        <Route path={routeUrls.comingSoon} element={<ComingSoon />} />
+        <Route path={routeUrls.createAccount} element={<CreateAccount />} />
+        <Route path={routeUrls.myAccount} element={<MyAccount />} />
+        <Route path={routeUrls.emailVerification} element={<EmailVerification />} />
       </Routes>
     </Router>
   );

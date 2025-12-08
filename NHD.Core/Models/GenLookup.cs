@@ -17,6 +17,8 @@ public partial class GenLookup
 
     public bool? IsActive { get; set; }
 
+    public virtual ICollection<Customer> Customers { get; set; } = new List<Customer>();
+
     public virtual GenLookupType LookupType { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

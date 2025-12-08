@@ -10,5 +10,6 @@ namespace NHD.Core.Repository.Customers
     public interface ICustomerRepository : IRepository<Customer>
     {
         Task<Customer> GetByEmailAsync(string email);
+        Task<Customer> GetByVerificationTokenAsync(string token);
     }
 }

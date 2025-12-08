@@ -1,0 +1,242 @@
+import React, { useState } from "react";
+import Footer from "../components/layout/Footer";
+import Header from "../components/layout/Header";
+import authService from "../api/authService";
+import { useNavigate } from "react-router-dom";
+import { routeUrls } from "../api/base/routeUrls";
+
+export default function CreateAccount() {
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const navigate = useNavigate();
+
+    const validateEmail = (email: string): boolean => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validatePassword = (password: string): string => {
+        if (password.length < 8) {
+            return "Password must be at least 8 characters long";
+        }
+        if (!/[A-Z]/.test(password)) {
+            return "Password must contain at least one uppercase letter";
+        }
+        if (!/[a-z]/.test(password)) {
+            return "Password must contain at least one lowercase letter";
+        }
+        if (!/[0-9]/.test(password)) {
+            return "Password must contain at least one number";
+        }
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            return "Password must contain at least one special character";
+        }
+        return "";
+    };
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        const form = event.target as HTMLFormElement;
+        const formData = new FormData(form);
+
+        // Reset errors
+        const newErrors: { [key: string]: string } = {};
+
+        // Get form values
+        const firstName = formData.get('firstName') as string;
+        const lastName = formData.get('lastName') as string;
+        const mobile = formData.get('mobile') as string;
+        const emailAddress = formData.get('emailAddress') as string;
+        const password = formData.get('password') as string;
+        const confirmPassword = formData.get('confirmPassword') as string;
+
+        // Validate required fields
+        if (!firstName) newErrors['firstName'] = "First name is required";
+        if (!lastName) newErrors['lastName'] = "Last name is required";
+        if (!mobile) newErrors['mobile'] = "Mobile number is required";
+        if (!emailAddress) {
+            newErrors['emailAddress'] = "Email address is required";
+        } else if (!validateEmail(emailAddress)) {
+            newErrors['emailAddress'] = "Please enter a valid email address";
+        }
+
+        if (!password) {
+            newErrors['password'] = "Password is required";
+        } else {
+            const passwordError = validatePassword(password);
+            if (passwordError) {
+                newErrors['password'] = passwordError;
+            }
+        }
+
+        if (!confirmPassword) {
+            newErrors['confirmPassword'] = "Please confirm your password";
+        } else if (password && confirmPassword !== password) {
+            newErrors['confirmPassword'] = "Passwords do not match";
+        }
+
+        // If there are validation errors, show them and stop
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
+        const data = {
+            firstName,
+            lastName,
+            mobile,
+            emailAddress,
+            password,
+        };
+
+        try {
+            await authService.register(data);
+            setErrors({});
+            navigate(routeUrls.emailVerification.replace(':email', encodeURIComponent(emailAddress)));
+        } catch (error) {
+            console.log('Error creating account. Please try again.');
+        }
+    };
+
+    const handleInputChange = (fieldName: string) => {
+        // Remove error when user starts typing
+        if (errors[fieldName]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[fieldName];
+                return newErrors;
+            });
+        }
+    };
+
+    return (<>
+        <Header />
+        <div className="breadcrumb" style={{ backgroundImage: "url(assets/images/bg/breadcrumb1-bg.jpg)" }}>
+        </div>
+        <div className="section" style={{ padding: '25px 0' }}>
+            <div className="container custom-container">
+                <div className="row g-6 justify-center">
+                    <div className="col-lg-8 col-12">
+                        <h2 className="mb-4">Create New Customer Account</h2>
+                        <div className="myaccount-content account-details">
+                            <div className="account-details-form">
+                                <form onSubmit={handleSubmit} noValidate>
+                                    <div className="row g-4">
+                                        <div className="col-12 mt-1">
+                                            <label htmlFor="firstName">
+                                                First Name <abbr className="required">*</abbr>
+                                            </label>
+                                            <input
+                                                className="form-field"
+                                                type="text"
+                                                id="firstName"
+                                                name="firstName"
+                                                onChange={() => handleInputChange('firstName')}
+                                                style={errors['firstName'] ? { borderColor: 'red' } : {}}
+                                            />
+                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                {errors['firstName'] || '\u00A0'}
+                                            </span>
+                                        </div>
+
+                                        <div className="col-12 mt-1">
+                                            <label htmlFor="lastName">
+                                                Last Name <abbr className="required">*</abbr>
+                                            </label>
+                                            <input
+                                                className="form-field"
+                                                type="text"
+                                                id="lastName"
+                                                name="lastName"
+                                                onChange={() => handleInputChange('lastName')}
+                                                style={errors['lastName'] ? { borderColor: 'red' } : {}}
+                                            />
+                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                {errors['lastName'] || '\u00A0'}
+                                            </span>
+                                        </div>
+
+                                        <div className="col-12 mt-1">
+                                            <label htmlFor="mobile">
+                                                Mobile Number <abbr className="required">*</abbr>
+                                            </label>
+                                            <input
+                                                className="form-field"
+                                                type="tel"
+                                                id="mobile"
+                                                name="mobile"
+                                                onChange={() => handleInputChange('mobile')}
+                                                style={errors['mobile'] ? { borderColor: 'red' } : {}}
+                                            />
+                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                {errors['mobile'] || '\u00A0'}
+                                            </span>
+                                        </div>
+
+                                        <div className="col-12 mt-1">
+                                            <label htmlFor="emailAddress">
+                                                Email Address <abbr className="required">*</abbr>
+                                            </label>
+                                            <input
+                                                className="form-field"
+                                                type="email"
+                                                id="emailAddress"
+                                                name="emailAddress"
+                                                onChange={() => handleInputChange('emailAddress')}
+                                                style={errors['emailAddress'] ? { borderColor: 'red' } : {}}
+                                            />
+                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                {errors['emailAddress'] || '\u00A0'}
+                                            </span>
+                                        </div>
+
+                                        <div className="col-12 mt-1">
+                                            <label htmlFor="password">
+                                                Password <abbr className="required">*</abbr>
+                                            </label>
+                                            <input
+                                                className="form-field"
+                                                type="password"
+                                                id="password"
+                                                name="password"
+                                                onChange={() => handleInputChange('password')}
+                                                style={errors['password'] ? { borderColor: 'red' } : {}}
+                                            />
+                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                {errors['password'] || '\u00A0'}
+                                            </span>
+                                        </div>
+
+                                        <div className="col-12 mt-1">
+                                            <label htmlFor="confirmPassword">
+                                                Confirm Password <abbr className="required">*</abbr>
+                                            </label>
+                                            <input
+                                                className="form-field"
+                                                type="password"
+                                                id="confirmPassword"
+                                                name="confirmPassword"
+                                                onChange={() => handleInputChange('confirmPassword')}
+                                                style={errors['confirmPassword'] ? { borderColor: 'red' } : {}}
+                                            />
+                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                {errors['confirmPassword'] || '\u00A0'}
+                                            </span>
+                                        </div>
+
+                                        <div className="col-12">
+                                            <button className="btn btn-dark btn-primary-hover w-100" type="submit">
+                                                Create An Account
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <Footer isDark={true} />
+    </>
+    );
+}

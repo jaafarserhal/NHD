@@ -152,6 +152,13 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");
+            entity.Property(e => e.ProviderId).HasColumnName("provider_id");
+            entity.Property(e => e.StatusLookupId).HasColumnName("status_lookup_id");
+
+            entity.HasOne(d => d.StatusLookup).WithMany(p => p.Customers)
+                .HasForeignKey(d => d.StatusLookupId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_customer_status_lookup");
         });
 
         modelBuilder.Entity<Date>(entity =>

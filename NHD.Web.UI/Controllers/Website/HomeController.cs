@@ -53,7 +53,7 @@ namespace NHD.Web.UI.Website.Controllers
         [HttpGet("SignatureGiftsProducts")]
         public async Task<ActionResult<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>>> GetProductsByCategory()
         {
-            var result = await _productService.GetProductsByCategoryAsync(BoxCategoryEnum.SignatureDateGifts.AsInt(), false, 3);
+            var result = await _productService.GetProductsByCategoryAsync(BoxCategoryLookup.SignatureDateGifts.AsInt(), false, 3);
             if (result.IsSuccess)
             {
                 return Ok(result.Data);
