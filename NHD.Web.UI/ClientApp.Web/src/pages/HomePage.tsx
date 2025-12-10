@@ -1,6 +1,6 @@
-import React from 'react';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
+import React, { useState } from 'react';
+import Header from '../components/Common/Header/Index';
+import Footer from '../components/Common/Footer/Index';
 import GiftCategory from '../components/CategoryTopProduct/Index';
 import Slider from '../components/Slider/Index';
 import CallToActionSection from '../components/CallToAction/Index';
@@ -11,13 +11,15 @@ import { SectionType } from '../api/common/Enums';
 import OurProducts from '../components/OurProducts/Index';
 import CustomGifts from '../components/CustomGifts/Index';
 import Subscribe from '../components/Subscribe/Index';
+import Loader from '../components/Common/Loader/Index';
 
 
 const HomePage: React.FC = () => {
     const [homeData, setHomeData] = React.useState<any>(null);
-
+    const [loading, setLoading] = useState(false);
     React.useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const [carouselData,
                     giftProductData,
@@ -64,8 +66,10 @@ const HomePage: React.FC = () => {
                     fillDatesProducts: homeFillDatesProducts,
                     homeSubscribe: homeSubscribe
                 });
+                setLoading(false);
             } catch (error) {
                 console.error("Error fetching home page data:", error);
+                setLoading(false);
             }
         };
 
@@ -75,6 +79,7 @@ const HomePage: React.FC = () => {
 
     return (
         <>
+            <Loader loading={loading} />
             <Header />
             <Slider sliderData={homeData?.carousel} />
             <GiftCategory informativeData={homeData?.giftIntro} products={homeData?.giftProducts} modalId="giftProductModal" />

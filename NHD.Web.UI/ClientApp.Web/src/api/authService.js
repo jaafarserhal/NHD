@@ -21,6 +21,11 @@ class authService extends apiService {
         return this.post(userData, apiUrls.registerCustomer);
     }
 
+    // Verify email
+    async verifyEmail(token) {
+        return this.post(token, apiUrls.verifyCustomerEmail);
+    }
+
     // Refresh token
     async refreshToken(token) {
         return this.post({ token }, 'refresh-token');

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import Footer from "../components/layout/Footer";
-import Header from "../components/layout/Header";
-import authService from "../api/authService";
+import Footer from "../../components/Common/Footer/Index";
+import Header from "../../components/Common/Header/Index";
+import authService from "../../api/authService";
 import { useNavigate } from "react-router-dom";
-import { routeUrls } from "../api/base/routeUrls";
-import encryptParameter from "../api/common/Utils";
+import { routeUrls } from "../../api/base/routeUrls";
+import encryptParameter from "../../api/common/Utils";
+import Loader from "../../components/Common/Loader/Index";
 
 
 export default function CreateAccount() {
@@ -97,7 +98,7 @@ export default function CreateAccount() {
             await authService.register(data);
             setErrors({});
             setLoading(false);
-            navigate(`${routeUrls.emailVerification}?token=${encryptParameter(emailAddress)}`);
+            navigate(`${routeUrls.emailVerify}?token=${encryptParameter(emailAddress)}`);
         } catch (error) {
             if (error && (error as any).status === 409) {
                 setErrors({ emailAddress: (error as any).data });
@@ -120,21 +121,16 @@ export default function CreateAccount() {
     };
 
     return (<>
-        {loading && (
-            <div className="loader-brand">
-                <img src="/assets/images/logo-new.png" className="loader-logo" alt="logo" />
-                <div className="loader-ring"></div>
-            </div>
-        )}
+        <Loader loading={loading} />
         <Header />
-        <div className="breadcrumb" style={{ backgroundImage: "url(assets/images/bg/breadcrumb1-bg.jpg)" }}>
+        <div className="breadcrumb" style={{ backgroundImage: "url(/assets/images/bg/breadcrumb1-bg.jpg)" }}>
         </div>
         <div className="section" style={{ padding: '25px 0' }}>
             <div className="container custom-container">
                 <div className="row g-6 justify-center">
                     <div className="col-lg-8 col-12">
                         <h2 className="mb-4">Create New Customer Account</h2>
-                        <div className="myaccount-content account-details">
+                        <div className="myaccount-content account-details" style={{ padding: '20px 0' }}>
                             <div className="account-details-form">
                                 <form onSubmit={handleSubmit} noValidate>
                                     <div className="row g-4">

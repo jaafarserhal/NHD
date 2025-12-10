@@ -1,26 +1,22 @@
 import React, { useState } from "react";
-import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
+import Header from "../../components/Common/Header/Index";
+import Footer from "../../components/Common/Footer/Index";
 import { useNavigate } from 'react-router';
+import { routeUrls } from "../../api/base/routeUrls";
 
 export default function MyAccount() {
-    const [loginMethod, setLoginMethod] = useState("otp");
-    const [email, setEmail] = useState("");
+
     const navigate = useNavigate();
 
-    const handleSendOTP = () => {
-        console.log("Sending OTP to:", email);
-    };
 
     const handleCreateAccount = () => {
-        navigate('/email-verification');
-        console.log("Redirecting to create account");
+        navigate(routeUrls.register);
     };
 
     return (
         <>
             <Header />
-            <div className="breadcrumb" style={{ backgroundImage: "url(assets/images/bg/breadcrumb1-bg.jpg)" }}>
+            <div className="breadcrumb" style={{ backgroundImage: "url(/assets/images/bg/breadcrumb1-bg.jpg)" }}>
             </div>
             <div className="section" style={{ padding: '25px 0' }}>
                 <div className="container custom-container">

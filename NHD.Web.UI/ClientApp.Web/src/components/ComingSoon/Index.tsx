@@ -35,7 +35,7 @@ const ComingSoon: React.FC = () => {
                 </div>
             </div>
             <div
-                className="coming-col coming-bg order-1 order-md-2" style={{ backgroundImage: 'url(assets/images/bg/coming-soon-new.jpg)' }}>
+                className="coming-col coming-bg order-1 order-md-2" style={{ backgroundImage: 'url(/assets/images/bg/coming-soon-new.jpg)' }}>
                 <a href="index.html">
                     <svg
                         className="coming-bg__logo"

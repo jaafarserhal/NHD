@@ -3788,6 +3788,11 @@ only screen and (max-width: 767px) {
   }
 }
 
+.footer-widget__logo img {
+  width: 229px;
+  height: auto;
+}
+
 @media only screen and (min-width: 768px) and (max-width: 991px),
 only screen and (max-width: 575px) {
   .footer-widget__logo img {
@@ -19871,6 +19876,12 @@ only screen and (max-width: 767px) {
 
 .forgot-password-link a {
   text-decoration: underline;
+}
+
+.verification-image {
+  width: 150px;
+  height: auto;
+  margin-bottom: 5px;
 }
 
 .loader-brand {

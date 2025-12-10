@@ -18,7 +18,7 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
                         <img
                             width={500}
                             height={625}
-                            src={`${(process.env.REACT_APP_BASE_URL || "")}${product.imageUrl ?? "assets/images/placeholder.png"}`}
+                            src={`${(process.env.REACT_APP_BASE_URL || "")}${product.imageUrl ?? "/assets/images/placeholder.png"}`}
                             alt={product.titleEn}
                         />
                     </a>
@@ -51,7 +51,7 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
                         ${product.fromPrice?.toFixed(2)}
                     </span>
                     {!isByCategory && <a href={`/product/${product.id}`} className="product-item__arrow">
-                        <img width={40} height={15} src="assets/images/arrow.svg" alt="arrow" />
+                        <img width={40} height={15} src="/assets/images/arrow.svg" alt="arrow" />
                     </a>}
                 </div>
             </div>

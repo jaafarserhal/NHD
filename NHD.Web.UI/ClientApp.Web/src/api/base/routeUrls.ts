@@ -2,7 +2,8 @@ export const routeUrls = {
     home: '/',
     about: '/about',
     comingSoon: '/coming-soon',
-    createAccount: '/create-account',
-    myAccount: '/my-account',
-    emailVerification: '/verification',
+    register: '/auth/register',
+    login: '/auth/login',
+    emailVerify: '/email/verify',
+    emailVerified: '/email/verified',
 };

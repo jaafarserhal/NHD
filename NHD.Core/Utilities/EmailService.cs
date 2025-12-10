@@ -108,7 +108,7 @@ namespace NHD.Core.Utilities
             {
                 var subject = "Verify Your Email Address";
 
-                var verifyUrl = $"{_emailConfig.BaseUrl}/api/customer/verify-email?token={token}";
+                var verifyUrl = $"{_emailConfig.BaseUrl}/email/verified?token={token}";
                 var body = GenerateEmailVerificationBody(verifyUrl);
 
                 return await SendEmailAsync(email, subject, body, true);

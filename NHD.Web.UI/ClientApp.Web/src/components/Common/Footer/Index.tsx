@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { LookupItem } from "../../api/common/Types";
-import homeService from "../../api/homeService";
+import { LookupItem } from "../../../api/common/Types";
+import homeService from "../../../api/homeService";
+import { routeUrls } from "../../../api/base/routeUrls";
+import { Link } from "react-router-dom";
 
 interface FooterProps {
     isDark?: boolean; // Optional prop, defaults to false (light mode)
@@ -78,12 +80,15 @@ const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
                                     {/* Footer Widget Start */}
                                     <div className="footer-widget">
                                         <div className="footer-widget__logo">
-                                            <a className="logo-dark" href="index.html">
-                                                <img src="assets/images/logo.svg" alt="Logo" />
-                                            </a>
-                                            <a className="logo-white d-none" href="index.html">
-                                                <img src="assets/images/logo-white.svg" alt="Logo" />
-                                            </a>
+                                            {isDark ? (
+                                                <Link to={routeUrls.home}>
+                                                    <img src="/assets/images/logo-white.svg" alt="Logo" />
+                                                </Link>
+                                            ) : (
+                                                <Link to={routeUrls.home}>
+                                                    <img src="/assets/images/logo-black.svg" alt="Logo" />
+                                                </Link>
+                                            )}
                                         </div>
                                         <div className="footer-widget__social">
                                             <a href="#/"><i className="lastudioicon-b-facebook"></i></a>

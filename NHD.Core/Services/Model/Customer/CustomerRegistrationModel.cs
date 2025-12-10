@@ -13,7 +13,6 @@ namespace NHD.Core.Services.Model.Customer
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Mobile { get; set; }
-        public string Provider { get; set; } // "local", "google", "apple"
         public string ProviderId { get; set; } // Google sub, Apple sub
         public string EmailVerificationToken { get; set; }
         public DateTime? EmailVerificationTokenExpires { get; set; }

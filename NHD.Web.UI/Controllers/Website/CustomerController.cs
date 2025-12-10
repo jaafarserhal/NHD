@@ -17,12 +17,11 @@ namespace NHD.Web.UI.Controllers.Website
     {
         private readonly ILogger<CustomerController> _logger;
         private readonly ICustomerService _customerService;
-        private readonly IEmailService _emailService;
-        public CustomerController(ILogger<CustomerController> logger, ICustomerService customerService, IEmailService emailService)
+
+        public CustomerController(ILogger<CustomerController> logger, ICustomerService customerService)
         {
             _logger = logger;
             _customerService = customerService;
-            _emailService = emailService;
         }
 
         [HttpPost("Register")]
@@ -61,18 +60,21 @@ namespace NHD.Web.UI.Controllers.Website
                 return StatusCode(500, "An error occurred while adding the customer.");
             }
         }
-        [HttpGet("VerifyEmail")]
-        public async Task<IActionResult> VerifyEmail(string token)
+        [HttpPost("VerifyEmail")]
+        public async Task<IActionResult> VerifyEmail([FromBody] string token)
         {
-            if (string.IsNullOrEmpty(token))
-                return BadRequest("Invalid token");
+            if (string.IsNullOrWhiteSpace(token))
+                return BadRequest("Token is required.");
 
             var customer = await _customerService.GetCustomerByVerificationTokenAsync(token);
 
-            if (customer == null || customer.EmailVerificationTokenExpires < DateTime.UtcNow)
-                return BadRequest("Token is invalid or expired");
+            if (customer == null)
+                return Conflict("Invalid verification token.");
 
-            // Activate the customer
+            if (customer.EmailVerificationTokenExpires <= DateTime.UtcNow)
+                return Conflict("Verification token has expired.");
+
+            // Activate customer
             customer.IsActive = true;
             customer.StatusLookupId = CustomerStatusLookup.Active.AsInt();
             customer.EmailVerificationToken = null;
@@ -80,8 +82,9 @@ namespace NHD.Web.UI.Controllers.Website
 
             await _customerService.UpdateCustomerAsync(customer);
 
-            return Ok("Email verified successfully!");
+            return Ok("Email verified successfully.");
         }
+
 
     }
 }

@@ -20,7 +20,7 @@ const Cart: React.FC = () => {
                                 </a>
                                 <div className="mini-cart-item__thumbnail">
                                     <a href="single-product.html">
-                                        <img width="70" height="88" src={`assets/images/mini-cart/cart-${i}.png`} alt="Cart" />
+                                        <img width="70" height="88" src={`/assets/images/mini-cart/cart-${i}.png`} alt="Cart" />
                                     </a>
                                 </div>
                                 <div className="mini-cart-item__content">

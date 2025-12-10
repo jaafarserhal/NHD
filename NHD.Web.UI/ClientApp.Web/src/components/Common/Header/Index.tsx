@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { routeUrls } from "../../../api/base/routeUrls";
 
 const Header: React.FC = () => {
     const [isSticky, setIsSticky] = useState(false);
@@ -41,7 +42,7 @@ const Header: React.FC = () => {
                                 <a href="/">
                                     <img
                                         className="white-logo"
-                                        src={isSticky ? "assets/images/logo.svg" : "assets/images/logo-white.svg"}
+                                        src={isSticky ? "/assets/images/logo-black.svg" : "/assets/images/logo-white.svg"}
                                         width={229}
                                         height={62}
                                         alt="Logo"
@@ -54,12 +55,12 @@ const Header: React.FC = () => {
                             <div className="header-menu">
                                 <ul className="header-primary-menu d-flex justify-content-center">
                                     <li>
-                                        <Link to="/" className={`menu-item-link ${isActive('/') ? 'active' : ''}`}>
+                                        <Link to={routeUrls.home} className={`menu-item-link ${isActive(routeUrls.home) ? 'active' : ''}`}>
                                             <span>Home</span>
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link to="/about" className={`menu-item-link ${isActive('/about') ? 'active' : ''}`}>
+                                        <Link to={routeUrls.about} className={`menu-item-link ${isActive(routeUrls.about) ? 'active' : ''}`}>
                                             <span>About</span>
                                         </Link>
                                     </li>
@@ -90,10 +91,10 @@ const Header: React.FC = () => {
                                             <div className="account-dropdown-menu position-absolute end-0 mt-2 p-3 bg-white shadow rounded" style={{ minWidth: '150px', zIndex: 1000 }}>
                                                 <ul className="list-unstyled m-0 p-0">
                                                     <li className="py-1">
-                                                        <Link to="/my-account" className="dropdown-item">My Account</Link>
+                                                        <Link to={routeUrls.login} className="dropdown-item">My Account</Link>
                                                     </li>
                                                     <li className="py-1">
-                                                        <Link to="/create-account" className="dropdown-item">Create Account</Link>
+                                                        <Link to={routeUrls.register} className="dropdown-item">Create Account</Link>
                                                     </li>
                                                 </ul>
                                             </div>
