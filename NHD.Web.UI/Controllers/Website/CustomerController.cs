@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using NHD.Core.Common.Models;
@@ -125,6 +126,45 @@ namespace NHD.Web.UI.Controllers.Website
             return Ok("Email verified successfully.");
         }
 
+        [HttpGet("Info")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            try
+            {
+                // Extract email from JWT token claims
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized(new { message = "Invalid token" });
+                }
+
+                // Fetch user details from database
+                var customer = await _customerService.GetCustomerByEmailAsync(email);
+
+                if (customer == null || customer.StatusCode != HttpStatusCodeEnum.OK.AsInt())
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                var customerResponse = new CustomerInfoModel
+                {
+                    Email = customer.Data.EmailAddress,
+                    FirstName = customer.Data.FirstName,
+                    LastName = customer.Data.LastName,
+                    Mobile = customer.Data.Mobile
+                };
+
+                return Ok(customerResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving current user");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred" });
+            }
+        }
+
         private string GenerateJwtToken(string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -132,10 +172,10 @@ namespace NHD.Web.UI.Controllers.Website
 
             var claims = new ClaimsIdentity(new[]
             {
-        new Claim(ClaimTypes.Name, email),
-        new Claim(ClaimTypes.Email, email),
-        // Add more claims as needed
-    });
+                new Claim(ClaimTypes.Name, email),
+                new Claim(ClaimTypes.Email, email),
+                // Add more claims as needed
+            });
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

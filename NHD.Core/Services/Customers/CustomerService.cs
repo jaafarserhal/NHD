@@ -98,6 +98,31 @@ namespace NHD.Core.Services.Customers
             }
         }
 
+        public async Task<AppApiResponse<Customer>> GetCustomerByEmailAsync(string email)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    return AppApiResponse<Customer>.Failure("Email cannot be empty", HttpStatusCodeEnum.BadRequest);
+                }
+
+                var customer = await _customerRepository.GetByUsernameAsync(email);
+
+                if (customer == null)
+                {
+                    return AppApiResponse<Customer>.Failure("Customer not found", HttpStatusCodeEnum.NotFound);
+                }
+
+                return AppApiResponse<Customer>.Success(customer, "Customer retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving customer by email");
+                return AppApiResponse<Customer>.Failure("Failed to retrieve customer");
+            }
+        }
+
         public async Task<Customer> GetCustomerByVerificationTokenAsync(string token)
         {
             return await _customerRepository.GetByVerificationTokenAsync(token);

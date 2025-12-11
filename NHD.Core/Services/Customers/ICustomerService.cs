@@ -13,5 +13,6 @@ namespace NHD.Core.Services.Customers
         Task<AppApiResponse<Customer>> LoginAsync(string email, string password);
         Task<Customer> GetCustomerByVerificationTokenAsync(string token);
         Task<Customer> UpdateCustomerAsync(Customer customer);
+        Task<AppApiResponse<Customer>> GetCustomerByEmailAsync(string email);
     }
 }

@@ -19893,6 +19893,19 @@ only screen and (max-width: 767px) {
   color: #DAAC00;
 }
 
+.underlined-link {
+  text-decoration: underline;
+}
+
+.account-info-link {
+  font-size: .775rem;
+}
+
+.h6-title {
+  font-family: "salom-semibold", serif;
+  font-size: 1.2rem;
+}
+
 .loader-brand {
   position: fixed;
   top: 0;

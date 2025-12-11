@@ -1,8 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Common/Header/Index";
 import Footer from "../components/Common/Footer/Index";
+import authService from "../api/authService";
 
 const MyAccount: React.FC = () => {
+    const [customerInfo, setCustomerInfo] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchCustomerInfo = async () => {
+            try {
+                const info = await authService.getCustomerInfo();
+                setCustomerInfo(info);
+            } catch (error) {
+                console.error("Failed to fetch customer info", error);
+            }
+        };
+
+        fetchCustomerInfo();
+    }, []);
     return (
         <>
             <Header />
@@ -18,7 +33,7 @@ const MyAccount: React.FC = () => {
                 {/* Breadcrumb Section End */}
 
                 {/* My Account Section Start */}
-                <div className="section section-padding-03">
+                <div className="section" style={{ padding: '25px 0', position: 'relative' }}>
                     <div className="container custom-container">
                         <div className="row g-lg-10 g-6">
                             {/* My Account Tab List Start */}
@@ -26,7 +41,7 @@ const MyAccount: React.FC = () => {
                                 <ul className="my-account-tab-list nav flex-column" id="accountTab" role="tablist">
                                     <li className="nav-item">
                                         <a className="nav-link active" id="account-info-tab" data-bs-toggle="tab" href="#account-info" role="tab">
-                                            <i className="dlicon users_single-01"></i> Account Details
+                                            <i className="dlicon users_single-01"></i> My Account
                                         </a>
                                     </li>
                                     <li className="nav-item">
@@ -65,75 +80,64 @@ const MyAccount: React.FC = () => {
                             {/* My Account Tab List End */}
 
                             {/* My Account Tab Content Start */}
-                            <div className="col-lg-8 col-12">
+                            <div className="col-lg-8 col-12 mt-2">
                                 <div className="tab-content" id="accountTabContent">
                                     {/* Account Info Tab */}
                                     <div className="tab-pane fade show active" id="account-info" role="tabpanel">
                                         <div className="myaccount-content account-details">
-                                            <div className="account-details-form">
-                                                <form>
-                                                    <div className="row g-4">
-                                                        <div className="col-md-6 col-12">
-                                                            <div className="single-input-item">
-                                                                <label htmlFor="first-name">
-                                                                    First Name <abbr className="required">*</abbr>
-                                                                </label>
-                                                                <input className="form-field" type="text" id="first-name" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-md-6 col-12">
-                                                            <div className="single-input-item">
-                                                                <label htmlFor="last-name">
-                                                                    Last Name <abbr className="required">*</abbr>
-                                                                </label>
-                                                                <input className="form-field" type="text" id="last-name" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-12">
-                                                            <label htmlFor="display-name">
-                                                                Display Name <abbr className="required">*</abbr>
-                                                            </label>
-                                                            <input className="form-field" type="text" id="display-name" />
-                                                            <p className="small mt-1">
-                                                                This will be how your name will be displayed in the account section and in reviews
-                                                            </p>
-                                                        </div>
-                                                        <div className="col-12">
-                                                            <label htmlFor="email">
-                                                                Email Address <abbr className="required">*</abbr>
-                                                            </label>
-                                                            <input className="form-field" type="email" id="email" />
-                                                        </div>
-                                                        <div className="col-12">
-                                                            <fieldset>
-                                                                <legend>Password change</legend>
-                                                                <div className="row g-4">
-                                                                    <div className="col-12">
-                                                                        <label htmlFor="current-pwd">
-                                                                            Current password (leave blank to leave unchanged)
-                                                                        </label>
-                                                                        <input className="form-field" type="password" id="current-pwd" />
-                                                                    </div>
-                                                                    <div className="col-12">
-                                                                        <label htmlFor="new-pwd">
-                                                                            New password (leave blank to leave unchanged)
-                                                                        </label>
-                                                                        <input className="form-field" type="password" id="new-pwd" />
-                                                                    </div>
-                                                                    <div className="col-12">
-                                                                        <label htmlFor="confirm-pwd">Confirm new password</label>
-                                                                        <input className="form-field" type="password" id="confirm-pwd" />
-                                                                    </div>
-                                                                </div>
-                                                            </fieldset>
-                                                        </div>
-                                                        <div className="col-12">
-                                                            <button className="btn btn-dark btn-primary-hover" type="submit">
-                                                                Save Changes
-                                                            </button>
-                                                        </div>
+                                            <div className="col-12">
+                                                <h3 className="border-bottom pb-1 mb-4">
+                                                    Account Information
+                                                </h3>
+                                            </div>
+
+                                            <div className="row mb-3">
+                                                {/* Contact Information */}
+                                                <div className="col-md-6 mb-4 mb-md-0">
+                                                    <h6 className="mb-3">Contact Information</h6>
+                                                    <p className="mb-1" >{customerInfo?.firstName} {customerInfo?.lastName}</p>
+                                                    <p className="mb-1">{customerInfo?.email}</p>
+                                                    <p className="mb-1">
+                                                        {customerInfo?.mobile
+                                                            ? customerInfo.mobile.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3")
+                                                            : ""}
+                                                    </p>
+
+                                                    <div className="d-flex gap-2">
+                                                        <a href="#" className="underlined-link account-info-link ">Edit</a>
+                                                        <span>|</span>
+                                                        <a href="#" className="underlined-link account-info-link ">Change Password</a>
                                                     </div>
-                                                </form>
+                                                </div>
+
+                                                {/* Newsletters */}
+                                                <div className="col-md-6">
+                                                    <h6 className="mb-3">Newsletters</h6>
+                                                    <p className="mb-1">You aren't subscribed to our newsletter.</p>
+                                                    <a href="#" className="underlined-link account-info-link ">Edit</a>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-12">
+                                                <div className="underlined-header-title border-bottom pb-1 mb-4">
+                                                    <span className="h6-title">Address Book</span>&nbsp;&nbsp;&nbsp;&nbsp;<span className="underlined-link" style={{ fontFamily: 'salom-regular', fontSize: '.7rem' }}>  Manage Addresses</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="row">
+                                                {/* Default Billing Address */}
+                                                <div className="col-md-6 mb-4 mb-md-0">
+                                                    <h6 className="mb-3">Default Billing Address</h6>
+                                                    <p className="mb-1">You have not set a default billing address.</p>
+                                                    <a href="#" className="underlined-link account-info-link ">Edit Address</a>
+                                                </div>
+
+                                                {/* Default Shipping Address */}
+                                                <div className="col-md-6">
+                                                    <h6 className="mb-3">Default Shipping Address</h6>
+                                                    <p className="mb-1">You have not set a default shipping address.</p>
+                                                    <a href="#" className="underlined-link account-info-link ">Edit Address</a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

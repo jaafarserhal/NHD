@@ -6,16 +6,6 @@ class authService extends apiService {
         super('/Customer');
     }
 
-    // Login user
-    async login(credentials) {
-        return this.post(credentials, 'login');
-    }
-
-    // Logout user
-    async logout() {
-        return this.post({}, 'logout');
-    }
-
     // Register new user
     async register(userData) {
         return this.post(userData, apiUrls.registerCustomer);
@@ -26,9 +16,10 @@ class authService extends apiService {
         return this.post(token, apiUrls.verifyCustomerEmail);
     }
 
-    // Refresh token
-    async refreshToken(token) {
-        return this.post({ token }, 'refresh-token');
+    // Get current user info
+    async getCustomerInfo() {
+        return this.get(apiUrls.customerInfo);
     }
+
 }
 export default new authService();
