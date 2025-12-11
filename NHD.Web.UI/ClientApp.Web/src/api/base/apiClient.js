@@ -1,44 +1,49 @@
-import axios from 'axios';
+import axios from "axios";
+import { routeUrls } from "./routeUrls";
+import { apiUrls } from "./apiUrls";
 
 const apiClient = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
   timeout: 60000,
 });
 
-// Request interceptor: add token if it exists
+const publicApiEndpoints = [
+  apiUrls.loginCustomer,
+  apiUrls.registerCustomer,
+  apiUrls.verifyCustomerEmail
+];
+
+const isPublicApiCall = (url) =>
+  publicApiEndpoints.some((endpoint) => url?.includes(endpoint));
+
+// Attach token to every request if available
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
-
-    // Add Authorization header only if token exists
+    const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('API Request:', config.method?.toUpperCase(), config.url);
-    }
-
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: do not redirect
+// Handle 401/403 globally
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    if (error.response?.status === 401) {
-      // Optional: log but do NOT redirect or remove token
-      console.warn("Unauthorized (401): token missing/expired");
+    if (error.response?.status === 401 && !isPublicApiCall(error.config.url)) {
+      localStorage.removeItem("authToken");
+      // trigger a page reload to let React redirect
+      window.location.href = routeUrls.login;
     }
 
     if (error.response?.status === 403) {
-      console.warn("Forbidden (403)");
+      console.error("Access forbidden");
     }
 
     if (!error.response) {
-      console.error("Network error or server unreachable");
+      console.error("Network error or server down");
     }
 
     return Promise.reject(error);

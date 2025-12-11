@@ -8,6 +8,8 @@ import Login from "./pages/Auth/Login";
 import EmailVerify from "./pages/Auth/EmailVerify";
 import EmailVerified from "./pages/Auth/EmailVerified";
 import { routeUrls } from "./api/base/routeUrls";
+import MyAccount from "./pages/MyAccount";
+import ProtectedRoute from "./components/Common/ProtectedRoute/Index";
 
 
 const App: React.FC = () => {
@@ -22,6 +24,14 @@ const App: React.FC = () => {
         <Route path={routeUrls.login} element={<Login />} />
         <Route path={routeUrls.emailVerify} element={<EmailVerify />} />
         <Route path={routeUrls.emailVerified} element={<EmailVerified />} />
+        <Route
+          path={routeUrls.myAccount}
+          element={
+            <ProtectedRoute>
+              <MyAccount />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

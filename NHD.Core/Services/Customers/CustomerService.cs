@@ -29,7 +29,7 @@ namespace NHD.Core.Services.Customers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ServiceResult<string>> RegisterCustomerAsync(Customer customer)
+        public async Task<ServiceResult<string>> RegisterAsync(Customer customer)
         {
             await BeginTransactionAsync();
             try
@@ -71,6 +71,30 @@ namespace NHD.Core.Services.Customers
                 await RollbackTransactionAsync();
                 _logger.LogError(ex, "Error adding customer");
                 return ServiceResult<string>.Failure("An error occurred while adding the customer.");
+            }
+        }
+
+        public async Task<AppApiResponse<Customer>> LoginAsync(string email, string password)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                {
+                    return AppApiResponse<Customer>.Failure("Email and password cannot be empty", HttpStatusCodeEnum.BadRequest);
+                }
+
+                var customer = await _customerRepository.GetByUsernameAsync(email);
+                if (customer == null || customer.Password != CommonUtilities.HashPassword(password))
+                {
+                    return AppApiResponse<Customer>.Failure("Invalid email or password", HttpStatusCodeEnum.Unauthorized);
+                }
+
+                return AppApiResponse<Customer>.Success(customer, "Login successful");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during user login");
+                return AppApiResponse<Customer>.Failure("User login failed");
             }
         }
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import homeService from "../../api/homeService";
-import Swal from "sweetalert2";
+import { showAlert } from "../../api/common/Utils";
 
 interface SubscribeProps {
     informativeData: any[];
@@ -18,14 +18,6 @@ export default function Subscribe({ informativeData }: SubscribeProps) {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return regex.test(value);
     };
-
-    const toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
-    });
 
     const handleSubscribe = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -45,17 +37,11 @@ export default function Subscribe({ informativeData }: SubscribeProps) {
         try {
             await homeService.subscribeEmail(email);
 
-            toast.fire({
-                icon: "success",
-                title: "Subscribed successfully!",
-            });
+            showAlert("success", "Subscribed successfully!");
 
             setEmail("");
         } catch (err) {
-            toast.fire({
-                icon: "error",
-                title: (err as any)?.data || "An error occurred",
-            });
+            showAlert("error", (err as any)?.data || "An error occurred");
         }
 
         setLoading(false);

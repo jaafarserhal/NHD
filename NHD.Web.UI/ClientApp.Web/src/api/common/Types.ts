@@ -54,3 +54,18 @@ export interface LookupItem {
     nameEn: string;
     nameSv: string;
 }
+
+export interface LoginRequest {
+    email: string;
+    password: string;
+}
+
+export interface LoginResponse {
+    token: string;
+    message?: string;
+    user: {
+        email: string;
+        firstName: string;
+        lastName: string;
+    }
+}

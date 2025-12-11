@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using NHD.Core.Common.Models;
 using NHD.Core.Models;
 using NHD.Core.Services.Customers;
 using NHD.Core.Services.Model.Customer;
@@ -17,11 +21,13 @@ namespace NHD.Web.UI.Controllers.Website
     {
         private readonly ILogger<CustomerController> _logger;
         private readonly ICustomerService _customerService;
+        private readonly string _jwtSecret;
 
-        public CustomerController(ILogger<CustomerController> logger, ICustomerService customerService)
+        public CustomerController(ILogger<CustomerController> logger, ICustomerService customerService, IConfiguration configuration)
         {
-            _logger = logger;
-            _customerService = customerService;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
+            _jwtSecret = configuration["JwtSettings:SecretKey"] ?? throw new ArgumentNullException("JwtSettings:SecretKey");
         }
 
         [HttpPost("Register")]
@@ -44,7 +50,7 @@ namespace NHD.Web.UI.Controllers.Website
                     CreatedAt = DateTime.UtcNow,
                 };
 
-                var result = await _customerService.RegisterCustomerAsync(customer);
+                var result = await _customerService.RegisterAsync(customer);
 
                 if (!result.IsSuccess && result.Status == HttpStatusCodeEnum.Conflict.AsInt())
                     return Conflict(result.ErrorMessage);
@@ -60,6 +66,40 @@ namespace NHD.Web.UI.Controllers.Website
                 return StatusCode(500, "An error occurred while adding the customer.");
             }
         }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] CustomerLoginModel login)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var authResult = await _customerService.LoginAsync(login.Email, login.Password);
+
+            if (authResult == null || authResult.StatusCode == HttpStatusCodeEnum.Unauthorized.AsInt())
+            {
+                _logger.LogWarning("Invalid login attempt for email: {Email}", login.Email);
+                return Unauthorized(new { message = "Wrong email or password." });
+            }
+
+            // Generate JWT token
+            var token = GenerateJwtToken(authResult.Data.EmailAddress);
+
+            var userResponse = new UserLoginResponse
+            {
+                Email = authResult.Data.EmailAddress,
+                FullName = $"{authResult.Data.FirstName} {authResult.Data.LastName}"
+            };
+
+            _logger.LogInformation("User {Email} logged in successfully", login.Email);
+
+            return Ok(new
+            {
+                token,
+                user = userResponse
+            });
+        }
+
+
         [HttpPost("VerifyEmail")]
         public async Task<IActionResult> VerifyEmail([FromBody] string token)
         {
@@ -85,6 +125,30 @@ namespace NHD.Web.UI.Controllers.Website
             return Ok("Email verified successfully.");
         }
 
+        private string GenerateJwtToken(string email)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSecret);
 
+            var claims = new ClaimsIdentity(new[]
+            {
+        new Claim(ClaimTypes.Name, email),
+        new Claim(ClaimTypes.Email, email),
+        // Add more claims as needed
+    });
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = claims,
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature
+                )
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
     }
 }

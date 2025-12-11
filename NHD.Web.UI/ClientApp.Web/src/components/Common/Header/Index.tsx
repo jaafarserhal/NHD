@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { routeUrls } from "../../../api/base/routeUrls";
+import Loader from "../Loader/Index";
 
 const Header: React.FC = () => {
     const [isSticky, setIsSticky] = useState(false);
     const [showAccountMenu, setShowAccountMenu] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const token = localStorage.getItem('authToken');
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -32,8 +36,19 @@ const Header: React.FC = () => {
         setShowAccountMenu((prev) => !prev);
     };
 
+    const signOut = () => {
+        setLoading(true);
+        setTimeout(() => {
+            localStorage.removeItem('authToken');
+            setShowAccountMenu(false);
+            setLoading(false);
+            navigate(routeUrls.login);
+        }, 3000);
+    };
+
     return (
         <>
+            <Loader loading={loading} />
             <div className={`header-section header-transparent header-sticky ${isSticky ? 'sticky' : ''}`}>
                 <div className="container position-relative">
                     <div className="row align-items-center">
@@ -91,11 +106,20 @@ const Header: React.FC = () => {
                                             <div className="account-dropdown-menu position-absolute end-0 mt-2 p-3 bg-white shadow rounded" style={{ minWidth: '150px', zIndex: 1000 }}>
                                                 <ul className="list-unstyled m-0 p-0">
                                                     <li className="py-1">
-                                                        <Link to={routeUrls.login} className="dropdown-item">My Account</Link>
+                                                        <Link to={token ? routeUrls.myAccount : routeUrls.login} className="dropdown-item">My Account</Link>
                                                     </li>
                                                     <li className="py-1">
-                                                        <Link to={routeUrls.register} className="dropdown-item">Create Account</Link>
+                                                        {!token ? (
+                                                            <Link to={routeUrls.register} className="dropdown-item">
+                                                                Create Account
+                                                            </Link>
+                                                        ) : (
+                                                            <button onClick={signOut} className="dropdown-item">
+                                                                Sign Out
+                                                            </button>
+                                                        )}
                                                     </li>
+
                                                 </ul>
                                             </div>
                                         )}

@@ -6,4 +6,5 @@ export const routeUrls = {
     login: '/auth/login',
     emailVerify: '/email/verify',
     emailVerified: '/email/verified',
+    myAccount: '/customer/my-account',
 };

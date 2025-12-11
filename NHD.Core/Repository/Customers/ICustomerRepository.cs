@@ -11,5 +11,6 @@ namespace NHD.Core.Repository.Customers
     {
         Task<Customer> GetByEmailAsync(string email);
         Task<Customer> GetByVerificationTokenAsync(string token);
+        Task<Customer> GetByUsernameAsync(string username);
     }
 }

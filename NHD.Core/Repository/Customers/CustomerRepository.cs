@@ -25,5 +25,10 @@ namespace NHD.Core.Repository.Customers
             return await _context.Customers
                 .FirstOrDefaultAsync(x => x.EmailVerificationToken == token);
         }
+
+        public async Task<Customer> GetByUsernameAsync(string username)
+        {
+            return await Task.FromResult(_context.Customers.FirstOrDefault(c => c.EmailAddress == username && c.IsActive == true));
+        }
     }
 }
