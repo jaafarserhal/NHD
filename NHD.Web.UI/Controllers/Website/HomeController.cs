@@ -24,30 +24,17 @@ namespace NHD.Web.UI.Website.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IProductService _productService;
-        private readonly ISectionService _sectionService;
 
         private readonly IDatesService _datesService;
 
         private readonly IEmailSubscriptionService _emailSubscriptionService;
 
-        public HomeController(ILogger<HomeController> logger, IProductService productService, ISectionService sectionService, IDatesService datesService, IEmailSubscriptionService emailSubscriptionService)
+        public HomeController(ILogger<HomeController> logger, IProductService productService, IDatesService datesService, IEmailSubscriptionService emailSubscriptionService)
         {
             _logger = logger;
             _productService = productService ?? throw new ArgumentNullException(nameof(productService));
-            _sectionService = sectionService ?? throw new ArgumentNullException(nameof(sectionService));
             _datesService = datesService ?? throw new ArgumentNullException(nameof(datesService));
             _emailSubscriptionService = emailSubscriptionService ?? throw new ArgumentNullException(nameof(emailSubscriptionService));
-        }
-
-        [HttpGet("Section/{typeId}/{top}")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<SectionViewModel>>>> GetSectionByType(int typeId, int top)
-        {
-            var result = await _sectionService.GetSectionByTypeAsync(typeId, top);
-            if (result.IsSuccess)
-            {
-                return Ok(result.Data);
-            }
-            return BadRequest(result.ErrorMessage);
         }
 
         [HttpGet("SignatureGiftsProducts")]

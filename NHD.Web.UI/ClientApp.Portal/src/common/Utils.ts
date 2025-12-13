@@ -16,11 +16,18 @@ export const getImageResolutionLabel = (value: string): string => {
         case SectionType.HomeCallToAction.toString():
             return "(1920 x 696)";
             break;
+        case SectionType.AboutNawaExperience.toString():
         case SectionType.HomeCustomeGifts.toString():
             return "(1920 x 934)";
             break;
         case SectionType.HomeSubscribe.toString():
             return "(1920 x 326)";
+            break;
+        case SectionType.AboutMainSection.toString():
+            return "(1920 x 720)";
+            break;
+        case SectionType.AboutWeLoveDates.toString():
+            return "(1045 x 781)";
             break;
         default:
             return '';

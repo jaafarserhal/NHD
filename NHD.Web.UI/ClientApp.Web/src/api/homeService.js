@@ -6,10 +6,6 @@ class homeService extends apiService {
         super(apiUrls.homepage);
     }
 
-    async getSectionsByType(typeId, top) {
-        return this.get(`Section/${typeId}/${top}`);
-    }
-
     async getSignatureGiftsProducts() {
         return this.get(`SignatureGiftsProducts`);
     }

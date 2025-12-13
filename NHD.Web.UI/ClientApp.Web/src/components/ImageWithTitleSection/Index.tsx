@@ -4,7 +4,7 @@ interface CustomGiftsProps {
     informativeData: any[];
 }
 
-const CustomGifts: React.FC<CustomGiftsProps> = ({ informativeData }) => {
+const ImageWithTitleSection: React.FC<CustomGiftsProps> = ({ informativeData }) => {
     if (!informativeData || informativeData.length === 0) return null;
     const section = informativeData[0];
     return (
@@ -27,4 +27,4 @@ const CustomGifts: React.FC<CustomGiftsProps> = ({ informativeData }) => {
         </div>
     );
 }
-export default CustomGifts;
+export default ImageWithTitleSection;

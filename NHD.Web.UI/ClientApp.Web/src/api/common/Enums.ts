@@ -5,5 +5,8 @@ export const enum SectionType {
     HomeOurProducts = 503,
     HomeCustomeGifts = 504,
     HomeSubscribe = 505,
-    HomeFillDates = 506
+    HomeFillDates = 506,
+    AboutMainSection = 507,
+    AboutWeLoveDates = 508,
+    AboutNawaExperience = 509
 }

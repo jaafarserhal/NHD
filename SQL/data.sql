@@ -53,7 +53,10 @@ VALUES
 (503, 500, 'Home - Our Products', 'Home - Our Products', SYSUTCDATETIME(), 1),
 (504, 500, 'Home - Custom Gifts', 'Home - Our Products', SYSUTCDATETIME(), 1),
 (505, 500, 'Home - Subscribe', 'Home - Our Products', SYSUTCDATETIME(), 1),
-(506, 500, 'Home - Fill Dates', 'Home - Fill Dates', SYSUTCDATETIME(), 1)
+(506, 500, 'Home - Fill Dates', 'Home - Fill Dates', SYSUTCDATETIME(), 1),
+(507, 500, 'About - Main Section', 'About - Main Section', SYSUTCDATETIME(), 1),
+(508, 500, 'About - We Love Dates', 'About - We Love Dates', SYSUTCDATETIME(), 1),
+(509, 500, 'About - Nawa Experience', 'About - Nawa Experience', SYSUTCDATETIME(), 1)
 (600, 600, N'Pending', N'Pending',SYSUTCDATETIME(), 1),
 (601, 600, N'Active', N'Aktiv', SYSUTCDATETIME(), 1),
 (602, 600, N'Inactive', N'Inaktiv', SYSUTCDATETIME(), 1),

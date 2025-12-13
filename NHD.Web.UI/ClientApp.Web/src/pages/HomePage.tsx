@@ -7,9 +7,10 @@ import CallToActionSection from '../components/CallToAction/Index';
 import Brands from '../components/Brands/Index';
 import Collections from '../components/Collections/Index';
 import homeService from '../api/homeService';
+import sectionService from '../api/sectionService';
 import { SectionType } from '../api/common/Enums';
 import OurProducts from '../components/OurProducts/Index';
-import CustomGifts from '../components/CustomGifts/Index';
+import ImageWithTitleSection from '../components/ImageWithTitleSection/Index';
 import Subscribe from '../components/Subscribe/Index';
 import Loader from '../components/Common/Loader/Index';
 
@@ -35,19 +36,19 @@ const HomePage: React.FC = () => {
                     homeFillDatesProducts,
                     homeSubscribe] =
                     await Promise.all([
-                        homeService.getSectionsByType(SectionType.HomeCarousel, 3),
+                        sectionService.getSectionsByType(SectionType.HomeCarousel, 3),
                         homeService.getSignatureGiftsProducts(),
-                        homeService.getSectionsByType(SectionType.HomeGifts, 1),
-                        homeService.getSectionsByType(SectionType.HomeCallToAction, 1),
+                        sectionService.getSectionsByType(SectionType.HomeGifts, 1),
+                        sectionService.getSectionsByType(SectionType.HomeCallToAction, 1),
                         homeService.getBrands(),
                         homeService.getTop4Collections(),
-                        homeService.getSectionsByType(SectionType.HomeOurProducts, 1),
+                        sectionService.getSectionsByType(SectionType.HomeOurProducts, 1),
                         homeService.getCategories(),
                         homeService.getHomeProductsByCategory(0),
-                        homeService.getSectionsByType(SectionType.HomeCustomeGifts, 1),
-                        homeService.getSectionsByType(SectionType.HomeFillDates, 1),
+                        sectionService.getSectionsByType(SectionType.HomeCustomeGifts, 1),
+                        sectionService.getSectionsByType(SectionType.HomeFillDates, 1),
                         homeService.getFillDatesProducts(),
-                        homeService.getSectionsByType(SectionType.HomeSubscribe, 1)
+                        sectionService.getSectionsByType(SectionType.HomeSubscribe, 1)
                     ]);
 
                 // Combine or store both responses as needed
@@ -87,7 +88,7 @@ const HomePage: React.FC = () => {
             <Brands brands={homeData?.brands} />
             <Collections collections={homeData?.top4Collections} />
             <OurProducts informativeData={homeData?.homeProductsInformative} categories={homeData?.homeProductsCategories} products={homeData?.homeProducts} />
-            <CustomGifts informativeData={homeData?.homeCustomGifts} />
+            <ImageWithTitleSection informativeData={homeData?.homeCustomGifts} />
             <GiftCategory informativeData={homeData?.fillDatesInformative} products={homeData?.fillDatesProducts} modalId="fillDatesProductModal" />
             <Subscribe informativeData={homeData?.homeSubscribe} />
             <Footer />

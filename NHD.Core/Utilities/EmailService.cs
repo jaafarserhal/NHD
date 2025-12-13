@@ -13,7 +13,7 @@ namespace NHD.Core.Utilities
     {
         Task<bool> SendPasswordResetCodeAsync(string email, string resetCode);
         Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true);
-        Task<bool> SendVerificationEmailAsync(string email, string token);
+        Task<bool> SendVerificationEmailAsync(string FirstName, string email, string token);
     }
 
     // Email Configuration Model
@@ -102,15 +102,14 @@ namespace NHD.Core.Utilities
             }
         }
 
-        public async Task<bool> SendVerificationEmailAsync(string email, string token)
+        public async Task<bool> SendVerificationEmailAsync(string FirstName, string email, string token)
         {
             try
             {
                 var subject = "Verify Your Email Address";
 
                 var verifyUrl = $"{_emailConfig.BaseUrl}/email/verified?token={token}";
-                var body = GenerateEmailVerificationBody(verifyUrl);
-
+                var body = GenerateEmailVerificationBody(FirstName, verifyUrl);
                 return await SendEmailAsync(email, subject, body, true);
             }
             catch (Exception ex)
@@ -120,66 +119,82 @@ namespace NHD.Core.Utilities
             }
         }
 
-        private string GenerateEmailVerificationBody(string verifyUrl)
+        private string GenerateEmailVerificationBody(string FirstName, string verifyUrl)
         {
             return $@"
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset='utf-8'>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>Email Verification</title>
-        <style>
-            body {{
-                font-family: Arial, sans-serif;
-                background-color: #f5f5f5;
-                margin: 0;
-                padding: 0;
-            }}
-            .container {{
-                max-width: 600px;
-                margin: 30px auto;
-                background: #ffffff;
-                padding: 25px;
-                border-radius: 10px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            }}
-            .btn {{
-                display: inline-block;
-                background-color: #28a745;
-                color: #fff;
-                padding: 12px 20px;
-                text-decoration: none;
-                border-radius: 6px;
-                font-size: 16px;
-            }}
-            .footer {{
-                margin-top: 30px;
-                font-size: 12px;
-                text-align: center;
-                color: #777;
-            }}
-        </style>
-    </head>
-    <body>
-        <div class='container'>
-            <h2>Verify Your Email Address</h2>
-            <p>Thank you for registering. Please click the button below to verify your email address.</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Confirm Your Email with Nawa</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .btn {{
+            display: inline-block;
+            background-color: #28a745;
+            color: #ffffff !important;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+        }}
+        .footer {{
+            margin-top: 30px;
+            font-size: 12px;
+            text-align: center;
+            color: #777;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h2>Confirm Your Email with Nawa</h2>
 
-            <p style='text-align:center; margin: 30px 0;'>
-                <a href='{verifyUrl}' class='btn'>Verify Email</a>
-            </p>
+        <p>Hello, {FirstName}</p>
 
-            <p>If the button doesn’t work, copy and paste the link below into your browser:</p>
-            <p>{verifyUrl}</p>
+        <p>
+            Thank you for registering with <strong>Nawa</strong>!  
+            To complete your registration and enjoy a seamless shopping experience,
+            please verify your email by clicking the button below:
+        </p>
 
-            <div class='footer'>
-                <p>This is an automated message. Please do not reply.</p>
-            </div>
+        <p style='text-align:center; margin: 30px 0;'>
+            <a href='{verifyUrl}' class='btn'>Verify Email</a>
+        </p>
+
+        <p>
+            We’re excited to have you with us and hope you enjoy shopping our premium dates.
+            If you have any questions, feel free to contact us at
+            <a href='mailto:support@nawahomeofdates.com'>support@nawahomeofdates.com</a>.
+        </p>
+
+        <p><strong>Welcome to the Nawa family!</strong></p>
+
+        <p>Best regards,<br/>The Nawa Team</p>
+
+        <div class='footer'>
+            <p>This is an automated message. Please do not reply.</p>
         </div>
-    </body>
-    </html>";
+    </div>
+</body>
+</html>";
         }
+
 
         private string GeneratePasswordResetEmailBody(string resetCode)
         {

@@ -52,6 +52,7 @@ namespace NHD.Core.Services.Customers
 
                 // 4. Send email BEFORE committing
                 var emailSent = await _emailService.SendVerificationEmailAsync(
+                    customer.FirstName,
                     customer.EmailAddress,
                     customer.EmailVerificationToken);
 
