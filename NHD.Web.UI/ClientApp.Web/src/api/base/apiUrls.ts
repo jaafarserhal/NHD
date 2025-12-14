@@ -5,5 +5,7 @@ export const apiUrls = {
     registerCustomer: 'Register',
     verifyCustomerEmail: 'VerifyEmail',
     loginCustomer: 'Customer/Login',
-    customerInfo: 'Info'
+    customerInfo: 'Info',
+    changeCustomerPassword: 'ChangePassword',
+    updateCustomerInfo: 'UpdateCustomerInfo',
 };

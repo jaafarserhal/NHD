@@ -14,6 +14,7 @@ namespace NHD.Core.Utilities
         Task<bool> SendPasswordResetCodeAsync(string email, string resetCode);
         Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true);
         Task<bool> SendVerificationEmailAsync(string FirstName, string email, string token);
+        Task<bool> SendSuccefullPasswordChangeEmailAsync(string email, string FirstName);
     }
 
     // Email Configuration Model
@@ -106,7 +107,7 @@ namespace NHD.Core.Utilities
         {
             try
             {
-                var subject = "Verify Your Email Address";
+                var subject = "Confirm Your Email with Nawa";
 
                 var verifyUrl = $"{_emailConfig.BaseUrl}/email/verified?token={token}";
                 var body = GenerateEmailVerificationBody(FirstName, verifyUrl);
@@ -115,6 +116,21 @@ namespace NHD.Core.Utilities
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Failed to send email verification to {email}");
+                return false;
+            }
+        }
+
+        public async Task<bool> SendSuccefullPasswordChangeEmailAsync(string email, string FirstName)
+        {
+            try
+            {
+                var subject = "Password Changed Successfully";
+                var body = GeneratePasswordChangedBody(FirstName);
+                return await SendEmailAsync(email, subject, body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to send password change confirmation email to {email}");
                 return false;
             }
         }
@@ -184,6 +200,82 @@ namespace NHD.Core.Utilities
         </p>
 
         <p><strong>Welcome to the Nawa family!</strong></p>
+
+        <p>Best regards,<br/>The Nawa Team</p>
+
+        <div class='footer'>
+            <p>This is an automated message. Please do not reply.</p>
+        </div>
+    </div>
+</body>
+</html>";
+        }
+        private string GeneratePasswordChangedBody(string FirstName)
+        {
+            return $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Password Changed Successfully</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .status {{
+            display: inline-block;
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+        }}
+        .footer {{
+            margin-top: 30px;
+            font-size: 12px;
+            text-align: center;
+            color: #777;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h2>Password Changed Successfully</h2>
+
+        <p>Hello, {FirstName}</p>
+
+        <p>
+            This email is to confirm that your <strong>Nawa</strong> account password
+            has been changed successfully.
+        </p>
+
+        <p style='text-align:center; margin: 30px 0;'>
+            <span class='status'>Password Updated</span>
+        </p>
+
+        <p>
+            If you made this change, no further action is required.
+            However, if you did <strong>not</strong> change your password,
+            please contact our support team immediately at
+            <a href='mailto:support@nawahomeofdates.com'>support@nawahomeofdates.com</a>.
+        </p>
+
+        <p>
+            Your account security is important to us, and we’re always here to help.
+        </p>
 
         <p>Best regards,<br/>The Nawa Team</p>
 

@@ -75,6 +75,41 @@ namespace NHD.Core.Services.Customers
             }
         }
 
+        public async Task<ServiceResult<string>> ChangePasswordAsync(Customer customer)
+        {
+            await BeginTransactionAsync();
+            try
+            {
+                customer.Password = CommonUtilities.HashPassword(customer.Password);
+
+                // 1. Update customer password
+                context.Customers.Update(customer);
+                await SaveChangesAsync();
+
+                // 4. Send email BEFORE committing
+                var emailSent = await _emailService.SendSuccefullPasswordChangeEmailAsync(
+                    customer.EmailAddress,
+                    customer.FirstName);
+
+                if (!emailSent)
+                {
+                    await RollbackTransactionAsync();
+                    return ServiceResult<string>.Failure("Failed to send password change confirmation email. Please try again.");
+                }
+
+                // 5. Commit only if everything succeeded
+                await CommitTransactionAsync();
+
+                return ServiceResult<string>.Success("Customer password changed successfully.");
+            }
+            catch (Exception ex)
+            {
+                await RollbackTransactionAsync();
+                _logger.LogError(ex, "Error changing customer password");
+                return ServiceResult<string>.Failure("An error occurred while changing the customer password.");
+            }
+        }
+
         public async Task<AppApiResponse<Customer>> LoginAsync(string email, string password)
         {
             try
@@ -127,6 +162,11 @@ namespace NHD.Core.Services.Customers
         public async Task<Customer> GetCustomerByVerificationTokenAsync(string token)
         {
             return await _customerRepository.GetByVerificationTokenAsync(token);
+        }
+
+        public async Task<Customer> GetCustomerInfoByEmailAsync(string email)
+        {
+            return await _customerRepository.GetByEmailAsync(email);
         }
 
         public async Task<Customer> UpdateCustomerAsync(Customer customer)

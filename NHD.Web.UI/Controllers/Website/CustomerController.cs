@@ -126,9 +126,84 @@ namespace NHD.Web.UI.Controllers.Website
             return Ok("Email verified successfully.");
         }
 
+
+        [HttpPut("ChangePassword")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] CustomerBindingModel model)
+        {
+            try
+            {
+                if (model == null || string.IsNullOrEmpty(model.Password))
+                    return BadRequest("Password is required.");
+
+                // Extract email from JWT token claims
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized(new { message = "Invalid token" });
+                }
+
+                var customer = await _customerService.GetCustomerInfoByEmailAsync(email);
+
+                if (customer == null)
+                {
+                    return NotFound(new { message = "Customer not found" });
+                }
+
+                customer.Password = model.Password;
+                var result = await _customerService.ChangePasswordAsync(customer);
+
+                return Ok(new { message = "Password changed successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error changing password");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred" });
+            }
+        }
+
+        [HttpPut("UpdateCustomerInfo")]
+        [Authorize]
+        public async Task<IActionResult> UpdateCustomerInfo([FromBody] CustomerBindingModel model)
+        {
+            try
+            {
+                if (model == null)
+                    return BadRequest("Model is required.");
+
+                // Extract email from JWT token claims
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized(new { message = "Invalid token" });
+                }
+
+                var customer = await _customerService.GetCustomerInfoByEmailAsync(email);
+
+                if (customer == null)
+                {
+                    return NotFound(new { message = "Customer not found" });
+                }
+
+                customer.FirstName = model.FirstName;
+                customer.LastName = model.LastName;
+                customer.Mobile = model.Mobile;
+                await _customerService.UpdateCustomerAsync(customer);
+
+                return Ok(new { message = "Information updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating information");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred" });
+            }
+        }
+
         [HttpGet("Info")]
         [Authorize]
-        public async Task<IActionResult> GetCurrentUser()
+        public async Task<IActionResult> GetCurrentCustomer()
         {
             try
             {
@@ -164,7 +239,6 @@ namespace NHD.Web.UI.Controllers.Website
                 return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred" });
             }
         }
-
         private string GenerateJwtToken(string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

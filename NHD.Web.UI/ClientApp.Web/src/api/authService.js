@@ -21,5 +21,14 @@ class authService extends apiService {
         return this.get(apiUrls.customerInfo);
     }
 
+    // Change password
+    async changePassword(passwordData) {
+        return this.put(passwordData, apiUrls.changeCustomerPassword);
+    }
+
+    // Update customer information
+    async updateCustomerInfo(customerData) {
+        return this.put(customerData, apiUrls.updateCustomerInfo);
+    }
 }
 export default new authService();
