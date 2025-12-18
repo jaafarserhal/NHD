@@ -36,7 +36,7 @@ const Header: React.FC = () => {
         setShowAccountMenu((prev) => !prev);
     };
 
-    const signOut = () => {
+    const logOut = () => {
         setLoading(true);
         setTimeout(() => {
             localStorage.removeItem('authToken');
@@ -114,8 +114,8 @@ const Header: React.FC = () => {
                                                                 Create Account
                                                             </Link>
                                                         ) : (
-                                                            <button onClick={signOut} className="dropdown-item">
-                                                                Sign Out
+                                                            <button onClick={logOut} className="dropdown-item">
+                                                                Log Out
                                                             </button>
                                                         )}
                                                     </li>

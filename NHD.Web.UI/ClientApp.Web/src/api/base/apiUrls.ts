@@ -8,4 +8,6 @@ export const apiUrls = {
     customerInfo: 'Info',
     changeCustomerPassword: 'ChangePassword',
     updateCustomerInfo: 'UpdateCustomerInfo',
+    initiatePasswordReset: 'InitiatePasswordReset',
+    resetPassword: 'ResetPassword',
 };

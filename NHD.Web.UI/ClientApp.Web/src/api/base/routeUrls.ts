@@ -7,4 +7,6 @@ export const routeUrls = {
     emailVerify: '/email/verify',
     emailVerified: '/email/verified',
     myAccount: '/customer/my-account',
+    forgotPassword: '/auth/forgot-password',
+    changePassword: '/auth/change-password',
 };

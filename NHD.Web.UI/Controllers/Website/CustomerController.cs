@@ -126,6 +126,53 @@ namespace NHD.Web.UI.Controllers.Website
             return Ok("Email verified successfully.");
         }
 
+        [HttpPost("InitiatePasswordReset")]
+        public async Task<IActionResult> InitiatePasswordReset([FromBody] string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return BadRequest("Email is required.");
+            var result = await _customerService.InitiatePasswordResetAsync(email);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new { message = result.ErrorMessage });
+            }
+            return Ok(new { message = "If there is an account associated with " + email + " you will receive an email with a link to reset your password." });
+        }
+
+        [HttpPut("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
+        {
+            try
+            {
+                if (model == null || string.IsNullOrEmpty(model.Token) || string.IsNullOrEmpty(model.Password))
+                    return BadRequest("All fields are required.");
+
+                var customer = await _customerService.GetCustomerByVerificationTokenAsync(model.Token);
+
+                if (customer == null)
+                    return Conflict("Invalid password reset token, please request a new one.");
+                // Check if token is expired
+                if (customer.EmailVerificationTokenExpires <= DateTime.UtcNow)
+                    return Conflict("Password reset token has expired.");
+
+                customer.Password = model.Password;
+                customer.EmailVerificationToken = null;
+                customer.EmailVerificationTokenExpires = null;
+
+                var result = await _customerService.ChangePasswordAsync(customer);
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(new { message = result.ErrorMessage });
+                }
+                return Ok(new { message = "Password has been reset successfully." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error resetting password");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while resetting the password." });
+            }
+        }
+
 
         [HttpPut("ChangePassword")]
         [Authorize]

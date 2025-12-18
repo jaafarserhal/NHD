@@ -65,26 +65,28 @@ export default function Login() {
 
             // Store the JWT token
             localStorage.setItem('authToken', response.token);
-
-        } catch (err: any) {
-            console.error('Login error:', err);
-
-            if (err.response?.status === 401) {
-                showAlert("error", "Invalid email or password");
-            } else if (err.response?.status === 429) {
-                showAlert("error", "Too many login attempts. Please try again later.");
-            } else if (err.response?.data?.message) {
-                showAlert("error", err.response.data.message);
-            } else if (!err.response) {
-                showAlert("error", 'Network error. Please check your connection and try again.');
-            } else {
-                showAlert("error", 'Login failed. Please try again.');
-            }
-        } finally {
             setTimeout(() => {
                 setIsLoading(false);
                 navigate(routeUrls.myAccount);
-            }, 3000);
+            }, 1000);
+
+        } catch (err: any) {
+            var message = err.message
+            if (err.response?.status === 401) {
+                message = "Invalid email or password";
+            } else if (err.response?.status === 429) {
+                message = "Too many login attempts. Please try again later.";
+            } else if (err.response?.data?.message) {
+                message = err.response.data.message;
+            } else if (!err.response) {
+                message = "Network error. Please check your internet connection.";
+            } else {
+                message = "An unexpected error occurred. Please try again.";
+            }
+            setTimeout(() => {
+                setIsLoading(false);
+                showAlert("error", message);
+            }, 1000);
         }
     };
 
@@ -156,20 +158,55 @@ export default function Login() {
                                                 <label htmlFor="password">
                                                     Password <abbr className="required">*</abbr>
                                                 </label>
-                                                <input
-                                                    id="password"
-                                                    name="password"
-                                                    type={showPassword ? 'text' : 'password'}
-                                                    autoComplete="current-password"
-                                                    required
-                                                    value={formData.password}
-                                                    onChange={handleInputChange}
-                                                    onKeyDown={handleKeyDown}
-                                                    placeholder="Enter your password"
-                                                    disabled={isLoading}
-                                                    className="form-field"
-                                                    style={errors['password'] ? { borderColor: 'red' } : {}}
-                                                />
+                                                <div style={{ position: 'relative' }}>
+                                                    <input
+                                                        id="password"
+                                                        name="password"
+                                                        type={showPassword ? 'text' : 'password'}
+                                                        autoComplete="current-password"
+                                                        required
+                                                        value={formData.password}
+                                                        onChange={handleInputChange}
+                                                        onKeyDown={handleKeyDown}
+                                                        placeholder="Enter your password"
+                                                        disabled={isLoading}
+                                                        className="form-field"
+                                                        style={errors['password'] ? { borderColor: 'red', paddingRight: '45px' } : { paddingRight: '45px' }}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                        disabled={isLoading}
+                                                        style={{
+                                                            position: 'absolute',
+                                                            right: '12px',
+                                                            top: '50%',
+                                                            transform: 'translateY(-50%)',
+                                                            background: 'none',
+                                                            border: 'none',
+                                                            cursor: 'pointer',
+                                                            padding: '4px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            color: '#666',
+                                                            opacity: isLoading ? 0.5 : 1
+                                                        }}
+                                                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                                    >
+                                                        {showPassword ? (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                            </svg>
+                                                        ) : (
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                                <circle cx="12" cy="12" r="3"></circle>
+                                                            </svg>
+                                                        )}
+                                                    </button>
+                                                </div>
                                                 <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
                                                     {errors['password'] || '\u00A0'}
                                                 </span>
@@ -179,7 +216,7 @@ export default function Login() {
                                                     LOGIN
                                                 </button>
                                                 <div className="forgot-password-link">
-                                                    <a href="#"><span>Forgot Your Password?</span>
+                                                    <a href={routeUrls.forgotPassword}><span>Forgot Your Password?</span>
                                                     </a>
                                                 </div>
                                             </div>

@@ -80,13 +80,12 @@ namespace NHD.Core.Services.Customers
             await BeginTransactionAsync();
             try
             {
+                // Hash the new password
                 customer.Password = CommonUtilities.HashPassword(customer.Password);
-
-                // 1. Update customer password
                 context.Customers.Update(customer);
                 await SaveChangesAsync();
 
-                // 4. Send email BEFORE committing
+                // Send email BEFORE committing
                 var emailSent = await _emailService.SendSuccefullPasswordChangeEmailAsync(
                     customer.EmailAddress,
                     customer.FirstName);
@@ -110,6 +109,47 @@ namespace NHD.Core.Services.Customers
             }
         }
 
+        public async Task<ServiceResult<string>> InitiatePasswordResetAsync(string email)
+        {
+            await BeginTransactionAsync();
+            try
+            {
+                var customer = await _customerRepository.GetByEmailAsync(email);
+                if (customer == null)
+                {
+                    return ServiceResult<string>.Validate("No customer found with the provided email address.");
+                }
+
+                customer.EmailVerificationToken = Guid.NewGuid().ToString("N");
+                // Token valid for 1 hour
+                customer.EmailVerificationTokenExpires = DateTime.UtcNow.AddHours(1);
+
+                context.Customers.Update(customer);
+                await SaveChangesAsync();
+
+                // Send password reset email
+                var emailSent = await _emailService.SendResetLinkEmailAsync(
+                    customer.EmailAddress,
+                    customer.FirstName,
+                    customer.EmailVerificationToken);
+
+                if (!emailSent)
+                {
+                    return ServiceResult<string>.Failure("Failed to send password reset email. Please try again.");
+                }
+                // 5. Commit only if everything succeeded
+                await CommitTransactionAsync();
+
+                return ServiceResult<string>.Success("Password reset email sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                await RollbackTransactionAsync();
+                _logger.LogError(ex, "Error initiating password reset");
+                return ServiceResult<string>.Failure("An error occurred while initiating the password reset.");
+            }
+        }
+
         public async Task<AppApiResponse<Customer>> LoginAsync(string email, string password)
         {
             try
@@ -119,7 +159,8 @@ namespace NHD.Core.Services.Customers
                     return AppApiResponse<Customer>.Failure("Email and password cannot be empty", HttpStatusCodeEnum.BadRequest);
                 }
 
-                var customer = await _customerRepository.GetByUsernameAsync(email);
+                var customer = await _customerRepository.AuthenticateLoginAsync(email);
+                var co = CommonUtilities.HashPassword(password);
                 if (customer == null || customer.Password != CommonUtilities.HashPassword(password))
                 {
                     return AppApiResponse<Customer>.Failure("Invalid email or password", HttpStatusCodeEnum.Unauthorized);
@@ -143,7 +184,7 @@ namespace NHD.Core.Services.Customers
                     return AppApiResponse<Customer>.Failure("Email cannot be empty", HttpStatusCodeEnum.BadRequest);
                 }
 
-                var customer = await _customerRepository.GetByUsernameAsync(email);
+                var customer = await _customerRepository.GetByEmailAsync(email);
 
                 if (customer == null)
                 {

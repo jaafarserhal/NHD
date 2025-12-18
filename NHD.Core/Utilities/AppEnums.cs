@@ -30,7 +30,7 @@ namespace NHD.Core.Utilities
         Pending = 600,
         Active = 601,
         InActive = 602,
-        GetCustomer = 603
+        Guest = 603,
     }
 
     public enum ProductSizeLookup

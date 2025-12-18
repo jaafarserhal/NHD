@@ -19897,6 +19897,15 @@ only screen and (max-width: 767px) {
   text-decoration: underline;
 }
 
+.manage-addresses {
+  cursor: pointer;
+}
+
+.manage-addresses:hover {
+  color: #DAAC00;
+  text-decoration: none;
+}
+
 .account-info-link {
   font-size: .775rem;
 }

@@ -15,6 +15,7 @@ namespace NHD.Core.Utilities
         Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true);
         Task<bool> SendVerificationEmailAsync(string FirstName, string email, string token);
         Task<bool> SendSuccefullPasswordChangeEmailAsync(string email, string FirstName);
+        Task<bool> SendResetLinkEmailAsync(string email, string FirstName, string token);
     }
 
     // Email Configuration Model
@@ -120,6 +121,22 @@ namespace NHD.Core.Utilities
             }
         }
 
+        public async Task<bool> SendResetLinkEmailAsync(string email, string FirstName, string token)
+        {
+            try
+            {
+                var subject = "Password Reset Link";
+                var changePasswordUrl = $"{_emailConfig.BaseUrl}/auth/change-password?token={token}";
+                var body = GenerateChangePasswordBody(FirstName, changePasswordUrl);
+                return await SendEmailAsync(email, subject, body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to send password reset link email to {email}");
+                return false;
+            }
+        }
+
         public async Task<bool> SendSuccefullPasswordChangeEmailAsync(string email, string FirstName)
         {
             try
@@ -200,6 +217,80 @@ namespace NHD.Core.Utilities
         </p>
 
         <p><strong>Welcome to the Nawa family!</strong></p>
+
+        <p>Best regards,<br/>The Nawa Team</p>
+
+        <div class='footer'>
+            <p>This is an automated message. Please do not reply.</p>
+        </div>
+    </div>
+</body>
+</html>";
+        }
+
+
+        private string GenerateChangePasswordBody(string FirstName, string changePasswordUrl)
+        {
+            return $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Reset Your Password with Nawa</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .btn {{
+            display: inline-block;
+            background-color: #28a745;
+            color: #ffffff !important;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+        }}
+        .footer {{
+            margin-top: 30px;
+            font-size: 12px;
+            text-align: center;
+            color: #777;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h2>Reset Your Password with Nawa</h2>
+
+        <p>Hello, {FirstName}</p>
+        <p>
+            We received a request to reset the password for your <strong>Nawa</strong> account.
+        </p>
+        
+        <p>
+        If you requested this change, set a new password here:
+        </p>
+
+        <p style='text-align:center; margin: 30px 0;'>
+            <a href='{changePasswordUrl}' class='btn'>Set New Password</a>
+        </p>
+
+        <p>
+          If you did not make this request, you can ignore this email and your password will remain the same.
+        </p>
 
         <p>Best regards,<br/>The Nawa Team</p>
 

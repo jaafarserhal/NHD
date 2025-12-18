@@ -18,5 +18,6 @@ namespace NHD.Core.Services.Customers
         Task<Customer> GetCustomerInfoByEmailAsync(string email);
 
         Task<ServiceResult<string>> ChangePasswordAsync(Customer customer);
+        Task<ServiceResult<string>> InitiatePasswordResetAsync(string email);
     }
 }

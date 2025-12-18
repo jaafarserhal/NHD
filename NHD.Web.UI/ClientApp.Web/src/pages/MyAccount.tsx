@@ -5,8 +5,11 @@ import authService from "../api/authService";
 import Loader from "../components/Common/Loader/Index";
 import { validatePassword } from "../api/common/Utils";
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from "react-router-dom";
+import { routeUrls } from "../api/base/routeUrls";
 
 const MyAccount: React.FC = () => {
+    const navigate = useNavigate();
     const [customerInfo, setCustomerInfo] = useState<any>(null);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [loading, setLoading] = useState(false);
@@ -163,6 +166,15 @@ const MyAccount: React.FC = () => {
         }
     };
 
+    const logOut = () => {
+        setLoading(true);
+        setTimeout(() => {
+            localStorage.removeItem('authToken');
+            setLoading(false);
+            navigate(routeUrls.login);
+        }, 3000);
+    };
+
     return (
         <>
             <Header />
@@ -197,22 +209,22 @@ const MyAccount: React.FC = () => {
                                     </li>
                                     <li className="nav-item">
                                         <a className="nav-link" id="account-info-tab" data-bs-toggle="tab" href="#account-info" role="tab">
-                                            <i className="dlicon users_single-01"></i> Account Information
+                                            <i className="dlicon business_badge"></i> Account Information
                                         </a>
                                     </li>
                                     <li className="nav-item">
                                         <a className="nav-link" id="change-password-tab" data-bs-toggle="tab" href="#change-password" role="tab">
-                                            <i className="dlicon lock"></i> Change Password
+                                            <i className="dlicon ui-1_lock-circle-open"></i> Change Password
                                         </a>
                                     </li>
 
                                     <li className="nav-item">
-                                        <a className="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab">
-                                            <i className="dlicon location_map-big"></i> Address
+                                        <a className="nav-link" id="address-book-tab" data-bs-toggle="tab" href="#address-book" role="tab">
+                                            <i className="dlicon location_pin"></i> Address Book
                                         </a>
                                     </li>
                                     <li className="nav-item">
-                                        <a className="nav-link" href="login.html">
+                                        <a className="nav-link" onClick={logOut} href="#" role="tab">
                                             <i className="dlicon arrows-1_log-out"></i> Logout
                                         </a>
                                     </li>
@@ -289,18 +301,19 @@ const MyAccount: React.FC = () => {
                                                         </a>
                                                     </div>
                                                 </div>
-
-                                                {/* Newsletters */}
-                                                <div className="col-md-6">
-                                                    <h6 className="mb-3">Newsletters</h6>
-                                                    <p className="mb-1">You aren't subscribed to our newsletter.</p>
-                                                    <a href="#" className="underlined-link account-info-link ">Edit</a>
-                                                </div>
                                             </div>
 
                                             <div className="col-12">
                                                 <div className="underlined-header-title border-bottom pb-1 mb-4">
-                                                    <span className="h6-title">Address Book</span>&nbsp;&nbsp;&nbsp;&nbsp;<span className="underlined-link" style={{ fontFamily: 'salom-regular', fontSize: '.7rem' }}>  Manage Addresses</span>
+                                                    <span className="h6-title">Address Book</span>&nbsp;&nbsp;&nbsp;&nbsp;<span className="underlined-link manage-addresses" style={{ fontFamily: 'salom-regular', fontSize: '.7rem' }}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            const tab = document.getElementById('address-book-tab');
+                                                            if (tab) {
+                                                                tab.click();
+                                                            }
+                                                        }}
+                                                    >  Manage Addresses</span>
                                                 </div>
                                             </div>
 
@@ -566,7 +579,7 @@ const MyAccount: React.FC = () => {
                                     </div>
 
                                     {/* Address Tab */}
-                                    <div className="tab-pane fade" id="address" role="tabpanel">
+                                    <div className="tab-pane fade" id="address-book" role="tabpanel">
                                         <div className="myaccount-content address">
                                             <div className="alert alert-light">
                                                 The following addresses will be used on the checkout page by default.

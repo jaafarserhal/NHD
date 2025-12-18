@@ -30,5 +30,17 @@ class authService extends apiService {
     async updateCustomerInfo(customerData) {
         return this.put(customerData, apiUrls.updateCustomerInfo);
     }
+
+    // Initiate password reset
+    async initiatePasswordReset(email) {
+        const response = await this.post(email, apiUrls.initiatePasswordReset);
+        return response.data?.message;
+    }
+
+
+    // Reset password
+    async resetPassword(resetData) {
+        return this.put(resetData, apiUrls.resetPassword);
+    }
 }
 export default new authService();

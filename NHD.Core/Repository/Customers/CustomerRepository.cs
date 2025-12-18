@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using NHD.Core.Data;
 using NHD.Core.Models;
 using NHD.Core.Repository.Base;
+using NHD.Core.Utilities;
 
 namespace NHD.Core.Repository.Customers
 {
@@ -26,9 +27,9 @@ namespace NHD.Core.Repository.Customers
                 .FirstOrDefaultAsync(x => x.EmailVerificationToken == token);
         }
 
-        public async Task<Customer> GetByUsernameAsync(string username)
+        public async Task<Customer> AuthenticateLoginAsync(string username)
         {
-            return await Task.FromResult(_context.Customers.FirstOrDefault(c => c.EmailAddress == username && c.IsActive == true));
+            return await Task.FromResult(_context.Customers.FirstOrDefault(c => c.EmailAddress == username && c.IsActive == true && c.StatusLookupId == CustomerStatusLookup.Active.AsInt()));
         }
     }
 }

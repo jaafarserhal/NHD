@@ -10,6 +10,8 @@ import EmailVerified from "./pages/Auth/EmailVerified";
 import { routeUrls } from "./api/base/routeUrls";
 import MyAccount from "./pages/MyAccount";
 import ProtectedRoute from "./components/Common/ProtectedRoute/Index";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import ChangePassword from "./pages/Auth/ChangePassword";
 
 
 const App: React.FC = () => {
@@ -24,6 +26,8 @@ const App: React.FC = () => {
         <Route path={routeUrls.login} element={<Login />} />
         <Route path={routeUrls.emailVerify} element={<EmailVerify />} />
         <Route path={routeUrls.emailVerified} element={<EmailVerified />} />
+        <Route path={routeUrls.forgotPassword} element={<ForgotPassword />} />
+        <Route path={routeUrls.changePassword} element={<ChangePassword />} />
         <Route
           path={routeUrls.myAccount}
           element={
