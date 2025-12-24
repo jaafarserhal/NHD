@@ -19,5 +19,9 @@ namespace NHD.Core.Services.Customers
 
         Task<ServiceResult<string>> ChangePasswordAsync(Customer customer);
         Task<ServiceResult<string>> InitiatePasswordResetAsync(string email);
+
+        Task<Address> AddAddressAsync(Address address);
+        Task<Address> UpdateAddressAsync(Address address);
+        Task<Address> GetAddressAsync(int addressId);
     }
 }

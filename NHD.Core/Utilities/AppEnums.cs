@@ -112,5 +112,11 @@ namespace NHD.Core.Utilities
         AboutNawaExperience = 509
     }
 
+    public enum AddressType
+    {
+        Shipping = 700,
+        Billing = 701
+    }
+
 
 }

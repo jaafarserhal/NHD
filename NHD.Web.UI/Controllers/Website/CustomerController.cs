@@ -31,6 +31,8 @@ namespace NHD.Web.UI.Controllers.Website
             _jwtSecret = configuration["JwtSettings:SecretKey"] ?? throw new ArgumentNullException("JwtSettings:SecretKey");
         }
 
+        #region Customer Actions
+
         [HttpPost("Register")]
         public async Task<IActionResult> RegisterCustomer([FromBody] CustomerRegistrationModel dto)
         {
@@ -99,7 +101,6 @@ namespace NHD.Web.UI.Controllers.Website
                 user = userResponse
             });
         }
-
 
         [HttpPost("VerifyEmail")]
         public async Task<IActionResult> VerifyEmail([FromBody] string token)
@@ -172,7 +173,6 @@ namespace NHD.Web.UI.Controllers.Website
                 return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while resetting the password." });
             }
         }
-
 
         [HttpPut("ChangePassword")]
         [Authorize]
@@ -250,7 +250,7 @@ namespace NHD.Web.UI.Controllers.Website
 
         [HttpGet("Info")]
         [Authorize]
-        public async Task<IActionResult> GetCurrentCustomer()
+        public async Task<ActionResult<ServiceResult<CustomerInfoModel>>> GetCustomerInfo()
         {
             try
             {
@@ -275,10 +275,29 @@ namespace NHD.Web.UI.Controllers.Website
                     Email = customer.Data.EmailAddress,
                     FirstName = customer.Data.FirstName,
                     LastName = customer.Data.LastName,
-                    Mobile = customer.Data.Mobile
+                    Mobile = customer.Data.Mobile,
+                    Addresses = customer.Data.Addresses?.Select(a => new CustomerAddressModel
+                    {
+                        Id = a.AddressId,
+                        FirstName = a.ContactFirstName,
+                        LastName = a.ContactLastName,
+                        Phone = a.ContactPhone,
+                        StreetName = a.StreetName,
+                        StreetNumber = a.StreetNumber,
+                        PostalCode = a.PostalCode,
+                        City = a.City,
+                        Type = a.AddressTypeLookup.NameEn,
+                        TypeId = a.AddressTypeLookupId,
+                        IsPrimary = a.IsPrimary
+                    }).ToList() ?? new List<CustomerAddressModel>()
                 };
 
-                return Ok(customerResponse);
+                return Ok(new ServiceResult<CustomerInfoModel>
+                {
+                    Data = customerResponse,
+                    IsSuccess = true,
+                    Status = HttpStatusCodeEnum.OK.AsInt()
+                });
             }
             catch (Exception ex)
             {
@@ -301,7 +320,7 @@ namespace NHD.Web.UI.Controllers.Website
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = claims,
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(24),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature
@@ -311,5 +330,113 @@ namespace NHD.Web.UI.Controllers.Website
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+        #endregion Customer Actions
+
+        #region Address Actions
+
+        [HttpPost("AddAddress")]
+        [Authorize]
+        public async Task<IActionResult> AddAddress([FromBody] CustomerAddressModel model)
+        {
+            try
+            {
+                if (model == null)
+                    return BadRequest("Address model is required.");
+
+                var address = new Address
+                {
+                    ContactFirstName = model.FirstName,
+                    ContactLastName = model.LastName,
+                    ContactPhone = model.Phone,
+                    StreetName = model.StreetName,
+                    StreetNumber = model.StreetNumber,
+                    PostalCode = model.PostalCode,
+                    City = model.City,
+                    AddressTypeLookupId = model.TypeId,
+                    IsPrimary = model.IsPrimary,
+                };
+
+                var addedAddress = await _customerService.AddAddressAsync(address);
+                return Ok(addedAddress);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding address");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), "An error occurred while adding the address.");
+            }
+        }
+
+        [HttpPut("UpdateAddress")]
+        [Authorize]
+        public async Task<IActionResult> UpdateAddress([FromBody] CustomerAddressModel model)
+        {
+            try
+            {
+                if (model == null || model.Id <= 0)
+                    return BadRequest("Address model is required.");
+
+                var address = new Address
+                {
+                    AddressId = model.Id,
+                    ContactFirstName = model.FirstName,
+                    ContactLastName = model.LastName,
+                    ContactPhone = model.Phone,
+                    StreetName = model.StreetName,
+                    StreetNumber = model.StreetNumber,
+                    PostalCode = model.PostalCode,
+                    City = model.City,
+                    AddressTypeLookupId = model.TypeId,
+                    IsPrimary = model.IsPrimary,
+                };
+                var updatedAddress = await _customerService.UpdateAddressAsync(address);
+                return Ok(updatedAddress);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating address");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), "An error occurred while updating the address.");
+            }
+        }
+
+        [HttpGet("Address/{addressId}")]
+        [Authorize]
+        public async Task<ActionResult<ServiceResult<CustomerAddressModel>>> GetAddress(int addressId)
+        {
+            try
+            {
+                var address = await _customerService.GetAddressAsync(addressId);
+                if (address == null)
+                {
+                    return NotFound("Address not found.");
+                }
+
+                var customerAddress = new CustomerAddressModel
+                {
+                    Id = address.AddressId,
+                    FirstName = address.ContactFirstName,
+                    LastName = address.ContactLastName,
+                    Phone = address.ContactPhone,
+                    StreetName = address.StreetName,
+                    StreetNumber = address.StreetNumber,
+                    PostalCode = address.PostalCode,
+                    City = address.City,
+                    TypeId = address.AddressTypeLookupId,
+                    IsPrimary = address.IsPrimary
+                };
+                return Ok(new ServiceResult<CustomerAddressModel>
+                {
+                    Data = customerAddress,
+                    IsSuccess = true,
+                    Status = HttpStatusCodeEnum.OK.AsInt()
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving address");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), "An error occurred while retrieving the address.");
+            }
+        }
+
+        #endregion Address Actions
     }
 }

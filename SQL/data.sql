@@ -8,7 +8,8 @@ VALUES
     (300, 'Product Size', 'Produktstorlek', SYSUTCDATETIME(), 1),
     (400, 'Order Status', 'Orderstatus', SYSUTCDATETIME(), 1),
 	(500, N'Sections Type', N'Sections Type',SYSUTCDATETIME(), 1),
-	(600, N'Customer Status', N'Customer Status',SYSUTCDATETIME(), 1);
+	(600, N'Customer Status', N'Customer Status',SYSUTCDATETIME(), 1),
+	(700, N'Address Type', N'Address Type',SYSUTCDATETIME(), 1);
 
 -- =============================================
 -- INSERT INTO gen_lookup
@@ -60,7 +61,9 @@ VALUES
 (600, 600, N'Pending', N'Pending',SYSUTCDATETIME(), 1),
 (601, 600, N'Active', N'Aktiv', SYSUTCDATETIME(), 1),
 (602, 600, N'Inactive', N'Inaktiv', SYSUTCDATETIME(), 1),
-(603, 600, N'Guest', N'Gäst', SYSUTCDATETIME(), 1);
+(603, 600, N'Guest', N'Gäst', SYSUTCDATETIME(), 1),
+(700, 700, N'Billing', N'Billing',SYSUTCDATETIME(), 1),
+(701, 700, N'Shipping', N'Shipping',SYSUTCDATETIME(), 1);
 
 
 

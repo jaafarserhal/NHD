@@ -69,3 +69,25 @@ export interface LoginResponse {
         lastName: string;
     }
 }
+
+export interface CustomerInfo {
+    email: string;
+    firstName: string;
+    lastName: string;
+    mobile: string;
+    addresses: Address[];
+}
+
+export interface Address {
+    id: number;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    streetName?: string;
+    streetNumber?: string;
+    postalCode?: string;
+    city?: string;
+    type?: string;
+    typeId?: number;
+    isPrimary?: boolean;
+}

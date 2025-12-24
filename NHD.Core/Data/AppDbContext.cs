@@ -55,15 +55,35 @@ public partial class AppDbContext : DbContext
     {
         modelBuilder.Entity<Address>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__address__CAA247C8C3DB21CC");
+            entity.HasKey(e => e.AddressId).HasName("PK__address__CAA247C859D762FF");
 
             entity.ToTable("address");
 
             entity.Property(e => e.AddressId).HasColumnName("address_id");
+            entity.Property(e => e.AddressTypeLookupId).HasColumnName("address_type_lookup_id");
             entity.Property(e => e.City)
                 .IsRequired()
                 .HasMaxLength(100)
                 .HasColumnName("city");
+            entity.Property(e => e.ContactFirstName)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnName("contact_firstName");
+            entity.Property(e => e.ContactLastName)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnName("contact_lastName");
+            entity.Property(e => e.ContactPhone)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasColumnName("contact_phone");
+            entity.Property(e => e.CountryCode)
+                .IsRequired()
+                .HasMaxLength(2)
+                .IsUnicode(false)
+                .HasDefaultValue("SE")
+                .IsFixedLength()
+                .HasColumnName("country_code");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
@@ -71,17 +91,27 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
-            entity.Property(e => e.Land)
-                .HasMaxLength(100)
-                .HasColumnName("land");
+            entity.Property(e => e.IsPrimary).HasColumnName("is_primary");
             entity.Property(e => e.Note).HasColumnName("note");
             entity.Property(e => e.PostalCode)
-                .HasMaxLength(20)
+                .IsRequired()
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .IsFixedLength()
                 .HasColumnName("postal_code");
-            entity.Property(e => e.Street)
+            entity.Property(e => e.StreetName)
                 .IsRequired()
                 .HasMaxLength(200)
-                .HasColumnName("street");
+                .HasColumnName("street_name");
+            entity.Property(e => e.StreetNumber)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasColumnName("street_number");
+
+            entity.HasOne(d => d.AddressTypeLookup).WithMany(p => p.Addresses)
+                .HasForeignKey(d => d.AddressTypeLookupId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_address_type_lookup");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Addresses)
                 .HasForeignKey(d => d.CustomerId)

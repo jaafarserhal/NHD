@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using NHD.Core.Common.Models;
 using NHD.Core.Data;
 using NHD.Core.Models;
+using NHD.Core.Repository.Addresses;
 using NHD.Core.Repository.Customers;
 using NHD.Core.Services.Model.Customer;
 using NHD.Core.Utilities;
@@ -17,18 +18,40 @@ namespace NHD.Core.Services.Customers
     {
         protected internal AppDbContext context;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IAddressRepository _addressRepository;
         private readonly IEmailService _emailService;
         private readonly ILogger<CustomerService> _logger;
         protected internal IDbContextTransaction Transaction;
 
-        public CustomerService(AppDbContext context, ICustomerRepository customerRepository, IEmailService emailService, ILogger<CustomerService> logger)
+        public CustomerService(AppDbContext context, ICustomerRepository customerRepository, IAddressRepository addressRepository, IEmailService emailService, ILogger<CustomerService> logger)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
+            _addressRepository = addressRepository ?? throw new ArgumentNullException(nameof(addressRepository));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        #region Addresses
+        public async Task<Address> AddAddressAsync(Address address)
+        {
+            await _addressRepository.AddAsync(address);
+            return address;
+        }
+
+        public async Task<Address> UpdateAddressAsync(Address address)
+        {
+            await _addressRepository.UpdateAsync(address);
+            return address;
+        }
+
+        public async Task<Address> GetAddressAsync(int addressId)
+        {
+            return await _addressRepository.GetByIdAsync(addressId);
+        }
+        #endregion Addresses
+
+        #region Customers
         public async Task<ServiceResult<string>> RegisterAsync(Customer customer)
         {
             await BeginTransactionAsync();
@@ -215,6 +238,7 @@ namespace NHD.Core.Services.Customers
             await _customerRepository.UpdateAsync(customer);
             return customer;
         }
+        #endregion Customers
 
         #region Transactions
         public async Task BeginTransactionAsync()

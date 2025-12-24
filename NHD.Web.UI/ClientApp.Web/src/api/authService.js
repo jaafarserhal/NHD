@@ -42,5 +42,17 @@ class authService extends apiService {
     async resetPassword(resetData) {
         return this.put(resetData, apiUrls.resetPassword);
     }
+
+    async addAddress(addressData) {
+        return this.post(addressData, apiUrls.addCustomerAddress);
+    }
+
+    async updateAddress(addressData) {
+        return this.put(addressData, apiUrls.updateCustomerAddress);
+    }
+
+    async getAddress(addressId) {
+        return this.get(`${apiUrls.getCustomerAddress}/${addressId}`);
+    }
 }
 export default new authService();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Header from "../components/Common/Header/Index";
 import Footer from "../components/Common/Footer/Index";
 import authService from "../api/authService";
@@ -7,40 +7,65 @@ import { validatePassword } from "../api/common/Utils";
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from "react-router-dom";
 import { routeUrls } from "../api/base/routeUrls";
+import { CustomerInfo, Address } from "../api/common/Types";
+import { AddressTypeEnum } from "../api/common/Enums";
+
 
 const MyAccount: React.FC = () => {
     const navigate = useNavigate();
-    const [customerInfo, setCustomerInfo] = useState<any>(null);
+    const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [loading, setLoading] = useState(false);
     const [formValues, setFormValues] = useState({
         firstName: "",
         lastName: "",
-        mobile: ""
+        mobile: "",
+        addresses: [] as Address[],
     });
 
+    const [address, setAddress] = useState<Address>({
+        id: 0,
+        firstName: "",
+        lastName: "",
+        phone: "",
+        streetName: "",
+        streetNumber: "",
+        postalCode: "",
+        city: "",
+        typeId: AddressTypeEnum.Billing,
+        isPrimary: false
+    });
 
-    useEffect(() => {
-        const fetchCustomerInfo = async () => {
-            try {
-                const info = await authService.getCustomerInfo();
-                setCustomerInfo(info);
-            } catch (error) {
-                console.error("Failed to fetch customer info", error);
-            }
-        };
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [addressErrors, setAddressErrors] = useState<{ [key: string]: string }>({});
 
-        fetchCustomerInfo();
+    const fetchCustomerInfo = useCallback(async () => {
+        try {
+            setLoading(true);
+            const response = await authService.getCustomerInfo();
+            setCustomerInfo(response.data);
+        } catch (error) {
+            console.error("Failed to fetch customer info", error);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
     useEffect(() => {
-        if (customerInfo) {
-            setFormValues({
-                firstName: customerInfo.firstName || "",
-                lastName: customerInfo.lastName || "",
-                mobile: customerInfo.mobile || ""
-            });
-        }
+        fetchCustomerInfo();
+    }, [fetchCustomerInfo]);
+
+    useEffect(() => {
+        if (!customerInfo) return;
+
+        const { firstName = "", lastName = "", mobile = "", addresses = [] } = customerInfo;
+
+        setFormValues({
+            firstName,
+            lastName,
+            mobile,
+            addresses,
+        });
     }, [customerInfo]);
 
     const handleEditInfoSubmit = async (event: React.FormEvent) => {
@@ -83,14 +108,10 @@ const MyAccount: React.FC = () => {
         const form = event.target as HTMLFormElement;
         const formData = new FormData(form);
 
-        // Reset errors
         const newErrors: { [key: string]: string } = {};
 
-        // Get form values
         const password = formData.get('password') as string;
         const confirmPassword = formData.get('confirmPassword') as string;
-
-        // Validate required fields
 
         if (!password) {
             newErrors['password'] = "Password is required";
@@ -107,7 +128,6 @@ const MyAccount: React.FC = () => {
             newErrors['confirmPassword'] = "Passwords do not match";
         }
 
-        // If there are validation errors, show them and stop
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             setLoading(false);
@@ -123,9 +143,7 @@ const MyAccount: React.FC = () => {
             setErrors({});
             setLoading(false);
             toast.success("Password changed successfully!");
-            // Clear form fields
             form.reset();
-
         } catch (error) {
             if (error && (error as any).status === 409) {
                 setErrors({ emailAddress: (error as any).data });
@@ -136,7 +154,6 @@ const MyAccount: React.FC = () => {
             toast.error("Failed to change password.");
         }
     };
-
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -156,7 +173,6 @@ const MyAccount: React.FC = () => {
     };
 
     const handlePasswordInputChange = (fieldName: string) => {
-        // Remove error when user starts typing
         if (errors[fieldName]) {
             setErrors(prev => {
                 const newErrors = { ...prev };
@@ -164,6 +180,122 @@ const MyAccount: React.FC = () => {
                 return newErrors;
             });
         }
+    };
+
+    const handleAddressInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setAddress(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        if (addressErrors[name]) {
+            setAddressErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        }
+    };
+
+    const validateAddressForm = () => {
+        const newErrors: { [key: string]: string } = {};
+
+        if (!address.firstName?.trim()) newErrors.firstName = "First name is required";
+        if (!address.lastName?.trim()) newErrors.lastName = "Last name is required";
+        if (!address.phone?.trim()) newErrors.phone = "Phone number is required";
+        if (!address.streetName?.trim()) newErrors.streetName = "Street name is required";
+        if (!address.streetNumber?.trim()) newErrors.streetNumber = "Street number is required";
+        if (!address.postalCode?.trim()) newErrors.postalCode = "Postal code is required";
+        if (!address.city?.trim()) newErrors.city = "City is required";
+
+        return newErrors;
+    };
+
+    const handleAddressSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        const validationErrors = validateAddressForm();
+
+        if (Object.keys(validationErrors).length > 0) {
+            setAddressErrors(validationErrors);
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            if (isEditMode && address.id) {
+                await authService.updateAddress(address);
+                toast.success("Address updated successfully!");
+            } else {
+                await authService.addAddress(address);
+                toast.success("Address added successfully!");
+            }
+
+            setAddress({
+                id: 0,
+                firstName: "",
+                lastName: "",
+                phone: "",
+                streetName: "",
+                streetNumber: "",
+                postalCode: "",
+                city: "",
+                typeId: AddressTypeEnum.Billing,
+                isPrimary: false
+            });
+            setIsEditMode(false);
+            setAddressErrors({});
+
+            await fetchCustomerInfo();
+            setLoading(false);
+        } catch (error) {
+            console.error("Failed to save address", error);
+            toast.error(isEditMode ? "Failed to update address." : "Failed to add address.");
+            setLoading(false);
+        }
+    };
+
+    const handleEditAddress = async (addressId: number) => {
+        try {
+            setLoading(true);
+
+            // First switch to address book tab
+            const tab = document.getElementById('address-book-tab');
+            if (tab) {
+                tab.click();
+            }
+
+            // Then fetch the address data
+            const response = await authService.getAddress(addressId);
+            setAddress(response.data);
+            setIsEditMode(true);
+            setAddressErrors({});
+
+            setLoading(false);
+        } catch (error) {
+            console.error("Failed to fetch address", error);
+            toast.error("Failed to load address details.");
+            setLoading(false);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setAddress({
+            id: 0,
+            firstName: "",
+            lastName: "",
+            phone: "",
+            streetName: "",
+            streetNumber: "",
+            postalCode: "",
+            city: "",
+            typeId: AddressTypeEnum.Billing,
+            isPrimary: false
+        });
+        setIsEditMode(false);
+        setAddressErrors({});
     };
 
     const logOut = () => {
@@ -179,7 +311,6 @@ const MyAccount: React.FC = () => {
         <>
             <Header />
             <div>
-                {/* Breadcrumb Section Start */}
                 <div
                     className="breadcrumb"
                     style={{
@@ -187,14 +318,10 @@ const MyAccount: React.FC = () => {
                     }}
                 >
                 </div>
-                {/* Breadcrumb Section End */}
 
-                {/* My Account Section Start */}
                 <div className="section" style={{ padding: '25px 0', position: 'relative' }}>
-
                     <div className="container custom-container" style={{ marginTop: '30px' }}>
                         <div className="row g-lg-10 g-6">
-                            {/* My Account Tab List Start */}
                             <div className="col-lg-4 col-12">
                                 <ul className="my-account-tab-list nav flex-column" id="accountTab" role="tablist">
                                     <li className="nav-item">
@@ -217,7 +344,6 @@ const MyAccount: React.FC = () => {
                                             <i className="dlicon ui-1_lock-circle-open"></i> Change Password
                                         </a>
                                     </li>
-
                                     <li className="nav-item">
                                         <a className="nav-link" id="address-book-tab" data-bs-toggle="tab" href="#address-book" role="tab">
                                             <i className="dlicon location_pin"></i> Address Book
@@ -229,24 +355,21 @@ const MyAccount: React.FC = () => {
                                         </a>
                                     </li>
                                 </ul>
-                                {/* Custom positioned toaster */}
                                 <Toaster
                                     containerStyle={{
                                         top: 0,
                                         left: 0,
-                                        position: 'absolute', // absolute inside sidebar
-                                        width: '100%',        // match sidebar width
+                                        position: 'absolute',
+                                        width: '100%',
                                     }}
                                     toastOptions={{
                                         style: {
-                                            marginBottom: '8px', // spacing between multiple toasts
+                                            marginBottom: '8px',
                                         },
                                     }}
                                 />
                             </div>
-                            {/* My Account Tab List End */}
 
-                            {/* My Account Tab Content Start */}
                             <div className="col-lg-8 col-12 mt-2">
                                 <Loader loading={loading} isDark={true} fullscreen={false} />
                                 <div className="tab-content" id="accountTabContent">
@@ -260,10 +383,9 @@ const MyAccount: React.FC = () => {
                                             </div>
 
                                             <div className="row mb-3">
-                                                {/* Contact Information */}
                                                 <div className="col-md-6 mb-4 mb-md-0">
                                                     <h6 className="mb-3">Contact Information</h6>
-                                                    <p className="mb-1" >{formValues?.firstName} {formValues?.lastName}</p>
+                                                    <p className="mb-1">{formValues?.firstName} {formValues?.lastName}</p>
                                                     {customerInfo?.email && <p className="mb-1">{customerInfo?.email}</p>}
                                                     <p className="mb-1">
                                                         {formValues?.mobile
@@ -305,7 +427,10 @@ const MyAccount: React.FC = () => {
 
                                             <div className="col-12">
                                                 <div className="underlined-header-title border-bottom pb-1 mb-4">
-                                                    <span className="h6-title">Address Book</span>&nbsp;&nbsp;&nbsp;&nbsp;<span className="underlined-link manage-addresses" style={{ fontFamily: 'salom-regular', fontSize: '.7rem' }}
+                                                    <span className="h6-title">Address Book</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <span
+                                                        className="underlined-link manage-addresses"
+                                                        style={{ fontFamily: 'salom-regular', fontSize: '.7rem', cursor: 'pointer' }}
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             const tab = document.getElementById('address-book-tab');
@@ -313,27 +438,99 @@ const MyAccount: React.FC = () => {
                                                                 tab.click();
                                                             }
                                                         }}
-                                                    >  Manage Addresses</span>
+                                                    >
+                                                        Manage Addresses
+                                                    </span>
                                                 </div>
                                             </div>
 
                                             <div className="row">
-                                                {/* Default Billing Address */}
                                                 <div className="col-md-6 mb-4 mb-md-0">
                                                     <h6 className="mb-3">Default Billing Address</h6>
-                                                    <p className="mb-1">You have not set a default billing address.</p>
-                                                    <a href="#" className="underlined-link account-info-link ">Edit Address</a>
+                                                    {!customerInfo?.addresses?.some(a => a.typeId === AddressTypeEnum.Billing) ? (
+                                                        <p className="mb-1">You have not set a default billing address.</p>
+                                                    ) : (
+                                                        <div className="mb-1">
+                                                            {customerInfo?.addresses.filter(address => address.typeId === AddressTypeEnum.Billing).map((address, index) => (
+                                                                <address key={index}>
+                                                                    <p className="name">
+                                                                        <strong>{address.firstName} {address.lastName}</strong>
+                                                                    </p>
+                                                                    <p className="mb-1">
+                                                                        {address.streetName} {address.streetNumber} <br />
+                                                                        {address.postalCode} {address.city}
+                                                                    </p>
+                                                                    <p>Mobile: {address.phone
+                                                                        ? address.phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3")
+                                                                        : ""}</p>
+                                                                </address>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    {customerInfo?.addresses?.some(a => a.typeId === AddressTypeEnum.Billing && a.isPrimary) && (
+                                                        <a
+                                                            href="#"
+                                                            className="underlined-link account-info-link"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                const billingAddr = customerInfo?.addresses?.find(a => a.typeId === AddressTypeEnum.Billing);
+                                                                if (billingAddr && billingAddr.id) {
+                                                                    handleEditAddress(billingAddr.id);
+                                                                } else {
+                                                                    const tab = document.getElementById('address-book-tab');
+                                                                    if (tab) tab.click();
+                                                                }
+                                                            }}
+                                                        >
+                                                            Edit Address
+                                                        </a>
+                                                    )}
                                                 </div>
 
-                                                {/* Default Shipping Address */}
                                                 <div className="col-md-6">
                                                     <h6 className="mb-3">Default Shipping Address</h6>
-                                                    <p className="mb-1">You have not set a default shipping address.</p>
-                                                    <a href="#" className="underlined-link account-info-link ">Edit Address</a>
+                                                    {!customerInfo?.addresses?.some(a => a.typeId === AddressTypeEnum.Shipping) ? (
+                                                        <p className="mb-1">You have not set a default shipping address.</p>
+                                                    ) : (
+                                                        <div className="mb-1">
+                                                            {customerInfo?.addresses.filter(address => address.typeId === AddressTypeEnum.Shipping).map((address, index) => (
+                                                                <address key={index}>
+                                                                    <p className="name">
+                                                                        <strong>{address.firstName} {address.lastName}</strong>
+                                                                    </p>
+                                                                    <p className="mb-1">
+                                                                        {address.streetName} {address.streetNumber} <br />
+                                                                        {address.postalCode} {address.city}
+                                                                    </p>
+                                                                    <p>Mobile: {address.phone
+                                                                        ? address.phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3")
+                                                                        : ""}</p>
+                                                                </address>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    {customerInfo?.addresses?.some(a => a.typeId === AddressTypeEnum.Shipping && a.isPrimary) && (<a
+                                                        href="#"
+                                                        className="underlined-link account-info-link"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            const shippingAddr = customerInfo?.addresses?.find(a => a.typeId === AddressTypeEnum.Shipping);
+                                                            if (shippingAddr && shippingAddr.id) {
+                                                                handleEditAddress(shippingAddr.id);
+                                                            } else {
+                                                                const tab = document.getElementById('address-book-tab');
+                                                                if (tab) tab.click();
+                                                            }
+                                                        }}
+                                                    >
+                                                        Edit Address
+                                                    </a>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
                                     {/* Account Info Tab */}
                                     <div className="tab-pane fade" id="account-info" role="tabpanel">
                                         <div className="row g-6 justify-center">
@@ -410,16 +607,15 @@ const MyAccount: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    {/* Account Info Tab */}
+                                    {/* Change Password Tab */}
                                     <div className="tab-pane fade" id="change-password" role="tabpanel">
                                         <div className="row g-6 justify-center">
                                             <div className="col-lg-8 col-12">
                                                 <h3 className="border-bottom pb-1 mb-4">Change Password</h3>
                                                 <div className="myaccount-content account-details" style={{ padding: '20px 0' }}>
                                                     <div className="account-details-form">
-                                                        <form onSubmit={handleChangePasswordSubmit} noValidate >
+                                                        <form onSubmit={handleChangePasswordSubmit} noValidate>
                                                             <div className="row g-4">
-
                                                                 <div className="col-12 mt-1">
                                                                     <label htmlFor="password">
                                                                         Password <abbr className="required">*</abbr>
@@ -454,7 +650,6 @@ const MyAccount: React.FC = () => {
                                                                     </span>
                                                                 </div>
 
-
                                                                 <div className="col-12">
                                                                     <button className="btn btn-dark btn-primary-hover w-100" type="submit">
                                                                         Save
@@ -465,20 +660,6 @@ const MyAccount: React.FC = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Dashboard Tab */}
-                                    <div className="tab-pane fade" id="dashboard" role="tabpanel">
-                                        <div className="myaccount-content dashboard">
-                                            <div className="alert alert-light">
-                                                Hello <b>didiv91396</b> (not <b>didiv91396</b>?{" "}
-                                                <a href="login.html">Log out</a>)
-                                            </div>
-                                            <p>
-                                                From your account dashboard you can view your <u>recent orders</u>, manage your{" "}
-                                                <u>shipping and billing addresses</u>, and <u>edit your password and account details</u>.
-                                            </p>
                                         </div>
                                     </div>
 
@@ -536,95 +717,321 @@ const MyAccount: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    {/* Download Tab */}
-                                    <div className="tab-pane fade" id="download" role="tabpanel">
-                                        <div className="myaccount-content download">
-                                            <div className="table-responsive">
-                                                <table className="table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Product</th>
-                                                            <th>Date</th>
-                                                            <th>Expire</th>
-                                                            <th>Download</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Haven - Free Real Estate PSD Template</td>
-                                                            <td>Aug 22, 2018</td>
-                                                            <td>Yes</td>
-                                                            <td>
-                                                                <a href="#">
-                                                                    <i className="dlicon arrows-1_cloud-download-93"></i>{" "}
-                                                                    <b>Download File</b>
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>HasTech - Profolio Business Template</td>
-                                                            <td>Sep 12, 2018</td>
-                                                            <td>Never</td>
-                                                            <td>
-                                                                <a href="#">
-                                                                    <i className="dlicon arrows-1_cloud-download-93"></i>{" "}
-                                                                    <b>Download File</b>
-                                                                </a>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Address Tab */}
+                                    {/* Address Book Tab */}
                                     <div className="tab-pane fade" id="address-book" role="tabpanel">
-                                        <div className="myaccount-content address">
-                                            <div className="alert alert-light">
-                                                The following addresses will be used on the checkout page by default.
-                                            </div>
-                                            <div className="row">
-                                                <div className="col-md-6 col-12">
-                                                    <h4 className="title">
-                                                        Billing Address <a href="#" className="edit-link">edit</a>
-                                                    </h4>
-                                                    <address>
-                                                        <p className="name">
-                                                            <strong>Alex Tuntuni</strong>
-                                                        </p>
-                                                        <p className="mb-3">
-                                                            1355 Market St, Suite 900 <br />
-                                                            San Francisco, CA 94103
-                                                        </p>
-                                                        <p>Mobile: (123) 456-7890</p>
-                                                    </address>
+                                        {/* Show default addresses only when NOT in edit mode */}
+                                        {!isEditMode && customerInfo?.addresses.length! > 0 && (
+                                            <div className="myaccount-content address">
+                                                <div className="row g-4">
+                                                    <div className="col-12">
+                                                        <h3 className="pb-1 mb-4">
+                                                            Default Addresses
+                                                        </h3>
+                                                    </div>
+
+                                                    <div className="col-lg-6 col-12">
+                                                        <h6 className="underlined-header-title">Default Billing Address</h6>
+                                                        <div className="myaccount-content account-details">
+                                                            <div className="account-details-form" style={{ marginBottom: '30px' }}>
+                                                                {customerInfo?.addresses.filter(address => address.typeId === AddressTypeEnum.Billing).map((address, index) => (
+                                                                    <address key={index} style={{ marginTop: '20px' }}>
+                                                                        <p className="name">
+                                                                            <strong>{address.firstName} {address.lastName}</strong>
+                                                                        </p>
+                                                                        <p className="mb-1">
+                                                                            {address.streetName} {address.streetNumber} <br />
+                                                                            {address.postalCode} {address.city}
+                                                                        </p>
+                                                                        <p>Mobile: {address.phone
+                                                                            ? address.phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3")
+                                                                            : ""}</p>
+                                                                    </address>
+                                                                ))}
+                                                                <a
+                                                                    href="#"
+                                                                    className="underlined-link account-info-link"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        const billingAddr = customerInfo?.addresses?.find(a => a.typeId === AddressTypeEnum.Billing);
+                                                                        if (billingAddr && billingAddr.id) {
+                                                                            handleEditAddress(billingAddr.id);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Changing Billing Address
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-lg-6 col-12">
+                                                        <h6 className="underlined-header-title">Default Shipping Address</h6>
+                                                        <div className="myaccount-content account-details">
+                                                            <div className="account-details-form">
+                                                                {customerInfo?.addresses.filter(address => address.typeId === AddressTypeEnum.Shipping).map((address, index) => (
+                                                                    <address key={index} style={{ marginTop: '20px' }}>
+                                                                        <p className="name">
+                                                                            <strong>{address.firstName} {address.lastName}</strong>
+                                                                        </p>
+                                                                        <p className="mb-1">
+                                                                            {address.streetName} {address.streetNumber} <br />
+                                                                            {address.postalCode} {address.city}
+                                                                        </p>
+                                                                        <p>Mobile: {address.phone
+                                                                            ? address.phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3")
+                                                                            : ""}</p>
+                                                                    </address>
+                                                                ))}
+                                                                <a
+                                                                    href="#"
+                                                                    className="underlined-link account-info-link"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        const shippingAddr = customerInfo?.addresses?.find(a => a.typeId === AddressTypeEnum.Shipping);
+                                                                        if (shippingAddr && shippingAddr.id) {
+                                                                            handleEditAddress(shippingAddr.id);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    Changing Shipping Address
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-12">
+                                                        <h6 className="underlined-header-title">Additional Address Entries</h6>
+                                                        <p className="mb-3">You have no other address entries in your address book.</p>
+                                                        <button
+                                                            className="btn btn-dark btn-primary-hover"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                setIsEditMode(true);
+                                                                setAddress({
+                                                                    id: 0,
+                                                                    firstName: '',
+                                                                    lastName: '',
+                                                                    phone: '',
+                                                                    streetName: '',
+                                                                    streetNumber: '',
+                                                                    postalCode: '',
+                                                                    city: '',
+                                                                    typeId: AddressTypeEnum.Billing,
+                                                                    isPrimary: false
+                                                                });
+                                                                setAddressErrors({});
+                                                            }}
+                                                        >
+                                                            Add New Address
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div className="col-md-6 col-12">
-                                                    <h4 className="title">
-                                                        Shipping Address <a href="#" className="edit-link">edit</a>
-                                                    </h4>
-                                                    <address>
-                                                        <p className="name">
-                                                            <strong>Alex Tuntuni</strong>
-                                                        </p>
-                                                        <p className="mb-3">
-                                                            1355 Market St, Suite 900 <br />
-                                                            San Francisco, CA 94103
-                                                        </p>
-                                                        <p>Mobile: (123) 456-7890</p>
-                                                    </address>
+                                            </div>
+                                        )}
+                                        {isEditMode || customerInfo?.addresses.length == 0 && (
+                                            <div className="myaccount-content address">
+                                                <div className="row g-4">
+                                                    <div className="col-12">
+                                                        <h3 className="border-bottom pb-1 mb-4">
+                                                            {address.id ? 'Edit Address' : 'Add New Address'}
+                                                        </h3>
+                                                    </div>
+
+                                                    <div className="col-lg-6 col-12">
+                                                        <h6 className="underlined-header-title">Contact Information</h6>
+                                                        <div className="myaccount-content account-details">
+                                                            <div className="account-details-form">
+                                                                <form style={{ marginTop: '35px' }} onSubmit={handleAddressSubmit}>
+                                                                    <div className="row g-4">
+                                                                        {!address.id && (
+                                                                            <div className="col-12 mt-1" style={{ marginBottom: '28px' }}>
+                                                                                <label htmlFor="typeId">
+                                                                                    Address Type <abbr className="required">*</abbr>
+                                                                                </label>
+                                                                                <select
+                                                                                    id="typeId"
+                                                                                    name="typeId"
+                                                                                    className="form-field select-input-style"
+                                                                                    style={addressErrors.typeId ? { borderColor: 'red' } : {}}
+                                                                                    value={address.typeId}
+                                                                                    onChange={handleAddressInputChange}
+                                                                                >
+                                                                                    <option value="">Select address type</option>
+                                                                                    <option value={AddressTypeEnum.Billing}>Billing</option>
+                                                                                    <option value={AddressTypeEnum.Shipping}>Shipping</option>
+                                                                                </select>
+                                                                                <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                                                    {addressErrors['typeId'] || '\u00A0'}
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
+                                                                        <div className="col-12 mt-1">
+                                                                            <label htmlFor="addressFirstName">
+                                                                                First Name <abbr className="required">*</abbr>
+                                                                            </label>
+                                                                            <input
+                                                                                id="addressFirstName"
+                                                                                name="firstName"
+                                                                                type="text"
+                                                                                placeholder="Enter first name"
+                                                                                className="form-field"
+                                                                                value={address.firstName}
+                                                                                onChange={handleAddressInputChange}
+                                                                                style={addressErrors.firstName ? { borderColor: 'red' } : {}}
+                                                                            />
+                                                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                                                {addressErrors['firstName'] || '\u00A0'}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div className="col-12 mt-1">
+                                                                            <label htmlFor="addressLastName">
+                                                                                Last Name <abbr className="required">*</abbr>
+                                                                            </label>
+                                                                            <input
+                                                                                id="addressLastName"
+                                                                                name="lastName"
+                                                                                type="text"
+                                                                                placeholder="Enter last name"
+                                                                                className="form-field"
+                                                                                value={address.lastName}
+                                                                                onChange={handleAddressInputChange}
+                                                                                style={addressErrors.lastName ? { borderColor: 'red' } : {}}
+                                                                            />
+                                                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                                                {addressErrors['lastName'] || '\u00A0'}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div className="col-12 mt-1">
+                                                                            <label htmlFor="addressPhone">
+                                                                                Mobile Number <abbr className="required">*</abbr>
+                                                                            </label>
+                                                                            <input
+                                                                                id="addressPhone"
+                                                                                name="phone"
+                                                                                type="tel"
+                                                                                placeholder="Enter phone number"
+                                                                                className="form-field"
+                                                                                value={address.phone}
+                                                                                onChange={handleAddressInputChange}
+                                                                                style={addressErrors.phone ? { borderColor: 'red' } : {}}
+                                                                            />
+                                                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                                                {addressErrors['phone'] || '\u00A0'}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-lg-6 col-12">
+                                                        <h6 className="underlined-header-title">Address</h6>
+                                                        <div className="myaccount-content account-details">
+                                                            <div className="account-details-form">
+                                                                <form onSubmit={handleAddressSubmit}>
+                                                                    <div className="col-12 mt-1">
+                                                                        <label htmlFor="streetName">
+                                                                            Street Name <abbr className="required">*</abbr>
+                                                                        </label>
+                                                                        <input
+                                                                            id="streetName"
+                                                                            name="streetName"
+                                                                            type="text"
+                                                                            className="form-field"
+                                                                            placeholder="Enter street name"
+                                                                            value={address.streetName}
+                                                                            onChange={handleAddressInputChange}
+                                                                            style={addressErrors.streetName ? { borderColor: 'red' } : {}}
+                                                                        />
+                                                                        <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                                            {addressErrors['streetName'] || '\u00A0'}
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <div className="col-12 mt-1">
+                                                                        <label htmlFor="streetNumber">
+                                                                            Street Number <abbr className="required">*</abbr>
+                                                                        </label>
+                                                                        <input
+                                                                            id="streetNumber"
+                                                                            name="streetNumber"
+                                                                            type="text"
+                                                                            className="form-field"
+                                                                            placeholder="Enter street number"
+                                                                            value={address.streetNumber}
+                                                                            onChange={handleAddressInputChange}
+                                                                            style={addressErrors.streetNumber ? { borderColor: 'red' } : {}}
+                                                                        />
+                                                                        <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                                            {addressErrors['streetNumber'] || '\u00A0'}
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <div className="col-12 mt-1">
+                                                                        <label htmlFor="postalCode">
+                                                                            Postal Code <abbr className="required">*</abbr>
+                                                                        </label>
+                                                                        <input
+                                                                            id="postalCode"
+                                                                            name="postalCode"
+                                                                            type="text"
+                                                                            className="form-field"
+                                                                            placeholder="Enter postal code"
+                                                                            value={address.postalCode}
+                                                                            onChange={handleAddressInputChange}
+                                                                            style={addressErrors.postalCode ? { borderColor: 'red' } : {}}
+                                                                        />
+                                                                        <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                                            {addressErrors['postalCode'] || '\u00A0'}
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <div className="col-12 mt-1">
+                                                                        <label htmlFor="city">
+                                                                            City <abbr className="required">*</abbr>
+                                                                        </label>
+                                                                        <input
+                                                                            id="city"
+                                                                            name="city"
+                                                                            type="text"
+                                                                            className="form-field"
+                                                                            placeholder="Enter city"
+                                                                            value={address.city}
+                                                                            onChange={handleAddressInputChange}
+                                                                            style={addressErrors.city ? { borderColor: 'red' } : {}}
+                                                                        />
+                                                                        <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
+                                                                            {addressErrors['city'] || '\u00A0'}
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <div className="col-12 mt-3 d-flex gap-2">
+                                                                        <button className="btn btn-dark btn-primary-hover flex-fill" type="submit">
+                                                                            {address.id ? 'UPDATE ADDRESS' : 'SAVE ADDRESS'}
+                                                                        </button>
+                                                                        <button
+                                                                            className="btn btn-outline-dark flex-fill"
+                                                                            type="button"
+                                                                            onClick={handleCancelEdit}
+                                                                        >
+                                                                            CANCEL
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
-                            {/* My Account Tab Content End */}
                         </div>
                     </div>
                 </div>
-                {/* My Account Section End */}
             </div>
             <Footer isDark={true} />
         </>

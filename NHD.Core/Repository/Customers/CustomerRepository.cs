@@ -18,7 +18,10 @@ namespace NHD.Core.Repository.Customers
 
         public async Task<Customer> GetByEmailAsync(string email)
         {
-            return await Task.FromResult(_context.Customers.FirstOrDefault(c => c.EmailAddress == email));
+            return await Task.FromResult(_context.Customers
+            .Include(c => c.Addresses)
+            .ThenInclude(t => t.AddressTypeLookup)
+            .FirstOrDefault(c => c.EmailAddress == email));
         }
 
         public async Task<Customer> GetByVerificationTokenAsync(string token)

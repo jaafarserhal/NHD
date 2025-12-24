@@ -245,16 +245,26 @@ CREATE TABLE dbo.customer (
 CREATE TABLE dbo.address (
     address_id INT IDENTITY(1,1) PRIMARY KEY,
     customer_id INT NOT NULL,
-    street NVARCHAR(200) NOT NULL,
+	contact_firstName NVARCHAR(200) NOT NULL,
+	contact_lastName NVARCHAR(200) NOT NULL,
+	contact_phone NVARCHAR(50) NOT NULL,
+    street_name NVARCHAR(200) NOT NULL,
+    street_number NVARCHAR(50) NOT NULL,
+    postal_code CHAR(5) NOT NULL,
     city NVARCHAR(100) NOT NULL,
-    land NVARCHAR(100) NULL,
-    postal_code NVARCHAR(20) NULL,
+    country_code CHAR(2) NOT NULL DEFAULT 'SE',
+    address_type_lookup_id INT NOT NULL,
+    is_primary BIT NOT NULL DEFAULT 0,
     note NVARCHAR(MAX) NULL,
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_address_created DEFAULT SYSUTCDATETIME(),
-    is_active BIT NULL DEFAULT 1,
-    CONSTRAINT FK_address_customer FOREIGN KEY (customer_id)
-        REFERENCES dbo.customer(customer_id)
+    is_active BIT NOT NULL DEFAULT 1,
+    CONSTRAINT FK_address_customer
+        FOREIGN KEY (customer_id)
+        REFERENCES dbo.customer(customer_id),
+    CONSTRAINT FK_address_type_lookup
+        FOREIGN KEY (address_type_lookup_id)
+        REFERENCES dbo.gen_lookup(lookup_id)
 );
 
 -- =============================================

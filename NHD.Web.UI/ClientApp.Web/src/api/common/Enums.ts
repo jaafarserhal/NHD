@@ -10,3 +10,8 @@ export const enum SectionType {
     AboutWeLoveDates = 508,
     AboutNawaExperience = 509
 }
+
+export const enum AddressTypeEnum {
+    Billing = 700,
+    Shipping = 701
+}
