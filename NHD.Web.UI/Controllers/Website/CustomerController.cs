@@ -343,21 +343,46 @@ namespace NHD.Web.UI.Controllers.Website
                 if (model == null)
                     return BadRequest("Address model is required.");
 
+                // Extract email from JWT token claims
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized(new { message = "Invalid token" });
+                }
+
+                // Fetch user details from database
+                var customer = await _customerService.GetCustomerByEmailAsync(email);
+
+                if (customer == null || customer.StatusCode != HttpStatusCodeEnum.OK.AsInt())
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
                 var address = new Address
                 {
+                    CustomerId = customer.Data.CustomerId,
                     ContactFirstName = model.FirstName,
                     ContactLastName = model.LastName,
                     ContactPhone = model.Phone,
                     StreetName = model.StreetName,
                     StreetNumber = model.StreetNumber,
                     PostalCode = model.PostalCode,
+                    CountryCode = "SE",
                     City = model.City,
                     AddressTypeLookupId = model.TypeId,
                     IsPrimary = model.IsPrimary,
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
                 };
 
-                var addedAddress = await _customerService.AddAddressAsync(address);
-                return Ok(addedAddress);
+                var result = await _customerService.SaveAddressAsync(customer.Data.CustomerId, address);
+                if (result == null)
+                {
+                    return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), "An error occurred while updating the address.");
+                }
+                return Ok(result.AddressId);
+
             }
             catch (Exception ex)
             {
@@ -375,9 +400,25 @@ namespace NHD.Web.UI.Controllers.Website
                 if (model == null || model.Id <= 0)
                     return BadRequest("Address model is required.");
 
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized(new { message = "Invalid token" });
+                }
+
+                // Fetch user details from database
+                var customer = await _customerService.GetCustomerByEmailAsync(email);
+
+                if (customer == null || customer.StatusCode != HttpStatusCodeEnum.OK.AsInt())
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
                 var address = new Address
                 {
                     AddressId = model.Id,
+                    CustomerId = customer.Data.CustomerId,
                     ContactFirstName = model.FirstName,
                     ContactLastName = model.LastName,
                     ContactPhone = model.Phone,
@@ -385,11 +426,17 @@ namespace NHD.Web.UI.Controllers.Website
                     StreetNumber = model.StreetNumber,
                     PostalCode = model.PostalCode,
                     City = model.City,
+                    CountryCode = "SE",
                     AddressTypeLookupId = model.TypeId,
                     IsPrimary = model.IsPrimary,
+                    IsActive = true
                 };
-                var updatedAddress = await _customerService.UpdateAddressAsync(address);
-                return Ok(updatedAddress);
+                var result = await _customerService.SaveAddressAsync(customer.Data.CustomerId, address);
+                if (result == null)
+                {
+                    return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), "An error occurred while updating the address.");
+                }
+                return Ok(result.AddressId);
             }
             catch (Exception ex)
             {
@@ -434,6 +481,68 @@ namespace NHD.Web.UI.Controllers.Website
             {
                 _logger.LogError(ex, "Error retrieving address");
                 return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), "An error occurred while retrieving the address.");
+            }
+        }
+
+        [HttpPut("SetDefaultAddress/{addressId}/{addressTypeId}")]
+        [Authorize]
+        public async Task<IActionResult> SetDefaultAddress(int addressId, int addressTypeId)
+        {
+            try
+            {
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized(new { message = "Invalid token" });
+                }
+
+                // Fetch user details from database
+                var customer = await _customerService.GetCustomerByEmailAsync(email);
+
+                if (customer == null || customer.StatusCode != HttpStatusCodeEnum.OK.AsInt())
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                var result = await _customerService.SetAddressAsDefaultAsync(customer.Data.CustomerId, addressId, addressTypeId);
+
+                if (!result.IsSuccess)
+                {
+                    return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), "An error occurred while setting the default address.");
+                }
+
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error setting default address");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), "An error occurred while setting the default address.");
+            }
+        }
+
+        [HttpDelete("DeleteAddress/{addressId}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteAddress(int addressId)
+        {
+            try
+            {
+                if (addressId <= 0)
+                    return BadRequest("Invalid address ID.");
+
+                var result = await _customerService.DeleteAddressAsync(addressId);
+
+                if (!result.IsSuccess)
+                {
+                    return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), "An error occurred while deleting the address.");
+                }
+
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting address");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), "An error occurred while deleting the address.");
             }
         }
 

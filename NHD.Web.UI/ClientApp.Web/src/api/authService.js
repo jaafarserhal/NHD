@@ -51,6 +51,14 @@ class authService extends apiService {
         return this.put(addressData, apiUrls.updateCustomerAddress);
     }
 
+    async setAddressAsDefault(addressId, addressTypeId) {
+        return this.put({}, apiUrls.setDefaultCustomerAddress + `/${addressId}/${addressTypeId}`);
+    }
+
+    async deleteAddress(addressId) {
+        return this.delete(`${apiUrls.deleteCustomerAddress}/${addressId}`);
+    }
+
     async getAddress(addressId) {
         return this.get(`${apiUrls.getCustomerAddress}/${addressId}`);
     }

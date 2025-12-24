@@ -72,3 +72,14 @@ export function showAlert(type: string, message: string) {
         title: message,
     });
 }
+export const formatPhoneNumber = (phone?: string): string => {
+    if (!phone) return "";
+    return phone.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
+};
+
+export const switchTab = (tabId: string): void => {
+    const tab = document.getElementById(tabId);
+    if (tab) {
+        tab.click();
+    }
+};

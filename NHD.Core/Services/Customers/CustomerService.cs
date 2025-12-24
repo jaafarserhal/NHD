@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using NHD.Core.Common.Models;
@@ -33,6 +34,132 @@ namespace NHD.Core.Services.Customers
         }
 
         #region Addresses
+        public async Task<Address?> SaveAddressAsync(int customerId, Address address)
+        {
+            await BeginTransactionAsync();
+
+            try
+            {
+                // UPDATE
+                if (address.AddressId > 0)
+                {
+                    // Try to get already-tracked entity first
+                    var tracked = context.Addresses.Local
+                        .FirstOrDefault(a => a.AddressId == address.AddressId);
+
+                    Address existing;
+
+                    if (tracked != null)
+                    {
+                        existing = tracked;
+                    }
+                    else
+                    {
+                        // Load from DB without tracking graph duplication
+                        existing = await context.Addresses
+                            .FirstOrDefaultAsync(a => a.AddressId == address.AddressId);
+
+                        if (existing == null)
+                            throw new InvalidOperationException("Address not found");
+
+                        context.Attach(existing);
+                    }
+
+                    // Copy values to the tracked entity
+                    context.Entry(existing).CurrentValues.SetValues(address);
+                }
+                else
+                {
+                    // INSERT
+                    address.CustomerId = customerId;
+
+                    var existingSameType = await context.Addresses
+                        .AsNoTracking()
+                        .AnyAsync(a =>
+                            a.CustomerId == customerId &&
+                            a.AddressTypeLookupId == address.AddressTypeLookupId);
+
+                    // Set as primary if none exists for that type
+                    if (!existingSameType)
+                    {
+                        address.IsPrimary = true;
+                    }
+
+                    await context.Addresses.AddAsync(address);
+                }
+
+                await SaveChangesAsync();
+                await CommitTransactionAsync();
+
+                return address;
+            }
+            catch (Exception ex)
+            {
+                await RollbackTransactionAsync();
+                _logger.LogError(ex, "Error saving address");
+                return null;
+            }
+        }
+
+        public async Task<ServiceResult<bool>> SetAddressAsDefaultAsync(
+            int customerId,
+            int addressId,
+            int addressTypeId)
+        {
+            await BeginTransactionAsync();
+
+            try
+            {
+                // Load TRACKED entities (no AsNoTracking here)
+                var addresses = await context.Addresses
+                    .Where(a => a.CustomerId == customerId &&
+                                a.AddressTypeLookupId == addressTypeId)
+                    .ToListAsync();
+
+                if (!addresses.Any())
+                    return ServiceResult<bool>.Failure("No addresses found for this type.");
+
+                foreach (var addr in addresses)
+                {
+                    addr.IsPrimary = addr.AddressId == addressId;
+                }
+
+                // No Update() needed because entities are tracked
+                await SaveChangesAsync();
+                await CommitTransactionAsync();
+
+                return ServiceResult<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                await RollbackTransactionAsync();
+                _logger.LogError(ex, "Error setting address as default");
+                return ServiceResult<bool>.Failure("An error occurred while setting the default address.");
+            }
+        }
+
+
+        public async Task<ServiceResult<bool>> DeleteAddressAsync(int addressId)
+        {
+            try
+            {
+                var address = await _addressRepository.GetByIdAsync(addressId);
+                if (address == null)
+                {
+                    return ServiceResult<bool>.Validate("Address not found.");
+                }
+
+                await _addressRepository.DeleteAsync(address.AddressId);
+                return ServiceResult<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting address");
+                return ServiceResult<bool>.Failure("An error occurred while deleting the address.");
+            }
+        }
+
+
         public async Task<Address> AddAddressAsync(Address address)
         {
             await _addressRepository.AddAsync(address);
