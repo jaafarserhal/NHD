@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Footer from "../../components/Common/Footer/Index";
 import Header from "../../components/Common/Header/Index";
 import authService from "../../api/authService";
@@ -12,6 +12,14 @@ export default function CreateAccount() {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    // Preload the banner image for better performance
+    useEffect(() => {
+        const img = new Image();
+        img.src = '/assets/images/banner/auth-banner.webp';
+        img.onload = () => setImageLoaded(true);
+    }, []);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -99,7 +107,17 @@ export default function CreateAccount() {
     return (<>
         <Loader loading={loading} />
         <Header />
-        <div className="breadcrumb" style={{ backgroundImage: "url(/assets/images/bg/breadcrumb1-bg.jpg)" }}>
+        <div
+            className="breadcrumb"
+            style={{
+                backgroundImage: "url(/assets/images/banner/auth-banner.webp)",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                opacity: imageLoaded ? 1 : 0.9,
+                transition: 'opacity 0.3s ease-in-out'
+            }}
+        >
         </div>
         <div className="section" style={{ padding: '25px 0' }}>
             <div className="container custom-container">

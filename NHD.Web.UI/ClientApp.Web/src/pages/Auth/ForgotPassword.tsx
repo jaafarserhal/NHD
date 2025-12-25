@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { decryptParameter, showAlert, validateEmail } from "../../api/common/Utils";
 import { routeUrls } from "../../api/base/routeUrls";
@@ -15,6 +15,15 @@ const ForgotPassword: React.FC = () => {
     const [isLoading, setIsLoading] = React.useState(false);
     const [successMessage, setSuccessMessage] = useState<string>('');
     const navigate = useNavigate();
+
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    // Preload the banner image for better performance
+    useEffect(() => {
+        const img = new Image();
+        img.src = '/assets/images/banner/auth-banner.webp';
+        img.onload = () => setImageLoaded(true);
+    }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -66,7 +75,17 @@ const ForgotPassword: React.FC = () => {
     };
     return (
         <><Header />
-            <div className="breadcrumb" style={{ backgroundImage: "url(/assets/images/bg/breadcrumb1-bg.jpg)" }}>
+            <div
+                className="breadcrumb"
+                style={{
+                    backgroundImage: "url(/assets/images/banner/auth-banner.webp)",
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    opacity: imageLoaded ? 1 : 0.9,
+                    transition: 'opacity 0.3s ease-in-out'
+                }}
+            >
             </div>
             <div className="section" style={{ padding: '25px 0', position: 'relative' }}>
                 <Loader loading={isLoading} isDark={true} fullscreen={false} />

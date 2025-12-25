@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { showAlert, validatePassword } from "../../api/common/Utils";
 import Header from "../../components/Common/Header/Index";
@@ -21,6 +21,15 @@ const ChangePassword: React.FC = () => {
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [isLoading, setIsLoading] = useState(false);
+
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    // Preload the banner image for better performance
+    useEffect(() => {
+        const img = new Image();
+        img.src = '/assets/images/banner/auth-banner.webp';
+        img.onload = () => setImageLoaded(true);
+    }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -106,8 +115,16 @@ const ChangePassword: React.FC = () => {
             <Header />
             <div
                 className="breadcrumb"
-                style={{ backgroundImage: "url(/assets/images/bg/breadcrumb1-bg.jpg)" }}
-            />
+                style={{
+                    backgroundImage: "url(/assets/images/banner/auth-banner.webp)",
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    opacity: imageLoaded ? 1 : 0.9,
+                    transition: 'opacity 0.3s ease-in-out'
+                }}
+            >
+            </div>
             <div className="section" style={{ padding: "25px 0", position: "relative" }}>
                 <Loader loading={isLoading} isDark={true} fullscreen={false} />
                 <div className="container custom-container">

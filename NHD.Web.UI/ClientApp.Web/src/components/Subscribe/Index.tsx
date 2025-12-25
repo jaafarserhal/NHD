@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import homeService from "../../api/homeService";
 import { showAlert } from "../../api/common/Utils";
 
@@ -13,6 +13,14 @@ export default function Subscribe({ informativeData }: SubscribeProps) {
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [bannerImageLoaded, setBannerImageLoaded] = useState(false);
+    useEffect(() => {
+        if (section?.imageUrl) {
+            const img = new Image();
+            img.src = `${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${section.imageUrl}`;
+            img.onload = () => setBannerImageLoaded(true);
+        }
+    }, [section?.imageUrl]);
 
     const validateEmail = (value: string) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -52,6 +60,11 @@ export default function Subscribe({ informativeData }: SubscribeProps) {
             className="newsletter-section bg-cover bg-center"
             style={{
                 backgroundImage: `url(${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${section.imageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                opacity: bannerImageLoaded ? 1 : 0.9,
+                transition: 'opacity 0.3s ease-in-out'
             }}
         >
             <div className="container mx-auto py-16 overflow-visible">

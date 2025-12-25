@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface CallToActionSectionProps {
     callToActionData: any[]; // You can replace `any` with your SectionViewModel type if available
@@ -7,13 +7,28 @@ interface CallToActionSectionProps {
 const CallToActionSection: React.FC<CallToActionSectionProps> = ({ callToActionData }) => {
     if (!callToActionData || callToActionData.length === 0) return null; // or show a loader
 
+    const [bannerImageLoaded, setBannerImageLoaded] = useState(false);
     const section = callToActionData[0];
+
+    // Preload banner image when data is available
+    useEffect(() => {
+        if (section?.imageUrl) {
+            const img = new Image();
+            img.src = `${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${section.imageUrl}`;
+            img.onload = () => setBannerImageLoaded(true);
+        }
+    }, [section?.imageUrl]);
 
     return (
         <section
             className="call-to-action"
             style={{
-                backgroundImage: `url(${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${section.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center center'
+                backgroundImage: `url(${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${section.imageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                opacity: bannerImageLoaded ? 1 : 0.9,
+                transition: 'opacity 0.3s ease-in-out'
             }}
         >
             <div className="container">

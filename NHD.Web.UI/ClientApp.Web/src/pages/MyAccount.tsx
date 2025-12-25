@@ -18,6 +18,14 @@ const MyAccount: React.FC = () => {
     const navigate = useNavigate();
     const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
     const [loading, setLoading] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
+
+    // Preload the banner image for better performance
+    useEffect(() => {
+        const img = new Image();
+        img.src = '/assets/images/banner/auth-banner.webp';
+        img.onload = () => setImageLoaded(true);
+    }, []);
 
     const fetchCustomerInfo = useCallback(async () => {
         try {
@@ -52,9 +60,15 @@ const MyAccount: React.FC = () => {
                 <div
                     className="breadcrumb"
                     style={{
-                        backgroundImage: `url('/assets/images/bg/breadcrumb1-bg.jpg')`,
+                        backgroundImage: "url(/assets/images/banner/auth-banner.webp)",
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        opacity: imageLoaded ? 1 : 0.9,
+                        transition: 'opacity 0.3s ease-in-out'
                     }}
-                />
+                >
+                </div>
 
                 <div className="section" style={{ padding: '25px 0', position: 'relative' }}>
                     <div className="container custom-container" style={{ marginTop: '30px' }}>
