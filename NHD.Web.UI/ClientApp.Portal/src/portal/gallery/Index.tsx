@@ -28,6 +28,7 @@ import { PortalToastContainer } from 'src/components/Toaster/Index';
 import PageTitle from 'src/components/PageTitle';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import { validateFileSize } from 'src/common/fileValidation';
 
 
 function Gallery() {
@@ -91,9 +92,9 @@ function Gallery() {
         const file = e.target.files?.[0] || null;
 
         if (file) {
-            const maxSize = 1024 * 1024; // 1MB
-            if (file.size > maxSize) {
-                setErrors([`Image size must be less than 1MB. Selected file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`]);
+            const validation = validateFileSize(file, 2); // 2MB limit
+            if (!validation.isValid) {
+                setErrors([validation.error!]);
                 e.target.value = '';
                 setImage(null);
                 setPreview(null);

@@ -13,6 +13,7 @@ import { useApiCall } from "src/api/hooks/useApi";
 import { SectionType } from "src/common/Enums";
 import { set } from "date-fns";
 import { getImageResolutionLabel } from "src/common/Utils";
+import { validateFileSize } from "src/common/fileValidation";
 
 export default function AddSection() {
 
@@ -77,9 +78,9 @@ export default function AddSection() {
 
         if (file) {
             // Check file size (1MB = 1024 * 1024 bytes)
-            const maxSize = 1024 * 1024; // 1MB in bytes
-            if (file.size > maxSize) {
-                setErrors([`Image size must be less than 1MB. Selected file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`]);
+            const validation = validateFileSize(file, 2); // 2MB limit
+            if (!validation.isValid) {
+                setErrors([validation.error!]);
                 // Clear the file input
                 e.target.value = '';
                 setImage(null);
