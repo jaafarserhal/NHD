@@ -286,7 +286,8 @@ namespace NHD.Core.Services.Dates
                 WeightPrice = date.WeightPrice,
                 CreatedAt = date.CreatedAt,
                 Quality = date.Quality,
-                IsFilled = date.IsFilled
+                IsFilled = date.IsFilled,
+                ImageUrl = date.ImageUrl
             };
         }
 

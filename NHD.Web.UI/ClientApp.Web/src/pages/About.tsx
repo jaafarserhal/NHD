@@ -130,7 +130,7 @@ export default function About() {
 
             {/* Video Section */}
             <VideoPlayer
-                videoUrl="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+                videoUrl={`/assets/media/about-us-video.mp4`}
                 screenshotTime={0.5}
                 height={720}
             />

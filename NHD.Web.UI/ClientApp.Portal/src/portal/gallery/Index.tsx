@@ -349,12 +349,12 @@ function Gallery() {
                                                 required
                                             />
                                             <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
-                                                * Image Resolution <span style={{ color: "red" }}>{(isProductMode ? "500 x 625" : form.isPrimary ? "192 x 148" : "350 x 350")}</span>
+                                                * Image Resolution <span style={{ color: "red" }}>500 x 625</span>
                                             </Box>
 
                                             {!preview && (
                                                 <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
-                                                    * Image is required (max size: 1MB)
+                                                    * Image is required (max size: 2MB)
                                                 </Box>
                                             )}
                                             {preview && (
@@ -376,7 +376,7 @@ function Gallery() {
                                                         name="isPrimary"
                                                     />
                                                 }
-                                                label='Banner'
+                                                label='Primary'
                                             />
                                         </Grid>
                                         <Grid item xs={12}>

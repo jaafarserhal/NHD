@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { routeUrls } from "../../../api/base/routeUrls";
 import Loader from "../Loader/Index";
 import { storage } from "../../../api/base/storage";
+import OffcanvasMenu from "../OffCanvasMenu/Index";
+
 
 const Header: React.FC = () => {
     const [isSticky, setIsSticky] = useState(false);
@@ -11,6 +13,7 @@ const Header: React.FC = () => {
     const token = storage.get('webAuthToken');
     const location = useLocation();
     const navigate = useNavigate();
+    const [showOffcanvasMenu, setShowOffcanvasMenu] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -82,7 +85,7 @@ const Header: React.FC = () => {
                                     </li>
                                     <li><a href="/coming-soon" className="menu-item-link"><span>Shop</span></a></li>
                                     <li><a href="/coming-soon" className="menu-item-link"><span>Our Dates</span></a></li>
-                                    <li><Link to={routeUrls.contactUs} className="menu-item-link"><span>Contact</span></Link></li>
+                                    <li><Link to={routeUrls.contactUs} className={`menu-item-link ${isActive(routeUrls.contactUs) ? 'active' : ''}`}><span>Contact</span></Link></li>
                                 </ul>
                             </div>
                         </div>
@@ -127,9 +130,19 @@ const Header: React.FC = () => {
                                     </li>
 
                                     <li className="d-lg-none">
-                                        <button className="action" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+                                        <button
+                                            type="button"
+                                            className="action"
+                                            onClick={() => setShowOffcanvasMenu(true)}
+                                        >
                                             <i className="lastudioicon-menu-8-1" />
                                         </button>
+
+                                        <OffcanvasMenu
+                                            isOpen={showOffcanvasMenu}
+                                            onClose={() => setShowOffcanvasMenu(false)}
+                                        />
+
                                     </li>
                                 </ul>
                             </div>

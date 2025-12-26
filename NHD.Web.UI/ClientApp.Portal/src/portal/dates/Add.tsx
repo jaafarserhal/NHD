@@ -8,13 +8,14 @@ import PageTitleWrapper from "src/components/PageTitleWrapper";
 import { useNavigate } from 'react-router-dom';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 import { RouterUrls } from "src/common/RouterUrls";
+import { validateFileSize } from "src/common/fileValidation";
 
 export default function AddDate() {
 
     const navigate = useNavigate();
 
 
-    const [form, setForm] = useState<Omit<Date, "id">>({
+    const [form, setForm] = useState<Omit<Date, "id" | "imageUrl">>({
         nameEn: "",
         nameSv: "",
         quality: false,
@@ -24,7 +25,8 @@ export default function AddDate() {
         isActive: true,
     });
 
-
+    const [image, setImage] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<string[]>([]);
     const errorBoxRef = React.useRef<HTMLDivElement>(null);
@@ -51,7 +53,41 @@ export default function AddDate() {
         }
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
 
+        if (file) {
+            const validation = validateFileSize(file, 2); // 2MB limit
+
+            if (!validation.isValid) {
+                setErrors([validation.error!]);
+                // Clear the file input
+                e.target.value = '';
+                setImage(null);
+                setPreview(null);
+
+                // Scroll to error box
+                setTimeout(() => {
+                    errorBoxRef.current?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }, 100);
+                return;
+            }
+
+            setImage(file);
+            setPreview(URL.createObjectURL(file));
+        } else {
+            setImage(null);
+            setPreview(null);
+        }
+
+        // Clear errors when user selects a valid file
+        if (errors.length > 0) {
+            setErrors([]);
+        }
+    };
 
     const handleActiveSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm((prev) => ({
@@ -89,6 +125,9 @@ export default function AddDate() {
         if (form.weightPrice === undefined || form.weightPrice < 0) {
             validationErrors.push("Valid weight price is required");
         }
+        if (!image) {
+            validationErrors.push("Image is required");
+        }
 
         setErrors(validationErrors);
 
@@ -115,16 +154,10 @@ export default function AddDate() {
         setLoading(true);
 
         try {
+            if (!image) throw new Error("Please select an image.");
 
-            const dateData: Omit<Date, "id"> = {
-                nameEn: form.nameEn,
-                nameSv: form.nameSv,
-                quality: form.quality,
-                unitPrice: form.unitPrice || 0,
-                weightPrice: form.weightPrice || 0,
-                isFilled: form.isFilled,
-                isActive: form.isActive,
-            };
+            const dateData = { ...form, imageFile: image };
+
             await dateService.addDate(dateData);
 
             navigate(RouterUrls.datesList);
@@ -265,6 +298,57 @@ export default function AddDate() {
                                 </CardContent>
                             </Card>
                         </Grid>
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Banner" />
+                                <Divider />
+                                <CardContent>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={form.quality}
+                                                onChange={handleQualitySwitchChange}
+                                                name="quality"
+                                            />
+                                        }
+                                        label=''
+                                    />
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader
+                                    title={
+                                        <>
+                                            Image Upload
+                                        </>
+                                    }
+                                />
+                                <Divider />
+                                <CardContent>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        style={{ marginBottom: '1rem' }}
+                                        required
+                                    />
+                                    {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
+                                        * Image is required (max size: 2MB) <span style={{ color: "red" }}>{form.quality ? "192 x 148" : "500 x 625"}</span>
+                                    </Box>}
+                                    {preview && (
+                                        <Box sx={{ mt: 2 }}>
+                                            <img
+                                                src={preview}
+                                                alt="Preview"
+                                                style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
+                                            />
+                                        </Box>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </Grid>
 
 
                         <Grid item xs={12}>
@@ -278,25 +362,6 @@ export default function AddDate() {
                                                 checked={form.isFilled}
                                                 onChange={handleIsFilledSwitchChange}
                                                 name="isFilled"
-                                            />
-                                        }
-                                        label=''
-                                    />
-                                </CardContent>
-                            </Card>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <Card>
-                                <CardHeader title="Premium" />
-                                <Divider />
-                                <CardContent>
-                                    <FormControlLabel
-                                        control={
-                                            <Switch
-                                                checked={form.quality}
-                                                onChange={handleQualitySwitchChange}
-                                                name="quality"
                                             />
                                         }
                                         label=''

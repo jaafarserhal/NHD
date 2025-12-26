@@ -203,6 +203,9 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.DescriptionEn).HasColumnName("description_en");
             entity.Property(e => e.DescriptionSv).HasColumnName("description_sv");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(500)
+                .HasColumnName("image_url");
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");

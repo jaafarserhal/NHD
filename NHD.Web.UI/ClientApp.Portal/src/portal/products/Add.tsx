@@ -806,7 +806,7 @@ export default function AddProduct() {
                                         required
                                     />
                                     {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
-                                        * Image is required (max size: 1MB)
+                                        * Image is required (max size: 2MB)
                                     </Box>}
                                     {preview && (
                                         <Box sx={{ mt: 2 }}>

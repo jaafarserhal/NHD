@@ -9,6 +9,7 @@ import PageHeader from '../PageHeader';
 import ConfirmDialog from 'src/components/ConfirmDialog/Index';
 import { useNavigate } from 'react-router-dom';
 import { RouterUrls } from 'src/common/RouterUrls';
+import { getImageSrc } from 'src/common/Utils';
 
 function Dates() {
     const [page, setPage] = useState(0); // 0-based for MUI TablePagination
@@ -74,18 +75,10 @@ function Dates() {
             label: 'Name',
         },
         {
-            key: 'unitPrice',
-            label: 'Price / piece',
-        },
-        {
-            key: 'weightPrice',
-            label: 'Price / gram',
-        },
-        {
             key: 'quality',
-            label: 'Quality',
+            label: 'Banner',
             render: (date) => (
-                <label>{date.quality ? 'Premium' : 'Regular'}</label>
+                <label>{date.quality ? 'Yes' : 'No'}</label>
             )
         },
         {
@@ -93,6 +86,22 @@ function Dates() {
             label: 'Filled',
             render: (date) => (
                 <label>{date.isFilled ? 'Yes' : 'No'}</label>
+            )
+        },
+        {
+            key: 'imageUrl',
+            label: 'Image',
+            render: (date) => (
+                <img
+                    src={getImageSrc(date.imageUrl, 'dates')}
+                    alt={date.nameEn}
+                    style={{
+                        width: '50px',
+                        height: '50px',
+                        objectFit: 'cover',
+                        borderRadius: '4px',
+                    }}
+                />
             )
         },
         {

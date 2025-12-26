@@ -18,6 +18,8 @@ namespace NHD.Core.Services.Model.Dates
         public decimal WeightPrice { get; set; }
         public bool? IsFilled { get; set; }
         public bool IsActive { get; set; }
+        public string ImageUrl { get; set; }
+        public IFormFile ImageFile { get; set; }
         public DateTime CreatedAt { get; set; }
 
     }

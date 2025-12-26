@@ -64,13 +64,30 @@ namespace NHD.Web.UI.Portal.Controllers
 
         [HttpPost]
         [Route("Add")]
-        public async Task<IActionResult> AddDate([FromBody] DateViewModel dto)
+        public async Task<IActionResult> AddDate([FromForm] DateViewModel dto)
         {
             try
             {
                 if (dto == null)
                     return BadRequest("Date data is required");
 
+                if (dto.ImageFile == null || dto.ImageFile.Length == 0)
+                    return BadRequest("Image is required");
+
+                // Create unique file name
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
+                var folderPath = Path.Combine("wwwroot/uploads", "dates");
+
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                var filePath = Path.Combine(folderPath, fileName);
+
+                // Save the uploaded file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ImageFile.CopyToAsync(stream);
+                }
 
                 var date = new Date
                 {
@@ -79,6 +96,7 @@ namespace NHD.Web.UI.Portal.Controllers
                     Quality = dto.Quality,
                     UnitPrice = dto.UnitPrice,
                     WeightPrice = dto.WeightPrice,
+                    ImageUrl = fileName,
                     IsFilled = dto.IsFilled,
                     IsActive = dto.IsActive,
                 };
@@ -95,7 +113,7 @@ namespace NHD.Web.UI.Portal.Controllers
 
         [HttpPut]
         [Route("Update")]
-        public async Task<IActionResult> UpdateDate([FromBody] DateViewModel dto)
+        public async Task<IActionResult> UpdateDate([FromForm] DateViewModel dto)
         {
             if (dto == null || dto.Id <= 0)
             {
@@ -106,6 +124,30 @@ namespace NHD.Web.UI.Portal.Controllers
             if (existingDate == null)
             {
                 return NotFound("Date not found.");
+            }
+
+            string oldImageFileName = existingDate.ImageUrl;
+            string? newFileName = null;
+
+            // Handle new image upload if provided
+            if (dto.ImageFile != null && dto.ImageFile.Length > 0)
+            {
+                // Create unique file name
+                newFileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
+                var folderPath = Path.Combine("wwwroot/uploads", "dates");
+
+                if (!Directory.Exists(folderPath))
+                    Directory.CreateDirectory(folderPath);
+
+                var filePath = Path.Combine(folderPath, newFileName);
+
+                // Save the uploaded file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ImageFile.CopyToAsync(stream);
+                }
+
+                existingDate.ImageUrl = newFileName;
             }
             // Update fields
             existingDate.NameEn = dto.NameEn;
@@ -119,6 +161,24 @@ namespace NHD.Web.UI.Portal.Controllers
 
             // Save changes
             var updatedDate = await _datesService.UpdateDateAsync(existingDate);
+
+
+            // If update succeeded and a new image was uploaded, delete the old one
+            if (newFileName != null && !string.IsNullOrEmpty(oldImageFileName))
+            {
+                var oldFilePath = Path.Combine("wwwroot/uploads/dates", oldImageFileName);
+                if (System.IO.File.Exists(oldFilePath))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(oldFilePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to delete old image file: {FilePath}", oldFilePath);
+                    }
+                }
+            }
 
             return Ok(updatedDate.DateId);
         }
@@ -289,19 +349,19 @@ namespace NHD.Web.UI.Portal.Controllers
                     return NotFound("Collection not found.");
                 }
 
-                string oldImagePath = existingCollection.ImageUrl;
-
+                string oldImageFileName = existingCollection.ImageUrl;
+                string? newFileName = null;
                 // Handle new image upload if provided
                 if (dto.ImageFile != null && dto.ImageFile.Length > 0)
                 {
                     // Create unique file name
-                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
+                    newFileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
                     var folderPath = Path.Combine("wwwroot/uploads", "collections");
 
                     if (!Directory.Exists(folderPath))
                         Directory.CreateDirectory(folderPath);
 
-                    var filePath = Path.Combine(folderPath, fileName);
+                    var filePath = Path.Combine(folderPath, newFileName);
 
                     // Save the uploaded file
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -309,7 +369,7 @@ namespace NHD.Web.UI.Portal.Controllers
                         await dto.ImageFile.CopyToAsync(stream);
                     }
 
-                    existingCollection.ImageUrl = fileName;
+                    existingCollection.ImageUrl = newFileName;
                 }
 
                 // Update collection properties
@@ -321,6 +381,23 @@ namespace NHD.Web.UI.Portal.Controllers
                 existingCollection.CreatedAt = DateTime.UtcNow;
 
                 var updated = await _datesService.UpdateCollectionAsync(existingCollection);
+
+                // If update succeeded and a new image was uploaded, delete the old one
+                if (newFileName != null && !string.IsNullOrEmpty(oldImageFileName))
+                {
+                    var oldFilePath = Path.Combine("wwwroot/uploads/collections", oldImageFileName);
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Failed to delete old image file: {FilePath}", oldFilePath);
+                        }
+                    }
+                }
                 return Ok(updated);
             }
             catch (System.Exception ex)

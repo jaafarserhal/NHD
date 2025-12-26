@@ -25,6 +25,7 @@ export interface Date {
     unitPrice: number;
     weightPrice: number;
     isFilled: boolean;
+    imageUrl: string;
     isActive: boolean;
 }
 

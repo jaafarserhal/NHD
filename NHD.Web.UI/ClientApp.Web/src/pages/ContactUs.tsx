@@ -39,14 +39,14 @@ const ContactUs: React.FC = () => {
                                     exercitation incididunt
                                 </p>
                                 <ul className="contact-section2_list">
-                                    <li>
+                                    {/* <li>
                                         <span className="contact-section2_list__icon">
                                             <i className="lastudioicon lastudioicon-pin-3-2" />
                                         </span>
                                         <span className="contact-section2_list__text">
                                             6391 Elgin St. Celina, Delaware 10299 <br /> 2464 Royal Ln. Mesa, New Jersey 45463
                                         </span>
-                                    </li>
+                                    </li> */}
                                     <li>
                                         <span className="contact-section2_list__icon">
                                             <i className="lastudioicon lastudioicon-phone-2" />

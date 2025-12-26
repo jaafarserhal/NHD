@@ -27,6 +27,8 @@ public partial class Date
 
     public bool? IsFilled { get; set; }
 
+    public string ImageUrl { get; set; }
+
     public virtual ICollection<DatesProduct> DatesProducts { get; set; } = new List<DatesProduct>();
 
     public virtual ICollection<Gallery> Galleries { get; set; } = new List<Gallery>();

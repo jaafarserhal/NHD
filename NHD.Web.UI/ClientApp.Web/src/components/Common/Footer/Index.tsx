@@ -133,10 +133,26 @@ const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
                                         <div className="footer-widget flex-grow-1">
                                             <h4 className="footer-widget__title">Information</h4>
                                             <ul className="footer-widget__link">
-                                                <li><a href="/about">About Us</a></li>
-                                                <li><a href="/coming-soon">Shop</a></li>
-                                                <li><a href="/coming-soon">Our Dates</a></li>
-                                                <li><a href="/coming-soon">Contact Us</a></li>
+                                                <li>
+                                                    <Link to={routeUrls.about}>
+                                                        About
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to={routeUrls.comingSoon}>
+                                                        Shop
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to={routeUrls.comingSoon}>
+                                                        Our Dates
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to={routeUrls.contactUs}>
+                                                        Contact Us
+                                                    </Link>
+                                                </li>
                                             </ul>
                                         </div>
                                         {/* Footer Widget End */}

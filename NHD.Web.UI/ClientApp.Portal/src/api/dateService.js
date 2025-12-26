@@ -57,11 +57,38 @@ class dateService extends apiService {
     }
 
     async addDate(date) {
-        return this.post(date, apiUrls.addDate);
+        const formData = new FormData();
+        formData.append('NameEn', date.nameEn || '');
+        formData.append('NameSv', date.nameSv || '');
+        formData.append('Quality', String(date.quality));
+        formData.append('UnitPrice', String(date.unitPrice));
+        formData.append('WeightPrice', String(date.weightPrice));
+        formData.append('IsFilled', String(date.isFilled));
+        formData.append('IsActive', String(date.isActive));
+
+        if (date.imageFile && date.imageFile instanceof File) {
+            formData.append('ImageFile', date.imageFile, date.imageFile.name);
+        }
+
+        return this.post(formData, apiUrls.addDate);
     }
 
     async updateDate(date) {
-        return this.put(date, apiUrls.updateDate);
+        const formData = new FormData();
+        formData.append('Id', String(date.id));
+        formData.append('NameEn', date.nameEn || '');
+        formData.append('NameSv', date.nameSv || '');
+        formData.append('Quality', String(date.quality));
+        formData.append('UnitPrice', String(date.unitPrice));
+        formData.append('WeightPrice', String(date.weightPrice));
+        formData.append('IsFilled', String(date.isFilled));
+        formData.append('IsActive', String(date.isActive));
+
+        if (date.imageFile && date.imageFile instanceof File) {
+            formData.append('ImageFile', date.imageFile, date.imageFile.name);
+        }
+
+        return this.put(formData, apiUrls.updateDate);
     }
 
     async getDateById(dateId) {
