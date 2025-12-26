@@ -1,8 +1,10 @@
 // src/components/ProtectedRoute.tsx
 import { Navigate } from 'react-router-dom';
+import { storage } from 'src/api/base/storage';
+
 
 const ProtectedRoute = ({ children }) => {
-    const token = localStorage.getItem('authToken');
+    const token = storage.get('authToken');
 
     if (!token) {
         // Redirect to login if no token

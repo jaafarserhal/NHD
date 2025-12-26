@@ -13,6 +13,7 @@ import authService from "../api/authService";
 import { routeUrls } from "../api/base/routeUrls";
 import { CustomerInfo, Address } from "../api/common/Types";
 import OrdersTab from "../components/MyAccount/OrdersTab";
+import { storage } from "../api/base/storage";
 
 const MyAccount: React.FC = () => {
     const navigate = useNavigate();
@@ -47,7 +48,7 @@ const MyAccount: React.FC = () => {
     const handleLogout = () => {
         setLoading(true);
         setTimeout(() => {
-            localStorage.removeItem('authToken');
+            storage.remove('webAuthToken');
             setLoading(false);
             navigate(routeUrls.login);
         }, 3000);

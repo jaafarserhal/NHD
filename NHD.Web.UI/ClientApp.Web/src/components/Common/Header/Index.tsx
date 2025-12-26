@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { routeUrls } from "../../../api/base/routeUrls";
 import Loader from "../Loader/Index";
+import { storage } from "../../../api/base/storage";
 
 const Header: React.FC = () => {
     const [isSticky, setIsSticky] = useState(false);
     const [showAccountMenu, setShowAccountMenu] = useState(false);
     const [loading, setLoading] = useState(false);
-    const token = localStorage.getItem('authToken');
+    const token = storage.get('webAuthToken');
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -39,7 +40,7 @@ const Header: React.FC = () => {
     const logOut = () => {
         setLoading(true);
         setTimeout(() => {
-            localStorage.removeItem('authToken');
+            storage.remove('webAuthToken');
             setShowAccountMenu(false);
             setLoading(false);
             navigate(routeUrls.login);

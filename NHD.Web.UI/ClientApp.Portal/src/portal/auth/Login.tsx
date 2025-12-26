@@ -3,6 +3,8 @@ import { Eye, EyeOff, Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
 import apiClient from '../../api/base/apiClient';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import { storage } from 'src/api/base/storage';
+
 
 interface LoginFormData {
     email: string;
@@ -31,7 +33,7 @@ const Login: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem('authToken');
+        const token = storage.get('authToken');
         if (token) {
             setIsAuthenticated(true);
         }
@@ -85,12 +87,11 @@ const Login: React.FC = () => {
             });
 
             // Store the JWT token
-            localStorage.setItem('authToken', response.token);
+            storage.set('authToken', response.token);
 
 
             // Store user info if needed
-            localStorage.setItem('user', JSON.stringify(response.user));
-
+            storage.set('user', JSON.stringify(response.user));
             setIsAuthenticated(true);
 
             // Redirect to dashboard or home page

@@ -8,6 +8,7 @@ import { LoginRequest, LoginResponse } from "../../api/common/Types";
 import Loader from "../../components/Common/Loader/Index";
 import { apiUrls } from "../../api/base/apiUrls";
 import { showAlert, validateEmail } from "../../api/common/Utils";
+import { storage } from "../../api/base/storage";
 
 
 export default function Login() {
@@ -72,7 +73,7 @@ export default function Login() {
             });
 
             // Store the JWT token
-            localStorage.setItem('authToken', response.token);
+            storage.set('webAuthToken', response.token);
             setTimeout(() => {
                 setIsLoading(false);
                 navigate(routeUrls.myAccount);

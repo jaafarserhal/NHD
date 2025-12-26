@@ -1,49 +1,43 @@
 import axios from 'axios';
+import { storage } from '../base/storage';
 
 const apiClient = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
   timeout: 60000,
 });
 
-// Request interceptor: Add auth token or redirect if missing
+// Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = storage.get('authToken');
 
-    // ✅ Allow login request without token
     const isLoginRequest = config.url?.includes('/users/login');
-    const isAuthRoute = window.location.pathname.includes('/auth/login');
 
+    // ➤ allow login without token
+    if (isLoginRequest) return config;
+
+    // ➤ attach token if present
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-    } else if (!isLoginRequest) {
-      // No token and not a login request → redirect
-      if (!isAuthRoute) {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-        window.location.href = '/auth/login';
-      }
-
-      // ❌ Do NOT reject login requests here — only reject protected ones
-      return Promise.reject(new Error('No auth token found'));
+      return config;
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log('API Request:', config.method?.toUpperCase(), config.url);
-    }
-
+    // ➤ no token: DO NOT reject the request
+    // let backend return 401; response interceptor will redirect
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: Handle common errors
+// Response interceptor
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    if (error.response?.status === 401 && !error.config.url?.includes('/users/login')) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
+    const isLoginRequest = error.config?.url?.includes('/users/login');
+
+    if (error.response?.status === 401 && !isLoginRequest) {
+      storage.remove('authToken');
+      storage.remove('user');
       window.location.href = '/auth/login';
     }
 
