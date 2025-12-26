@@ -9,4 +9,5 @@ export const routeUrls = {
     myAccount: '/customer/my-account',
     forgotPassword: '/auth/forgot-password',
     changePassword: '/auth/change-password',
+    contactUs: '/contact-us',
 };

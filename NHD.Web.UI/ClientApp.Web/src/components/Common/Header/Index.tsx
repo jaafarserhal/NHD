@@ -81,7 +81,7 @@ const Header: React.FC = () => {
                                     </li>
                                     <li><a href="/coming-soon" className="menu-item-link"><span>Shop</span></a></li>
                                     <li><a href="/coming-soon" className="menu-item-link"><span>Our Dates</span></a></li>
-                                    <li><a href="/coming-soon" className="menu-item-link"><span>Contact</span></a></li>
+                                    <li><Link to={routeUrls.contactUs} className="menu-item-link"><span>Contact</span></Link></li>
                                 </ul>
                             </div>
                         </div>
