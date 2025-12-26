@@ -376,7 +376,7 @@ function Gallery() {
                                                         name="isPrimary"
                                                     />
                                                 }
-                                                label='Primary'
+                                                label='Banner'
                                             />
                                         </Grid>
                                         <Grid item xs={12}>

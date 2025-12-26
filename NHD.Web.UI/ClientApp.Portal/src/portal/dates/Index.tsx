@@ -89,6 +89,13 @@ function Dates() {
             )
         },
         {
+            key: 'isFilled',
+            label: 'Filled',
+            render: (date) => (
+                <label>{date.isFilled ? 'Yes' : 'No'}</label>
+            )
+        },
+        {
             key: 'isActive',
             label: 'Status',
             render: (prd) => (

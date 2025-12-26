@@ -16,6 +16,7 @@ namespace NHD.Core.Services.Model.Dates
         public decimal UnitPrice { get; set; }
 
         public decimal WeightPrice { get; set; }
+        public bool? IsFilled { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
 

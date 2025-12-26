@@ -20,6 +20,7 @@ export default function AddDate() {
         quality: false,
         unitPrice: undefined,
         weightPrice: undefined,
+        isFilled: false,
         isActive: true,
     });
 
@@ -65,6 +66,12 @@ export default function AddDate() {
             quality: e.target.checked,
         }));
     };
+    const handleIsFilledSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm((prev) => ({
+            ...prev,
+            isFilled: e.target.checked,
+        }));
+    }
 
 
     const validateForm = () => {
@@ -115,6 +122,7 @@ export default function AddDate() {
                 quality: form.quality,
                 unitPrice: form.unitPrice || 0,
                 weightPrice: form.weightPrice || 0,
+                isFilled: form.isFilled,
                 isActive: form.isActive,
             };
             await dateService.addDate(dateData);
@@ -128,6 +136,7 @@ export default function AddDate() {
                 quality: false,
                 unitPrice: undefined,
                 weightPrice: undefined,
+                isFilled: false,
                 isActive: true,
             });
 
@@ -253,6 +262,26 @@ export default function AddDate() {
                                             }}
                                         />
                                     </Box>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+
+
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader title="Filled" />
+                                <Divider />
+                                <CardContent>
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={form.isFilled}
+                                                onChange={handleIsFilledSwitchChange}
+                                                name="isFilled"
+                                            />
+                                        }
+                                        label=''
+                                    />
                                 </CardContent>
                             </Card>
                         </Grid>

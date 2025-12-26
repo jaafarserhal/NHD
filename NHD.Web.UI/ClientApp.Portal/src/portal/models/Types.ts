@@ -24,6 +24,7 @@ export interface Date {
     quality: boolean;
     unitPrice: number;
     weightPrice: number;
+    isFilled: boolean;
     isActive: boolean;
 }
 

@@ -206,6 +206,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
+            entity.Property(e => e.IsFilled).HasColumnName("is_filled");
             entity.Property(e => e.NameEn)
                 .IsRequired()
                 .HasMaxLength(100)
