@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Header from '../components/Common/Header/Index';
 import Footer from '../components/Common/Footer/Index';
-import GiftCategory from '../components/CategoryTopProduct/Index';
+import ProductsWindowItems from '../components/ProductsWindowItems/Index';
+import DatesWindowItems from '../components/DatesWindowItems/Index';
 import Slider from '../components/Slider/Index';
 import CallToActionSection from '../components/CallToAction/Index';
 import Brands from '../components/Brands/Index';
@@ -83,13 +84,13 @@ const HomePage: React.FC = () => {
             <Loader loading={loading} />
             <Header />
             <Slider sliderData={homeData?.carousel} />
-            <GiftCategory informativeData={homeData?.giftIntro} products={homeData?.giftProducts} modalId="giftProductModal" />
+            <ProductsWindowItems informativeData={homeData?.giftIntro} products={homeData?.giftProducts} modalId="giftProductModal" />
             <CallToActionSection callToActionData={homeData?.callToAction} />
             <Brands brands={homeData?.brands} />
             <Collections collections={homeData?.top4Collections} />
             <OurProducts informativeData={homeData?.homeProductsInformative} categories={homeData?.homeProductsCategories} products={homeData?.homeProducts} />
             <ImageWithTitleSection informativeData={homeData?.homeCustomGifts} />
-            <GiftCategory informativeData={homeData?.fillDatesInformative} products={homeData?.fillDatesProducts} modalId="fillDatesProductModal" />
+            <DatesWindowItems informativeData={homeData?.fillDatesInformative} dates={homeData?.fillDatesProducts} />
             <Subscribe informativeData={homeData?.homeSubscribe} />
             <Footer />
         </>

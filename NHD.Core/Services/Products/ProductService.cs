@@ -104,27 +104,15 @@ namespace NHD.Core.Services.Products
         {
             try
             {
-                var products = await _productRepository.GetProductsByTypeAsync(BoxTypeEnum.FilledDate.AsInt(), 3);
+                var products = await _datesRepository.GetFillDatesAsync(3);
                 var productDtos = products.Select(p => new ProductsWithGalleryViewModel()
                 {
-                    Id = p.PrdId,
+                    Id = p.DateId,
                     TitleEn = p.NameEn,
                     TitleSv = p.NameSv,
                     DescriptionEn = p.DescriptionEn,
                     DescriptionSv = p.DescriptionSv,
-                    BadgeTextEn = p.BadgeEn,
-                    BadgeTextSv = p.BadgeSv,
-                    ImageUrl = $"/uploads/products/{p.ImageUrl}",
-                    FromPrice = p.FromPrice ?? 0,
-                    Type = p.PrdLookupType?.NameEn,
-                    Size = p.PrdLookupSize?.NameEn,
-                    Galleries = p.Galleries != null ? p.Galleries.Where(ga => ga.IsPrimary == false).Select(g => new GalleryViewModel
-                    {
-                        Id = g.GalleryId,
-                        AltText = g.AltText,
-                        ImageUrl = $"/uploads/products/{g.ImageUrl}",
-                    }).ToList() : new List<GalleryViewModel>()
-
+                    ImageUrl = $"/uploads/dates/{p.ImageUrl}"
                 }).ToList();
                 return ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Success(productDtos);
             }

@@ -3,13 +3,13 @@ import { ProductsWithGallery } from "../../api/common/Types";
 import QuickView from "../QuickView/Index";
 import Product from "../Product/Index";
 
-interface CategoryTopProductProps {
+interface ProductsWindowItemsProps {
     informativeData: any[];
     products: ProductsWithGallery[];
     modalId: string;
 }
 
-const CategoryTopProduct: React.FC<CategoryTopProductProps> = ({
+const ProductsWindowItems: React.FC<ProductsWindowItemsProps> = ({
     informativeData,
     products,
     modalId
@@ -48,4 +48,4 @@ const CategoryTopProduct: React.FC<CategoryTopProductProps> = ({
     );
 };
 
-export default CategoryTopProduct;
+export default ProductsWindowItems;

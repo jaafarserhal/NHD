@@ -58,5 +58,13 @@ namespace NHD.Core.Repository.Dates
                 .Take(take)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Date>> GetFillDatesAsync(int take)
+        {
+            return await _context.Dates
+                .Where(d => d.IsActive == true && d.IsFilled == true)
+                .Take(take)
+                .ToListAsync();
+        }
     }
 }

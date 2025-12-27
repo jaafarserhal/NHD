@@ -14,5 +14,6 @@ namespace NHD.Core.Repository.Dates
         Task<Date> GetDateByIdAsync(int dateId);
         Task<IEnumerable<Date>> GetActiveDatesAsync();
         Task<IEnumerable<Date>> GetTopDatesWithGalleriesAsync(int take);
+        Task<IEnumerable<Date>> GetFillDatesAsync(int take);
     }
 }

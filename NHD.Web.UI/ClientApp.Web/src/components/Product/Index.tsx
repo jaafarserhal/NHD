@@ -3,9 +3,9 @@ import { ProductsWithGallery } from "../../api/common/Types";
 
 interface ProductProps {
     product: ProductsWithGallery;
-    onQuickView: (product: ProductsWithGallery) => void;
-    isByCategory: boolean;
-    modalId: string;
+    onQuickView?: (product: ProductsWithGallery) => void;
+    isByCategory?: boolean;
+    modalId?: string;
 }
 //product-item border text-center
 const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, modalId }) => {
@@ -22,7 +22,7 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
                             alt={product.titleEn}
                         />
                     </a>
-                    <ul className={`product-item__meta ${isByCategory ? '' : 'meta-middle'}`}>
+                    {modalId && <ul className={`product-item__meta ${isByCategory ? '' : 'meta-middle'}`}>
                         <li className="product-item__meta-action">
                             <a
                                 className="labtn-icon-quickview"
@@ -34,25 +34,24 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
                                 data-bs-target={`#${modalId}`}
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    onQuickView(product);
+
+                                    onQuickView && onQuickView(product);
                                 }}
                             />
                         </li>
                         <li className="product-item__meta-action">
                             <a className="labtn-icon-cart" href="#" />
                         </li>
-                    </ul>
+                    </ul>}
                 </div>
+
                 <div className={`product-item__content ${isByCategory ? 'pt-5' : 'pb-3'}`}>
                     <h5 className="product-item__title">
                         <a href={`/product/${product.id}`}>{product.titleEn}</a>
                     </h5>
-                    <span className={`product-item__price ${isByCategory ? '' : 'fs-2'}`}>
+                    {(product.fromPrice || product.fromPrice !== 0) && <span className={`product-item__price ${isByCategory ? '' : 'fs-2'}`}>
                         ${product.fromPrice?.toFixed(2)}
-                    </span>
-                    {!isByCategory && <a href={`/product/${product.id}`} className="product-item__arrow">
-                        <img width={40} height={15} src="/assets/images/arrow.svg" alt="arrow" />
-                    </a>}
+                    </span>}
                 </div>
             </div>
         </div>
