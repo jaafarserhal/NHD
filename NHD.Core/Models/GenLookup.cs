@@ -19,6 +19,8 @@ public partial class GenLookup
 
     public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
 
+    public virtual ICollection<ContactMessage> ContactMessages { get; set; } = new List<ContactMessage>();
+
     public virtual ICollection<Customer> Customers { get; set; } = new List<Customer>();
 
     public virtual GenLookupType LookupType { get; set; }

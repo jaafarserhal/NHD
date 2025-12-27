@@ -15013,7 +15013,7 @@ only screen and (max-width: 767px) {
   font-family: "salom-regular", sans-serif;
   font-size: 14px;
   color: #858585;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
   max-width: 470px;
   width: 100%;
   margin-left: 0;
@@ -15026,7 +15026,7 @@ only screen and (max-width: 767px) {
 }
 
 .contact-section2_list li {
-  padding-bottom: 40px;
+  padding-bottom: 20px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;

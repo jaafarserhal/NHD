@@ -22,7 +22,8 @@ namespace NHD.Core.Utilities
         ProductSize = 300,
         BoxCategory = 400,
         SectionType = 500,
-        CustomerStatus = 600
+        CustomerStatus = 600,
+        ContactMessageSubject = 800
     }
 
     public enum CustomerStatusLookup
@@ -116,6 +117,13 @@ namespace NHD.Core.Utilities
     {
         Shipping = 700,
         Billing = 701
+    }
+
+    public enum SubjectType
+    {
+        OnlineShopping = 800,
+        CorporateGifts = 801,
+        SalesInquiry = 802,
     }
 
 

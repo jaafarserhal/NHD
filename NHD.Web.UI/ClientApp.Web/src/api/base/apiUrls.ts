@@ -1,7 +1,8 @@
 
 export const apiUrls = {
-    homepage: 'home',
+    homepage: 'Home',
     section: 'Section',
+    contact: 'Contact',
     registerCustomer: 'Register',
     verifyCustomerEmail: 'VerifyEmail',
     loginCustomer: 'Customer/Login',
@@ -15,4 +16,6 @@ export const apiUrls = {
     getCustomerAddress: 'Address',
     initiatePasswordReset: 'InitiatePasswordReset',
     resetPassword: 'ResetPassword',
+    submitContact: 'SubmitContact',
+    subjects: 'Subjects'
 };

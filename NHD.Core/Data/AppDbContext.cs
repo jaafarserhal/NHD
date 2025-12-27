@@ -18,6 +18,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Collection> Collections { get; set; }
 
+    public virtual DbSet<ContactMessage> ContactMessages { get; set; }
+
     public virtual DbSet<Customer> Customers { get; set; }
 
     public virtual DbSet<Date> Dates { get; set; }
@@ -144,6 +146,46 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NameSv)
                 .HasMaxLength(255)
                 .HasColumnName("name_sv");
+        });
+
+        modelBuilder.Entity<ContactMessage>(entity =>
+        {
+            entity.HasKey(e => e.ContactId).HasName("PK__contact___024E7A8676B81D04");
+
+            entity.ToTable("contact_messages");
+
+            entity.Property(e => e.ContactId).HasColumnName("contact_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.EmailAddress)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("email_address");
+            entity.Property(e => e.FirstName)
+                .IsRequired()
+                .HasMaxLength(150)
+                .HasColumnName("first_name");
+            entity.Property(e => e.IpAddress)
+                .HasMaxLength(45)
+                .HasColumnName("ip_address");
+            entity.Property(e => e.LastName)
+                .IsRequired()
+                .HasMaxLength(150)
+                .HasColumnName("last_name");
+            entity.Property(e => e.Message)
+                .IsRequired()
+                .HasColumnName("message");
+            entity.Property(e => e.Phone)
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasColumnName("phone");
+            entity.Property(e => e.SubjectLookupId).HasColumnName("subject_lookup_id");
+
+            entity.HasOne(d => d.SubjectLookup).WithMany(p => p.ContactMessages)
+                .HasForeignKey(d => d.SubjectLookupId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_subject_lookup");
         });
 
         modelBuilder.Entity<Customer>(entity =>

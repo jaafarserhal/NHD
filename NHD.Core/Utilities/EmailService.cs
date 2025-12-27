@@ -5,6 +5,7 @@ using MimeKit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace NHD.Core.Utilities
 {
@@ -16,6 +17,9 @@ namespace NHD.Core.Utilities
         Task<bool> SendVerificationEmailAsync(string FirstName, string email, string token);
         Task<bool> SendSuccefullPasswordChangeEmailAsync(string email, string FirstName);
         Task<bool> SendResetLinkEmailAsync(string email, string FirstName, string token);
+        Task<bool> SendContactUsEmailAsync(string fromEmail, string fromName, string phone, string subject, string message);
+
+        Task<bool> SendSuccessfullContactUsReplyEmailAsync(string toEmail, string toName);
     }
 
     // Email Configuration Model
@@ -152,6 +156,150 @@ namespace NHD.Core.Utilities
             }
         }
 
+        public async Task<bool> SendContactUsEmailAsync(string fromEmail, string fromName, string phone, string subject, string message)
+        {
+            try
+            {
+                var encodedFromName = WebUtility.HtmlEncode(fromName ?? string.Empty);
+                var encodedFromEmail = WebUtility.HtmlEncode(fromEmail ?? string.Empty);
+                var encodedPhone = WebUtility.HtmlEncode(phone ?? string.Empty);
+                var encodedSubject = WebUtility.HtmlEncode(subject ?? string.Empty);
+                var encodedMessage = WebUtility.HtmlEncode(message ?? string.Empty)
+                    .Replace("\n", "<br/>");
+
+                var fullSubject = $"📩 Contact Form: {encodedSubject}";
+
+                var body = $@"
+<!DOCTYPE html>
+<html>
+  <body style=""font-family:Segoe UI,Arial,sans-serif;background-color:#f4f6f8;margin:0;padding:24px;"">
+    <table role=""presentation"" width=""100%"" cellspacing=""0"" cellpadding=""0"">
+      <tr>
+        <td align=""center"">
+          <table role=""presentation"" width=""600"" cellspacing=""0"" cellpadding=""0"" 
+                 style=""background:#ffffff;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.08);padding:24px;"">
+
+            <tr>
+              <td style=""text-align:center;padding-bottom:8px;"">
+                <h2 style=""margin:0;color:#111827;"">New Contact Form Message</h2>
+                <p style=""margin:4px 0 0 0;color:#6b7280;font-size:13px;"">
+                  You received this message from your website contact form.
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style=""padding:16px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;"">
+                <p style=""margin:0 0 6px 0;"">
+                  <strong>Name:</strong> {encodedFromName}
+                </p>
+                <p style=""margin:0 0 6px 0;"">
+                  <strong>Email:</strong> {encodedFromEmail}
+                </p>
+                <p style=""margin:0 0 6px 0;"">
+                  <strong>Subject:</strong> {encodedSubject}
+                </p>
+                <p style=""margin:0 0 6px 0;"">
+                  <strong>Phone:</strong> {encodedPhone}
+                </p>
+                <p style=""margin:0;"">
+                  <strong>Received:</strong> {DateTime.UtcNow:dddd, MMM dd yyyy • HH:mm} UTC
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style=""padding-top:16px;"">
+                <p style=""margin:0 0 6px 0;font-weight:600;"">Message:</p>
+                <div style=""background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px;white-space:normal;"">
+                  {encodedMessage}
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style=""text-align:center;color:#9ca3af;font-size:12px;padding-top:18px;"">
+                <p style=""margin:0;"">
+                  You can reply directly to this email to contact the sender.
+                </p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>";
+                return await SendEmailAsync("kontakt@nawahomeofdates.com", fullSubject, body, isHtml: true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to send contact us email from {fromEmail}");
+                return false;
+            }
+        }
+
+        public async Task<bool> SendSuccessfullContactUsReplyEmailAsync(string toEmail, string toName)
+        {
+            try
+            {
+                var subject = "Thank You for Contacting Nawa";
+
+                var body = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Thank You for Contacting Nawa</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .footer {{
+            margin-top: 30px;
+            font-size: 12px;
+            text-align: center;
+            color: #777;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h2>Thank You for Contacting Nawa</h2>
+        <p>Hello, {toName}</p>
+        <p>
+            We appreciate you reaching out to us. Your message has been received,
+            and our team will get back to you as soon as possible.
+        </p>
+        <p>
+            In the meantime, feel free to explore our website for more information
+            about our premium dates and offerings.
+        </p>
+        <p>Best regards,<br/>The Nawa Team</p>  
+    </div>
+</body>
+</html>";
+                return await SendEmailAsync(toEmail, subject, body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to send contact us reply email to {toEmail}");
+                return false;
+            }
+        }
         private string GenerateEmailVerificationBody(string FirstName, string verifyUrl)
         {
             return $@"

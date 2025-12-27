@@ -1,0 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using NHD.Core.Common.Models;
+using NHD.Core.Models;
+using NHD.Core.Repository.Base;
+
+namespace NHD.Core.Repository.ContactMessages
+{
+    public interface IContactMessagesRepository : IRepository<ContactMessage>
+    {
+        Task<PagedResult<ContactMessage>> GetContactMessagesAsync(int page, int limit);
+        Task<ContactMessage> GetContactMessageByIdAsync(int id);
+    }
+}

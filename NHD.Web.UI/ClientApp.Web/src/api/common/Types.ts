@@ -91,3 +91,12 @@ export interface Address {
     typeId?: number;
     isPrimary?: boolean;
 }
+
+export interface ContactMessage {
+    subjectId: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    message: string;
+}

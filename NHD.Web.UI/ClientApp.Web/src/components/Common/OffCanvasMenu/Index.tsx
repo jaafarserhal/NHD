@@ -67,19 +67,19 @@ const OffcanvasMenu: React.FC<OffcanvasMenuProps> = ({ isOpen, onClose }) => {
                                 <i className="lastudioicon lastudioicon-support248"></i>
                                 <div className="hotline-content">
                                     <span className="hotline-text">Hotline</span>
-                                    <a className="hotline-link" href="tel:0123456789">(012) 345-6789</a>
+                                    <a className="hotline-link" href="tel:+46720488396">+46 72 048 83 96</a>
                                 </div>
                             </div>
                         </li>
-                        {/* <li>
+                        <li>
                             <div className="hotline">
                                 <i className="lastudioicon lastudioicon-pin-check"></i>
                                 <div className="hotline-content">
                                     <span className="hotline-text">Store Location</span>
-                                    <a className="hotline-link" href="#/">6391 Elgin St. Celina, Delaware 10299</a>
+                                    <a className="hotline-link" href="#/">Kölgatan 3  216 47 limhamn Sweden</a>
                                 </div>
                             </div>
-                        </li> */}
+                        </li>
                     </ul>
                 </div>
             </div>

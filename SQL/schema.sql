@@ -349,6 +349,21 @@ CREATE TABLE email_subscription (
 	is_active BIT NOT NULL DEFAULT 1,
 );
 
+CREATE TABLE dbo.contact_messages (
+    contact_id INT IDENTITY(1,1) PRIMARY KEY,
+  	first_name NVARCHAR(150) NOT NULL,
+  	last_name NVARCHAR(150) NOT NULL,
+  	email_address NVARCHAR(255) NOT NULL,
+  	message NVARCHAR(MAX) NOT NULL,
+  	ip_address NVARCHAR(45) NULL,
+  	phone NVARCHAR(50) NOT NULL,
+  	subject_lookup_id INT NOT NULL,
+  	created_at DATETIME2 NOT NULL 
+    CONSTRAINT DF_contact_messages DEFAULT SYSUTCDATETIME(),
+     CONSTRAINT FK_subject_lookup
+        FOREIGN KEY (subject_lookup_id)
+        REFERENCES dbo.gen_lookup(lookup_id)
+);
 
 -- =============================================
 -- CREATE INDEXES FOR PERFORMANCE
