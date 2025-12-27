@@ -11,7 +11,7 @@ class homeService extends apiService {
     }
 
     async getBrands() {
-        return this.get('TopFiveDatesWithGalleries');
+        return this.get('TopFiveBannerDates');
     }
     async getTop4Collections() {
         return this.get('Top4Collections');

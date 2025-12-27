@@ -28,23 +28,20 @@ namespace NHD.Core.Services.Dates
 
         #region Website Methods
 
-        public async Task<ServiceResult<IEnumerable<DatesWithGalleryViewModel>>> GetHomePageTopFiveDatesWithGalleriesAsync()
+        public async Task<ServiceResult<IEnumerable<DatesWithGalleryViewModel>>> GetBannerDatesAsync()
         {
             try
             {
-                var datesData = await _datesRepository.GetTopDatesWithGalleriesAsync(5);
+                var datesData = await _datesRepository.GetBannerDatesAsync(5);
                 var dateDtos = datesData
                 .Select(d =>
                 {
-                    var primaryGallery = d.Galleries?.FirstOrDefault(x => x.IsPrimary);
-
                     return new DatesWithGalleryViewModel
                     {
                         Id = d.DateId,
                         NameEn = d.NameEn,
                         NameSv = d.NameSv,
-                        ImageUrl = primaryGallery?.ImageUrl,
-                        AltText = primaryGallery?.AltText
+                        ImageUrl = d.ImageUrl
                     };
                 })
                 .ToList();

@@ -13,7 +13,7 @@ namespace NHD.Core.Repository.Dates
         Task<PagedResult<Date>> GetDatesAsync(int page, int limit);
         Task<Date> GetDateByIdAsync(int dateId);
         Task<IEnumerable<Date>> GetActiveDatesAsync();
-        Task<IEnumerable<Date>> GetTopDatesWithGalleriesAsync(int take);
+        Task<IEnumerable<Date>> GetBannerDatesAsync(int take);
         Task<IEnumerable<Date>> GetFillDatesAsync(int take);
     }
 }

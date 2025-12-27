@@ -48,10 +48,10 @@ namespace NHD.Web.UI.Website.Controllers
             return BadRequest(result.ErrorMessage);
         }
 
-        [HttpGet("TopFiveDatesWithGalleries")]
-        public async Task<ActionResult<ServiceResult<IEnumerable<DatesWithGalleryViewModel>>>> GetTopFiveDatesWithGalleries()
+        [HttpGet("TopFiveBannerDates")]
+        public async Task<ActionResult<ServiceResult<IEnumerable<DatesWithGalleryViewModel>>>> GetTopFiveBannerDates()
         {
-            var result = await _datesService.GetHomePageTopFiveDatesWithGalleriesAsync();
+            var result = await _datesService.GetBannerDatesAsync();
             if (result.IsSuccess)
             {
                 return Ok(result.Data);

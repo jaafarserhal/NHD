@@ -50,11 +50,10 @@ namespace NHD.Core.Repository.Dates
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Date>> GetTopDatesWithGalleriesAsync(int take)
+        public async Task<IEnumerable<Date>> GetBannerDatesAsync(int take)
         {
             return await _context.Dates
-                .Include(d => d.Galleries)
-                .Where(d => d.IsActive)
+                .Where(d => d.IsActive == true && d.Quality == true)
                 .Take(take)
                 .ToListAsync();
         }
