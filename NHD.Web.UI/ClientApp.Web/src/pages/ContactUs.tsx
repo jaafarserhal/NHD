@@ -269,6 +269,7 @@ const ContactUs: React.FC = () => {
                                             <FormField
                                                 label="Phone"
                                                 name="phone"
+                                                type="tel"
                                                 value={formData.phone}
                                                 error={errors.phone}
                                                 onChange={handleChange}

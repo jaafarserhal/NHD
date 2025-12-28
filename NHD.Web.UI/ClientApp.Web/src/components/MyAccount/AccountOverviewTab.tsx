@@ -1,8 +1,48 @@
 import React from 'react';
 import { CustomerInfo } from '../../api/common/Types';
 import { AddressTypeEnum } from '../../api/common/Enums';
-import { formatPhoneNumber, switchTab } from '../../api/common/Utils';
+import { switchTab } from '../../api/common/Utils';
 import AddressDisplay from './AddressDisplay';
+import { countryCodeMap } from '../../api/hooks/countryCodeMap';
+
+// Convert ISO country code to emoji flag
+const getFlagEmoji = (countryCode: string) =>
+    countryCode
+        .toUpperCase()
+        .replace(/./g, char => String.fromCodePoint(127397 + char.charCodeAt(0)));
+
+// Format mobile dynamically
+const formatMobile = (mobile?: string) => {
+    if (!mobile) return null;
+
+    const digits = mobile.replace(/\D/g, '');
+    let countryCode = '';
+    let restNumber = '';
+
+    // Check 3 → 2 → 1 digit prefixes
+    for (let i = 3; i >= 1; i--) {
+        const prefix = digits.slice(0, i);
+        if (countryCodeMap[prefix]) {
+            countryCode = prefix;
+            restNumber = digits.slice(i);
+            break;
+        }
+    }
+
+    if (!countryCode) return mobile; // fallback
+
+    const isoCode = countryCodeMap[countryCode];
+    const flag = getFlagEmoji(isoCode);
+
+    // Simple formatting: split remaining digits
+    const formattedRest = restNumber
+        .match(/(\d{1,3})(\d{1,3})?(\d{0,4})?/)
+        ?.slice(1)
+        .filter(Boolean)
+        .join('-');
+
+    return `${flag} +${countryCode} ${formattedRest}`;
+};
 
 interface AccountOverviewTabProps {
     customerInfo: CustomerInfo | null;
@@ -10,12 +50,15 @@ interface AccountOverviewTabProps {
 }
 
 const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({ customerInfo, onRefresh }) => {
-    const billingAddress = customerInfo?.addresses?.find(a => a.typeId === AddressTypeEnum.Billing && a.isPrimary);
-    const shippingAddress = customerInfo?.addresses?.find(a => a.typeId === AddressTypeEnum.Shipping && a.isPrimary);
+    const billingAddress = customerInfo?.addresses?.find(
+        a => a.typeId === AddressTypeEnum.Billing && a.isPrimary
+    );
+    const shippingAddress = customerInfo?.addresses?.find(
+        a => a.typeId === AddressTypeEnum.Shipping && a.isPrimary
+    );
 
     const handleEditAddress = async (addressId: number) => {
         switchTab('address-book-tab');
-        // Trigger edit in AddressBookTab through a custom event
         window.dispatchEvent(new CustomEvent('editAddress', { detail: { addressId } }));
     };
 
@@ -33,13 +76,13 @@ const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({ customerInfo, o
                             {customerInfo?.firstName} {customerInfo?.lastName}
                         </p>
                         {customerInfo?.email && <p className="mb-1">{customerInfo.email}</p>}
-                        <p className="mb-1">{formatPhoneNumber(customerInfo?.mobile)}</p>
+                        <p className="mb-1">{formatMobile(customerInfo?.mobile)}</p>
 
                         <div className="d-flex gap-2">
                             <a
                                 href="#"
                                 className="underlined-link account-info-link"
-                                onClick={(e) => {
+                                onClick={e => {
                                     e.preventDefault();
                                     switchTab('account-info-tab');
                                 }}
@@ -50,7 +93,7 @@ const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({ customerInfo, o
                             <a
                                 href="#"
                                 className="underlined-link account-info-link"
-                                onClick={(e) => {
+                                onClick={e => {
                                     e.preventDefault();
                                     switchTab('change-password-tab');
                                 }}
@@ -67,7 +110,7 @@ const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({ customerInfo, o
                         <span
                             className="underlined-link manage-addresses"
                             style={{ fontFamily: 'salom-regular', fontSize: '.7rem', cursor: 'pointer' }}
-                            onClick={(e) => {
+                            onClick={e => {
                                 e.preventDefault();
                                 switchTab('address-book-tab');
                             }}
@@ -89,11 +132,9 @@ const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({ customerInfo, o
                                     <a
                                         href="#"
                                         className="underlined-link account-info-link"
-                                        onClick={(e) => {
+                                        onClick={e => {
                                             e.preventDefault();
-                                            if (billingAddress.id) {
-                                                handleEditAddress(billingAddress.id);
-                                            }
+                                            if (billingAddress.id) handleEditAddress(billingAddress.id);
                                         }}
                                     >
                                         Edit Address
@@ -114,11 +155,9 @@ const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({ customerInfo, o
                                     <a
                                         href="#"
                                         className="underlined-link account-info-link"
-                                        onClick={(e) => {
+                                        onClick={e => {
                                             e.preventDefault();
-                                            if (shippingAddress.id) {
-                                                handleEditAddress(shippingAddress.id);
-                                            }
+                                            if (shippingAddress.id) handleEditAddress(shippingAddress.id);
                                         }}
                                     >
                                         Edit Address
@@ -132,4 +171,5 @@ const AccountOverviewTab: React.FC<AccountOverviewTabProps> = ({ customerInfo, o
         </div>
     );
 };
+
 export default AccountOverviewTab;

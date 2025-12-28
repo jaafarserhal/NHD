@@ -19937,6 +19937,10 @@ only screen and (max-width: 767px) {
   font-size: 1.2rem;
 }
 
+.tel-input-padding {
+  padding: 10px 10px 10px 40px !important;
+}
+
 .select-input-style {
   width: 100%;
   padding: 13.5px 40px 13.4px 16px;

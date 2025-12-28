@@ -27,5 +27,6 @@ namespace NHD.Core.Services.Customers
         Task<Address?> SaveAddressAsync(int customerId, Address address);
         Task<ServiceResult<bool>> SetAddressAsDefaultAsync(int customerId, int addressId, int addressTypeId);
         Task<ServiceResult<bool>> DeleteAddressAsync(int addressId);
+        Task<ServiceResult<bool>> ResendVerificationEmail(string email);
     }
 }

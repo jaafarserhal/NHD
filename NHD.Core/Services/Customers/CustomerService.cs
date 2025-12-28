@@ -225,6 +225,37 @@ namespace NHD.Core.Services.Customers
             }
         }
 
+        public async Task<ServiceResult<bool>> ResendVerificationEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return ServiceResult<bool>.Validate("Email address is required");
+
+            var customer = await _customerRepository.GetByEmailAsync(email);
+            if (customer == null)
+                return ServiceResult<bool>.Validate("Customer not found");
+
+            if (customer.IsActive == true)
+                return ServiceResult<bool>.Validate("Email is already verified.");
+
+            // Optional: regenerate token if expired
+            if (customer.EmailVerificationTokenExpires < DateTime.UtcNow)
+            {
+                customer.EmailVerificationToken = Guid.NewGuid().ToString("N");
+                customer.EmailVerificationTokenExpires = DateTime.UtcNow.AddHours(24);
+                await _customerRepository.UpdateAsync(customer);
+            }
+
+            var emailSent = await _emailService.SendVerificationEmailAsync(
+                customer.FirstName,
+                customer.EmailAddress,
+                customer.EmailVerificationToken);
+
+            if (!emailSent)
+                return ServiceResult<bool>.Failure("Failed to send verification email. Please try again.");
+
+            return ServiceResult<bool>.Success(true);
+        }
+
         public async Task<ServiceResult<string>> ChangePasswordAsync(Customer customer)
         {
             await BeginTransactionAsync();

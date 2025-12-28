@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { routeUrls } from "../../api/base/routeUrls";
 import encryptParameter, { validateEmail, validatePassword } from "../../api/common/Utils";
 import Loader from "../../components/Common/Loader/Index";
+import FormField from "../../components/Common/FormField/Index";
 
 
 export default function CreateAccount() {
@@ -93,13 +94,15 @@ export default function CreateAccount() {
         }
     };
 
-    const handleInputChange = (fieldName: string) => {
-        // Remove error when user starts typing
-        if (errors[fieldName]) {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name } = e.target;
+
+        // clear individual error on change
+        if (errors[name]) {
             setErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[fieldName];
-                return newErrors;
+                const next = { ...prev };
+                delete next[name];
+                return next;
             });
         }
     };
@@ -128,113 +131,73 @@ export default function CreateAccount() {
                             <div className="account-details-form">
                                 <form onSubmit={handleSubmit} noValidate>
                                     <div className="row g-4">
-                                        <div className="col-12 mt-1">
-                                            <label htmlFor="firstName">
-                                                First Name <abbr className="required">*</abbr>
-                                            </label>
-                                            <input
-                                                className="form-field"
-                                                type="text"
-                                                id="firstName"
-                                                name="firstName"
-                                                onChange={() => handleInputChange('firstName')}
-                                                style={errors['firstName'] ? { borderColor: 'red' } : {}}
-                                            />
-                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
-                                                {errors['firstName'] || '\u00A0'}
-                                            </span>
-                                        </div>
 
-                                        <div className="col-12 mt-1">
-                                            <label htmlFor="lastName">
-                                                Last Name <abbr className="required">*</abbr>
-                                            </label>
-                                            <input
-                                                className="form-field"
-                                                type="text"
-                                                id="lastName"
-                                                name="lastName"
-                                                onChange={() => handleInputChange('lastName')}
-                                                style={errors['lastName'] ? { borderColor: 'red' } : {}}
-                                            />
-                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
-                                                {errors['lastName'] || '\u00A0'}
-                                            </span>
-                                        </div>
+                                        <FormField
+                                            label="First Name"
+                                            name="firstName"
+                                            onChange={handleInputChange}
+                                            error={errors.firstName}
+                                            required
+                                        />
 
-                                        <div className="col-12 mt-1">
-                                            <label htmlFor="mobile">
-                                                Mobile Number <abbr className="required">*</abbr>
-                                            </label>
-                                            <input
-                                                className="form-field"
-                                                type="tel"
-                                                id="mobile"
-                                                name="mobile"
-                                                onChange={() => handleInputChange('mobile')}
-                                                style={errors['mobile'] ? { borderColor: 'red' } : {}}
-                                            />
-                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
-                                                {errors['mobile'] || '\u00A0'}
-                                            </span>
-                                        </div>
+                                        <FormField
+                                            label="Last Name"
+                                            name="lastName"
+                                            onChange={handleInputChange}
+                                            error={errors.lastName}
+                                            required
+                                        />
 
-                                        <div className="col-12 mt-1">
-                                            <label htmlFor="emailAddress">
-                                                Email Address <abbr className="required">*</abbr>
-                                            </label>
-                                            <input
-                                                className="form-field"
-                                                type="email"
-                                                id="emailAddress"
-                                                name="emailAddress"
-                                                onChange={() => handleInputChange('emailAddress')}
-                                                style={errors['emailAddress'] ? { borderColor: 'red' } : {}}
-                                            />
-                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
-                                                {errors['emailAddress'] || '\u00A0'}
-                                            </span>
-                                        </div>
+                                        <FormField
+                                            label="Mobile Number"
+                                            name="mobile"
+                                            type="tel"
+                                            onChange={handleInputChange}
+                                            error={errors.mobile}
+                                            required
+                                        />
 
-                                        <div className="col-12 mt-1">
-                                            <label htmlFor="password">
-                                                Password <abbr className="required">*</abbr>
-                                            </label>
-                                            <input
-                                                className="form-field"
-                                                type="password"
-                                                id="password"
-                                                name="password"
-                                                onChange={() => handleInputChange('password')}
-                                                style={errors['password'] ? { borderColor: 'red' } : {}}
-                                            />
-                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
-                                                {errors['password'] || '\u00A0'}
-                                            </span>
-                                        </div>
+                                        <FormField
+                                            label="Email Address"
+                                            name="emailAddress"
+                                            type="email"
+                                            onChange={handleInputChange}
+                                            error={errors.emailAddress}
+                                            required
+                                        />
 
-                                        <div className="col-12 mt-1">
-                                            <label htmlFor="confirmPassword">
-                                                Confirm Password <abbr className="required">*</abbr>
-                                            </label>
-                                            <input
-                                                className="form-field"
-                                                type="password"
-                                                id="confirmPassword"
-                                                name="confirmPassword"
-                                                onChange={() => handleInputChange('confirmPassword')}
-                                                style={errors['confirmPassword'] ? { borderColor: 'red' } : {}}
-                                            />
-                                            <span style={{ color: 'red', fontSize: '14px', marginTop: '4px', display: 'block', minHeight: '20px' }}>
-                                                {errors['confirmPassword'] || '\u00A0'}
-                                            </span>
-                                        </div>
+                                        <FormField
+                                            label="Password"
+                                            name="password"
+                                            type="password"
+                                            onChange={handleInputChange}
+                                            error={errors.password}
+                                            required
+                                        />
 
-                                        <div className="col-12">
-                                            <button className="btn btn-dark btn-primary-hover w-100" type="submit">
+                                        <FormField
+                                            label="Confirm Password"
+                                            name="confirmPassword"
+                                            type="password"
+                                            onChange={handleInputChange}
+                                            error={errors.confirmPassword}
+                                            required
+                                        />
+
+                                        <div className="col-12 mt-3 d-flex gap-2">
+                                            <button className="btn btn-dark btn-primary-hover flex-fill" type="submit">
                                                 Create An Account
                                             </button>
+
+                                            <button
+                                                className="btn btn-outline-dark flex-fill"
+                                                type="button"
+                                                onClick={() => navigate(routeUrls.login)}
+                                            >
+                                                CANCEL
+                                            </button>
                                         </div>
+
                                     </div>
                                 </form>
                             </div>

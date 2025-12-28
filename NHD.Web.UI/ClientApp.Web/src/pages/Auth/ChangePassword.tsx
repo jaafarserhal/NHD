@@ -6,6 +6,7 @@ import Footer from "../../components/Common/Footer/Index";
 import Loader from "../../components/Common/Loader/Index";
 import authService from "../../api/authService";
 import { routeUrls } from "../../api/base/routeUrls";
+import FormField from "../../components/Common/FormField/Index";
 
 const ChangePassword: React.FC = () => {
     const location = useLocation();
@@ -136,52 +137,40 @@ const ChangePassword: React.FC = () => {
                                 <div className="account-details-form">
                                     <form>
                                         <div className="row g-4">
-                                            <div className="col-12">
-                                                <label htmlFor="password">
-                                                    New Password <abbr className="required">*</abbr>
-                                                </label>
-                                                <input
-                                                    id="password"
-                                                    name="password"
-                                                    type="password"
-                                                    value={formData.password}
-                                                    onChange={handleInputChange}
-                                                    onKeyDown={handleKeyDown}
-                                                    disabled={isLoading}
-                                                    className="form-field"
-                                                    style={errors.password ? { borderColor: "red" } : {}}
-                                                />
-                                                <span className="text-danger">{errors.password || "\u00A0"}</span>
-                                            </div>
 
-                                            <div className="col-12">
-                                                <label htmlFor="confirmPassword">
-                                                    Confirm Password <abbr className="required">*</abbr>
-                                                </label>
-                                                <input
-                                                    id="confirmPassword"
-                                                    name="confirmPassword"
-                                                    type="password"
-                                                    value={formData.confirmPassword}
-                                                    onChange={handleInputChange}
-                                                    onKeyDown={handleKeyDown}
-                                                    disabled={isLoading}
-                                                    className="form-field"
-                                                    style={errors.confirmPassword ? { borderColor: "red" } : {}}
-                                                />
-                                                <span className="text-danger">
-                                                    {errors.confirmPassword || "\u00A0"}
-                                                </span>
-                                            </div>
+                                            <FormField
+                                                label="New Password"
+                                                name="password"
+                                                type="password"
+                                                value={formData.password}
+                                                error={errors.password}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
 
-                                            <div className="col-12">
+                                            <FormField
+                                                label="Confirm Password"
+                                                name="confirmPassword"
+                                                type="password"
+                                                value={formData.confirmPassword}
+                                                error={errors.confirmPassword}
+                                                onChange={handleInputChange}
+                                                required
+                                            />
+                                            <div className="col-12 mt-3 d-flex gap-2">
                                                 <button
+                                                    className="btn btn-dark btn-primary-hover flex-fill"
                                                     type="button"
-                                                    className="btn btn-dark btn-primary-hover w-100"
                                                     onClick={handleSubmit}
-                                                    disabled={isLoading}
                                                 >
                                                     Change Password
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-dark flex-fill"
+                                                    type="button"
+                                                    onClick={() => navigate(routeUrls.login)}
+                                                >
+                                                    CANCEL
                                                 </button>
                                             </div>
                                         </div>

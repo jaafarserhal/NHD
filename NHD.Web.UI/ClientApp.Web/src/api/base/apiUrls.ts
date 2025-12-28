@@ -15,6 +15,7 @@ export const apiUrls = {
     deleteCustomerAddress: 'DeleteAddress',
     getCustomerAddress: 'Address',
     initiatePasswordReset: 'InitiatePasswordReset',
+    resendVerificationEmail: 'ResendVerification',
     resetPassword: 'ResetPassword',
     submitContact: 'SubmitContact',
     subjects: 'Subjects'

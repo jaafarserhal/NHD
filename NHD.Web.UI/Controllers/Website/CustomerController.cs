@@ -70,6 +70,21 @@ namespace NHD.Web.UI.Controllers.Website
             }
         }
 
+        [HttpPost("ResendVerification")]
+        public async Task<IActionResult> ResendVerificationEmail([FromBody] string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return BadRequest("Email address is required");
+
+            var result = await _customerService.ResendVerificationEmail(email);
+            if (!result.IsSuccess)
+            {
+                return BadRequest(new { message = result.ErrorMessage });
+            }
+            return Ok(new { message = "Verification email sent successfully." });
+        }
+
+
         [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] CustomerLoginModel login)
         {

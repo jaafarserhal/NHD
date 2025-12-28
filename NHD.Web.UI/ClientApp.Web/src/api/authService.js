@@ -37,6 +37,10 @@ class authService extends apiService {
         return response.data?.message;
     }
 
+    async resendVerificationEmail(email) {
+        return this.post(email, apiUrls.resendVerificationEmail);
+    }
+
 
     // Reset password
     async resetPassword(resetData) {
