@@ -21,6 +21,7 @@ import EmergencyShareIcon from '@mui/icons-material/EmergencyShare';
 import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import ContactMailIcon from '@mui/icons-material/ContactMail';
 
 import { RouterUrls } from 'src/common/RouterUrls';
 
@@ -195,6 +196,18 @@ function SidebarMenu() {
                 startIcon={<HelpOutlineIcon />}
               >
                 FAQs
+              </Button>
+            </ListItem>
+            {/* CONTACT MESSAGES */}
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to={RouterUrls.contactsList}
+                startIcon={<ContactMailIcon />}
+              >
+                Complains
               </Button>
             </ListItem>
           </List>

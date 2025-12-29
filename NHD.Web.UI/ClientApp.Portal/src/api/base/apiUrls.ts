@@ -37,4 +37,6 @@ export const apiUrls = {
     getFaqById: '/GetById/',
     deleteFaq: '/Delete/',
     getFaqTypes: '/Types',
+    contacts: '/Contact',
+    exportContacts: '/export'
 };

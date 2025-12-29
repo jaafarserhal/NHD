@@ -19,5 +19,6 @@ namespace NHD.Core.Services.ContactMessages
         Task<ContactMessage> UpdateContactMessageAsync(ContactMessage contactMessage);
         Task<ServiceResult<bool>> DeleteContactMessageAsync(int contactMessageId);
         Task<ServiceResult<ContactMessage>> SubmitContactAsync(ContactMessagesViewModel model);
+        Task<ServiceResult<IEnumerable<ContactMessagesViewModel>>> GetAllContactMessagesAsync();
     }
 }

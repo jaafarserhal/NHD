@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using NHD.Core.Common.Models;
@@ -58,6 +59,24 @@ namespace NHD.Core.Services.ContactMessages
             {
                 _logger.LogError(ex, "Error retrieving contact messages");
                 return PagedServiceResult<IEnumerable<ContactMessagesViewModel>>.Failure("An error occurred while retrieving contact messages");
+            }
+        }
+
+        public async Task<ServiceResult<IEnumerable<ContactMessagesViewModel>>> GetAllContactMessagesAsync()
+        {
+            try
+            {
+                var contacts = await _context.ContactMessages
+                    .Include(c => c.SubjectLookup)
+                    .OrderByDescending(c => c.CreatedAt)
+                    .ToListAsync();
+
+                var contactMessagesDtos = contacts.Select(MapToContactMessage).ToList();
+                return ServiceResult<IEnumerable<ContactMessagesViewModel>>.Success(contactMessagesDtos);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<IEnumerable<ContactMessagesViewModel>>.Failure($"Error retrieving contacts: {ex.Message}");
             }
         }
 

@@ -22,4 +22,5 @@ export const RouterUrls = {
     faqsList: '/faqs',
     faqAdd: '/faqs/add',
     faqEdit: '/faqs/edit/:id',
+    contactsList: '/contacts'
 };
