@@ -10,7 +10,8 @@ VALUES
 	(500, N'Sections Type', N'Sections Type',SYSUTCDATETIME(), 1),
 	(600, N'Customer Status', N'Customer Status',SYSUTCDATETIME(), 1),
 	(700, N'Address Type', N'Address Type',SYSUTCDATETIME(), 1),
-	(800, N'Contact Subject', N'AContact Subject',SYSUTCDATETIME(), 1);
+	(800, N'Contact Subject', N'AContact Subject',SYSUTCDATETIME(), 1),
+	(900, N'FAQ Type', N'FAQ Type',SYSUTCDATETIME(), 1);
 
 -- =============================================
 -- INSERT INTO gen_lookup
@@ -67,7 +68,10 @@ VALUES
 (701, 700, N'Shipping', N'Shipping',SYSUTCDATETIME(), 1),
 (800, 800, 'Online Shopping', 'Online Shopping', SYSUTCDATETIME(), 1),
 (801, 800, 'Corporate Gifts', 'Corporate Gifts', SYSUTCDATETIME(), 1),
-(802, 800, 'Sales Inquiry', 'Sales Inquiry', SYSUTCDATETIME(), 1);
+(802, 800, 'Sales Inquiry', 'Sales Inquiry', SYSUTCDATETIME(), 1),
+(900, 900, 'Delivery & Shipping', 'Delivery & Shipping', SYSUTCDATETIME(), 1),
+(901, 900, 'Payment & Refund', 'Payment & Refund', SYSUTCDATETIME(), 1),
+(902, 900, 'Security', 'Security', SYSUTCDATETIME(), 1);
 
 
 

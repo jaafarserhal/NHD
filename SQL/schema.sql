@@ -365,6 +365,21 @@ CREATE TABLE dbo.contact_messages (
         REFERENCES dbo.gen_lookup(lookup_id)
 );
 
+CREATE TABLE dbo.faq (
+    faq_id INT IDENTITY(1,1) PRIMARY KEY,
+    question_en NVARCHAR(500) NOT NULL,
+    question_sv NVARCHAR(500) NOT NULL,
+    answer_en NVARCHAR(MAX) NOT NULL,
+    answer_sv NVARCHAR(MAX) NOT NULL,
+    type_lookup_id INT NOT NULL,
+    created_at DATETIME2 NOT NULL CONSTRAINT DF_FAQ_CreatedAt DEFAULT SYSUTCDATETIME(),
+    is_active BIT NOT NULL DEFAULT 1,
+    CONSTRAINT UQ_FAQ_Question_Type
+       FOREIGN KEY (type_lookup_id)
+       REFERENCES dbo.gen_lookup(lookup_id)
+);
+
+
 -- =============================================
 -- CREATE INDEXES FOR PERFORMANCE
 -- =============================================

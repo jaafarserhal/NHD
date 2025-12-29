@@ -19,6 +19,9 @@ class homeService extends apiService {
     async getCategories() {
         return this.get('Categories');
     }
+    async getFaqTypes() {
+        return this.get('FaqTypes');
+    }
     async getHomeProductsByCategory(categoryId = 0) {
         return this.get(`HomeProducts/${categoryId}`);
     }

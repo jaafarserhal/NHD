@@ -18,5 +18,8 @@ export const RouterUrls = {
     collectionEdit: '/collections/edit/:id',
     sectionsList: '/sections',
     sectionAdd: '/sections/add',
-    sectionEdit: '/sections/edit/:id'
+    sectionEdit: '/sections/edit/:id',
+    faqsList: '/faqs',
+    faqAdd: '/faqs/add',
+    faqEdit: '/faqs/edit/:id',
 };

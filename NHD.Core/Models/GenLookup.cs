@@ -23,6 +23,8 @@ public partial class GenLookup
 
     public virtual ICollection<Customer> Customers { get; set; } = new List<Customer>();
 
+    public virtual ICollection<Faq> Faqs { get; set; } = new List<Faq>();
+
     public virtual GenLookupType LookupType { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

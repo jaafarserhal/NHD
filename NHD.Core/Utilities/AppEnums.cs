@@ -23,9 +23,16 @@ namespace NHD.Core.Utilities
         BoxCategory = 400,
         SectionType = 500,
         CustomerStatus = 600,
-        ContactMessageSubject = 800
+        ContactMessageSubject = 800,
+        FaqType = 900
     }
 
+    public enum FaqTypeLookup
+    {
+        ShippingAndDelivery = 900,
+        PaymentAndRefunds = 901,
+        Security = 902,
+    }
     public enum CustomerStatusLookup
     {
         Pending = 600,
@@ -49,7 +56,6 @@ namespace NHD.Core.Utilities
         Grams_500 = 310,
         Milliliters_400 = 311
     }
-
 
     public enum BoxCategoryLookup
     {

@@ -10,4 +10,5 @@ export const routeUrls = {
     forgotPassword: '/auth/forgot-password',
     changePassword: '/auth/change-password',
     contactUs: '/contact-us',
+    faqs: '/faqs/:typeId/:typeName',
 };

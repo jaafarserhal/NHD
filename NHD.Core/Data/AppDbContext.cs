@@ -28,6 +28,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<EmailSubscription> EmailSubscriptions { get; set; }
 
+    public virtual DbSet<Faq> Faqs { get; set; }
+
     public virtual DbSet<Gallery> Galleries { get; set; }
 
     public virtual DbSet<GenLookup> GenLookups { get; set; }
@@ -325,6 +327,41 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.UserAgent)
                 .HasMaxLength(500)
                 .HasColumnName("user_agent");
+        });
+
+        modelBuilder.Entity<Faq>(entity =>
+        {
+            entity.HasKey(e => e.FaqId).HasName("PK__faq__66734BAF49E1466F");
+
+            entity.ToTable("faq");
+
+            entity.Property(e => e.FaqId).HasColumnName("faq_id");
+            entity.Property(e => e.AnswerEn)
+                .IsRequired()
+                .HasColumnName("answer_en");
+            entity.Property(e => e.AnswerSv)
+                .IsRequired()
+                .HasColumnName("answer_sv");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.QuestionEn)
+                .IsRequired()
+                .HasMaxLength(500)
+                .HasColumnName("question_en");
+            entity.Property(e => e.QuestionSv)
+                .IsRequired()
+                .HasMaxLength(500)
+                .HasColumnName("question_sv");
+            entity.Property(e => e.TypeLookupId).HasColumnName("type_lookup_id");
+
+            entity.HasOne(d => d.TypeLookup).WithMany(p => p.Faqs)
+                .HasForeignKey(d => d.TypeLookupId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("UQ_FAQ_Question_Type");
         });
 
         modelBuilder.Entity<Gallery>(entity =>

@@ -25,6 +25,8 @@ using NHD.Core.Services.Customers;
 using NHD.Core.Repository.Addresses;
 using NHD.Core.Repository.ContactMessages;
 using NHD.Core.Services.ContactMessages;
+using NHD.Core.Repository.FAQ;
+using NHD.Core.Services.FAQ;
 
 
 namespace NHD.Web.UI
@@ -188,6 +190,7 @@ namespace NHD.Web.UI
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IContactMessagesRepository, ContactMessagesRepository>();
+            services.AddScoped<IFAQRepository, FAQRepository>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
@@ -196,6 +199,7 @@ namespace NHD.Web.UI
             services.AddScoped<IEmailSubscriptionService, EmailSubscriptionService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IContactMessagesService, ContactMessagesService>();
+            services.AddScoped<IFAQService, FAQService>();
         }
     }
 }

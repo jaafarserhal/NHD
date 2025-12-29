@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { LookupItem } from "../../../api/common/Types";
 import homeService from "../../../api/homeService";
+import faqService from "../../../api/faqService";
 import { routeUrls } from "../../../api/base/routeUrls";
-import { Link } from "react-router-dom";
+import { Link, generatePath } from "react-router-dom";
+
 
 interface FooterProps {
     isDark?: boolean; // Optional prop, defaults to false (light mode)
@@ -12,6 +14,7 @@ const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
     const [showScrollTop, setShowScrollTop] = useState(false);
     const [lastScrollTop, setLastScrollTop] = useState(0);
     const [Categories, setCategories] = useState<LookupItem[]>([]);
+    const [faqTypes, setFaqTypes] = useState<LookupItem[]>([]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -22,6 +25,15 @@ const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
                 console.error("Failed to fetch categories", error);
             }
         };
+        const fetchFaqTypes = async () => {
+            try {
+                const types = await faqService.getFaqTypes();
+                setFaqTypes(Array.isArray(types.data) ? types.data : []);
+            } catch (error) {
+                console.error("Failed to fetch FAQ types", error);
+            }
+        };
+        fetchFaqTypes();
 
         fetchCategories();
     }, []);
@@ -59,6 +71,7 @@ const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
             behavior: 'smooth'
         });
     };
+
 
     return (
         <>
@@ -121,11 +134,28 @@ const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
                                         <div className="footer-widget flex-grow-1">
                                             <h4 className="footer-widget__title">Services</h4>
                                             <ul className="footer-widget__link">
-                                                <li><a href="/coming-soon">Delivery</a></li>
-                                                <li><a href="/coming-soon">Payment</a></li>
-                                                <li><a href="/coming-soon">Returns</a></li>
-                                                <li><a href="/coming-soon">Privacy</a></li>
+                                                {faqTypes.map((type) => {
+                                                    const slug = type.nameEn
+                                                        .toLowerCase()
+                                                        .replace(/&/g, 'and')                 // optional: keep meaning
+                                                        .replace(/[^a-z0-9]+/g, '-')          // anything not a–z/0–9 → hyphen
+                                                        .replace(/^-+|-+$/g, '');             // trim leading/trailing hyphens
+
+                                                    return (
+                                                        <li key={type.id}>
+                                                            <Link
+                                                                to={generatePath(routeUrls.faqs, {
+                                                                    typeId: type.id.toString(),
+                                                                    typeName: slug,
+                                                                })}
+                                                            >
+                                                                {type.nameEn}
+                                                            </Link>
+                                                        </li>
+                                                    );
+                                                })}
                                             </ul>
+
                                         </div>
                                         {/* Footer Widget End */}
 

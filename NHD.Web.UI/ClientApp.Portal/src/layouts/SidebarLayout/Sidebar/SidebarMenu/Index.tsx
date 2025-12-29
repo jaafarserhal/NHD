@@ -20,6 +20,7 @@ import MmsTwoToneIcon from '@mui/icons-material/MmsTwoTone';
 import EmergencyShareIcon from '@mui/icons-material/EmergencyShare';
 import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
 import DataUsageIcon from '@mui/icons-material/DataUsage';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 import { RouterUrls } from 'src/common/RouterUrls';
 
@@ -181,6 +182,19 @@ function SidebarMenu() {
                 startIcon={<MmsTwoToneIcon />}
               >
                 Transactions
+              </Button>
+            </ListItem>
+
+            {/* FAQS */}
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to={RouterUrls.faqsList}
+                startIcon={<HelpOutlineIcon />}
+              >
+                FAQs
               </Button>
             </ListItem>
           </List>

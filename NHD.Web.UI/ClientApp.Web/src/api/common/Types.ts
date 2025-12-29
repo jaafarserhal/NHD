@@ -100,3 +100,14 @@ export interface ContactMessage {
     phone: string;
     message: string;
 }
+
+export interface FAQ {
+    id: number;
+    questionEn: string;
+    questionSv: string;
+    answerEn: string;
+    answerSv: string;
+    typeId: number;
+    type: string;
+    isActive: boolean;
+}

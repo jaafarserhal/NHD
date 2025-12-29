@@ -46,5 +46,10 @@ namespace NHD.Core.Repository.Lookup
         {
             return await GetLookupsByTypeAsync(LookupType.ContactMessageSubject.AsInt());
         }
+
+        public async Task<List<GenLookup>> GetFaqTypesAsync()
+        {
+            return await GetLookupsByTypeAsync(LookupType.FaqType.AsInt());
+        }
     }
 }

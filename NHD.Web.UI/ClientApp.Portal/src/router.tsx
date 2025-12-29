@@ -20,6 +20,9 @@ import UpdateCollection from './portal/collections/Update';
 import Sections from './portal/sections/Index';
 import UpdateSection from './portal/sections/Update';
 import AddSection from './portal/sections/Add';
+import Faqs from './portal/faqs/Index';
+import UpdateFaq from './portal/faqs/Update';
+import AddFaq from './portal/faqs/Add';
 
 const Loader = (Component) => (props) => (
   <Suspense fallback={<SuspenseLoader />}>
@@ -63,6 +66,9 @@ const routes: RouteObject[] = [
       { path: RouterUrls.sectionsList, element: <Sections /> },
       { path: RouterUrls.sectionAdd, element: <AddSection /> },
       { path: RouterUrls.sectionEdit, element: <UpdateSection /> },
+      { path: RouterUrls.faqsList, element: <Faqs /> },
+      { path: RouterUrls.faqAdd, element: <AddFaq /> },
+      { path: RouterUrls.faqEdit, element: <UpdateFaq /> },
     ]
   },
   {

@@ -19941,6 +19941,15 @@ only screen and (max-width: 767px) {
   padding: 10px 10px 10px 40px !important;
 }
 
+.faq-expand-button {
+  background-color: #fff;
+  border: none;
+  padding-bottom: 20px;
+  border-bottom: solid 2px #ccc;
+  width: 100%;
+  text-align: left;
+}
+
 .select-input-style {
   width: 100%;
   padding: 13.5px 40px 13.4px 16px;

@@ -31,4 +31,10 @@ export const apiUrls = {
     getSectionById: '/GetById/',
     deleteSection: '/Delete/',
     getSectionTypes: '/Types',
+    faqs: '/Faqs',
+    addFaq: '/Add',
+    updateFaq: '/Update',
+    getFaqById: '/GetById/',
+    deleteFaq: '/Delete/',
+    getFaqTypes: '/Types',
 };

@@ -13,6 +13,7 @@ import ProtectedRoute from "./components/Common/ProtectedRoute/Index";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ChangePassword from "./pages/Auth/ChangePassword";
 import ContactUs from "./pages/ContactUs";
+import Faqs from "./pages/Faqs";
 
 
 const App: React.FC = () => {
@@ -30,6 +31,7 @@ const App: React.FC = () => {
         <Route path={routeUrls.forgotPassword} element={<ForgotPassword />} />
         <Route path={routeUrls.changePassword} element={<ChangePassword />} />
         <Route path={routeUrls.contactUs} element={<ContactUs />} />
+        <Route path={routeUrls.faqs} element={<Faqs />} />
         <Route
           path={routeUrls.myAccount}
           element={

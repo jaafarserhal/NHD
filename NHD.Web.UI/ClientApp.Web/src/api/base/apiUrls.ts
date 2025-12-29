@@ -18,5 +18,6 @@ export const apiUrls = {
     resendVerificationEmail: 'ResendVerification',
     resetPassword: 'ResetPassword',
     submitContact: 'SubmitContact',
-    subjects: 'Subjects'
+    subjects: 'Subjects',
+    faqs: 'Faqs',
 };

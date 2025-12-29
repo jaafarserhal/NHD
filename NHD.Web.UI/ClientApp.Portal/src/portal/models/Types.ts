@@ -74,6 +74,16 @@ export interface Section {
     isActive: boolean;
 }
 
+export interface Faq {
+    id?: number;
+    questionEn: string;
+    questionSv: string;
+    answerEn: string;
+    answerSv: string;
+    typeId: number;
+    isActive: boolean;
+}
+
 export interface ProductCollection {
     id?: number;
     collectionId: number;
