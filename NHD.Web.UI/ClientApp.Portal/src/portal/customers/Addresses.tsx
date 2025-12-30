@@ -3,20 +3,22 @@ import { Grid, Container, Typography, Chip, Box, AlertColor } from '@mui/materia
 import { useState } from 'react';
 import { useApiCall } from '../../api/hooks/useApi';
 import GenericTable from 'src/components/GenericTable/index';
-import contactService from 'src/api/contactService';
+import customerService from 'src/api/customerService';
+import { RouterUrls } from 'src/common/RouterUrls';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import PageHeader from '../PageHeader';
-import { toast } from 'react-toastify';
+import { useParams } from 'react-router-dom';
+import PageTitle from 'src/components/PageTitle';
 
 
-function Contacts() {
+function Addresses() {
+    const { customerId, title } = useParams<{ customerId?: string, title?: string }>();
     const [page, setPage] = useState(0); // 0-based for MUI TablePagination
     const [limit, setLimit] = useState(10);
-    const [exporting, setExporting] = useState(false);
+
 
     // Convert 0-based page to 1-based for API
-    const { data: contacts, loading, error, refetch } = useApiCall(
-        () => contactService.getContactMessages(page + 1, limit),
+    const { data: addresses, loading, error, refetch } = useApiCall(
+        () => customerService.getAddressesByCustomerId(customerId, page + 1, limit),
         [page, limit] // Dependencies to refetch when page/limit changes
     );
 
@@ -44,25 +46,37 @@ function Contacts() {
             }
         },
         {
-            key: 'firstName',
-            label: 'First Name',
+            key: 'fullName',
+            label: 'Full Name',
         },
         {
-            key: 'lastName',
-            label: 'Last Name',
+            key: 'phone',
+            label: 'Phone',
         },
         {
-            key: 'email',
-            label: 'Email',
+            key: 'streetName',
+            label: 'Street Name',
         },
         {
-            key: 'subject',
-            label: 'Subject',
+            key: 'streetNumber',
+            label: 'Street Number',
         },
         {
-            key: 'message',
-            label: 'Message',
-        }
+            key: 'postalCode',
+            label: 'Postal Code',
+        },
+        {
+            key: 'city',
+            label: 'City',
+        },
+        {
+            key: 'isPrimary',
+            label: 'Is Primary',
+        },
+        {
+            key: 'type',
+            label: 'Type',
+        },
     ];
 
     // Handle pagination changes
@@ -75,42 +89,7 @@ function Contacts() {
         setPage(0); // Reset to first page when changing page size
     };
 
-    const handleExport = async () => {
-        try {
-            setExporting(true);
-            await contactService.exportToExcel();
-            notifySuccess();
-        } catch (error) {
-            notifyError();
-        } finally {
-            setExporting(false);
-        }
-    };
 
-    const notifySuccess = () => {
-        toast.success('Contacts exported successfully!', {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-        });
-    };
-    const notifyError = () => {
-        toast.error('Failed to export contacts', {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-        });
-    };
 
     if (error) {
         return (
@@ -128,13 +107,14 @@ function Contacts() {
             overflow="hidden"
         >
             <Helmet>
-                <title>Complains - Applications</title>
+                <title>{title} | Addresses - Applications</title>
             </Helmet>
 
             <PageTitleWrapper>
-                <PageHeader sectionTitle="Complains" action="export" enableAddButton={false}
-                    onExport={handleExport}
-                    isExporting={exporting} />
+                <PageTitle
+                    heading="Addresses"
+                    subHeading={`${title} | Manage addresses associated with this customer`}
+                    backUrl={`${RouterUrls.customersList}`} />
             </PageTitleWrapper>
             <Container
                 maxWidth="lg"
@@ -145,9 +125,9 @@ function Contacts() {
                     justifyContent: "center",
                 }}
             >
-                {!contacts || !contacts.data || contacts.data.length === 0 ? (
+                {!addresses || !addresses.data || addresses.data.length === 0 ? (
                     <Typography variant="h6" color="textSecondary" align="center">
-                        No Contacts found.
+                        No Addresses found.
                     </Typography>
                 ) : (
                     <Grid
@@ -160,13 +140,13 @@ function Contacts() {
                     >
                         <Grid item xs={12}>
                             <GenericTable
-                                data={contacts.data}
+                                data={addresses.data}
                                 idKey="id"
                                 columns={columns}
 
                                 currentPage={page}
                                 pageSize={limit}
-                                totalCount={contacts.total || contacts.data.length}
+                                totalCount={addresses.total || addresses.data.length}
                                 onPageChange={handlePageChange}
                                 onPageSizeChange={handleLimitChange}
                                 disableInternalPagination={true}
@@ -179,4 +159,4 @@ function Contacts() {
     );
 }
 
-export default Contacts;
+export default Addresses;

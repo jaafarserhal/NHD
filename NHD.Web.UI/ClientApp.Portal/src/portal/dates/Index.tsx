@@ -179,7 +179,7 @@ function Dates() {
                                 columns={columns}
                                 onEdit={(date) => navigate(`/dates/edit/${date.id}`)}
                                 onDelete={(date) => handleDeleteClick(date)}
-                                onManage={(date) => navigate(`/dates/gallery/${date.id}/${date.nameEn}`)}
+                                onRedirect={(date) => navigate(`/dates/gallery/${date.id}/${date.nameEn}`)}
                                 currentPage={page}
                                 pageSize={limit}
                                 totalCount={dates.total || dates.data.length}

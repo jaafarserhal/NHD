@@ -37,7 +37,7 @@ const Transactions = Loader(lazy(() => import('src/portal/transactions/Index')))
 const Dates = Loader(lazy(() => import('src/portal/dates/Index')));
 const Orders = Loader(lazy(() => import('src/portal/orders/Index')));
 const Customers = Loader(lazy(() => import('src/portal/customers/Index')));
-const Addresses = Loader(lazy(() => import('src/portal/addresses/Index')));
+const Addresses = Loader(lazy(() => import('src/portal/customers/Addresses')));
 const Galleries = Loader(lazy(() => import('src/portal/gallery/Index')));
 
 const routes: RouteObject[] = [

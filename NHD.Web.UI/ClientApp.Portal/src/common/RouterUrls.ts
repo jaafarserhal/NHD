@@ -6,7 +6,7 @@ export const RouterUrls = {
     dateAdd: '/dates/add',
     dateEdit: '/dates/edit/:id',
     customersList: '/customers',
-    addressesList: '/addresses',
+    addressesList: '/addresses/:customerId/:title',
     ordersList: '/orders',
     transactionsList: '/transactions',
     datesGallery: '/dates/gallery/:dateId/:title',

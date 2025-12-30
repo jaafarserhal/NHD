@@ -82,7 +82,7 @@ export default function Login() {
         } catch (err: any) {
             var message = err.message
             if (err.response?.status === 401) {
-                message = "Invalid email or password";
+                message = err.response.data.message;
             } else if (err.response?.status === 429) {
                 message = "Too many login attempts. Please try again later.";
             } else if (err.response?.data?.message) {
@@ -90,7 +90,7 @@ export default function Login() {
             } else if (!err.response) {
                 message = "Network error. Please check your internet connection.";
             } else {
-                message = "An unexpected error occurred. Please try again.";
+                message = err.response.data.message || "An unexpected error occurred. Please try again.";
             }
             setTimeout(() => {
                 setIsLoading(false);

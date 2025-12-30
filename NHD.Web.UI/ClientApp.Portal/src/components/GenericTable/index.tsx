@@ -17,7 +17,7 @@ import {
   Backdrop
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { ImageIcon, LinkIcon } from 'lucide-react';
+import { ImageIcon, LinkIcon, LockIcon } from 'lucide-react';
 
 type ColumnDefinition<T> = {
   key: keyof T | string;
@@ -32,7 +32,9 @@ type GenericTableProps<T> = {
   columns: ColumnDefinition<T>[];
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
-  onManage?: (item: T) => void;
+  onRedirect?: (item: T) => void;
+  redirectTitle?: string;
+  onUpdateStatus?: (item: T) => void;
   currentPage?: number;
   pageSize?: number;
   totalCount?: number;
@@ -48,7 +50,9 @@ function GenericTable<T extends Record<string, any>>({
   columns,
   onEdit,
   onDelete,
-  onManage,
+  onRedirect,
+  redirectTitle = 'Manage Images',
+  onUpdateStatus,
   currentPage: externalPage,
   pageSize: externalPageSize,
   totalCount: externalTotalCount,
@@ -136,7 +140,7 @@ function GenericTable<T extends Record<string, any>>({
                   {col.label}
                 </TableCell>
               ))}
-              {(onEdit || onDelete) && <TableCell align="right">Actions</TableCell>}
+              {(onEdit || onDelete || onUpdateStatus || onRedirect) && <TableCell align="right">Actions</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -158,7 +162,7 @@ function GenericTable<T extends Record<string, any>>({
                         {col.render ? col.render(row) : row[col.key]}
                       </TableCell>
                     ))}
-                    {(onEdit || onDelete) && (
+                    {(onEdit || onDelete || onUpdateStatus) && (
                       <TableCell align="right">
                         {onEdit && (
                           <Tooltip title="Edit" arrow>
@@ -174,10 +178,17 @@ function GenericTable<T extends Record<string, any>>({
                             </IconButton>
                           </Tooltip>
                         )}
-                        {onManage && (
-                          <Tooltip title="Manage Images" arrow>
-                            <IconButton onClick={() => onManage(row)} color="default">
-                              <ImageIcon fontSize="small" />
+                        {onRedirect && (
+                          <Tooltip title={redirectTitle} arrow>
+                            <IconButton onClick={() => onRedirect(row)} color="default">
+                              <LinkIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        {onUpdateStatus && (
+                          <Tooltip title="Activate/Deactivate" arrow>
+                            <IconButton onClick={() => onUpdateStatus(row)} color="secondary">
+                              <LockIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         )}

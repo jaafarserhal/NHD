@@ -81,6 +81,20 @@ function SidebarMenu() {
       <List component="div">
         <SubMenuWrapper>
           <List component="div">
+
+            {/* PRODUCTS */}
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/"
+                startIcon={<CheckBoxTwoToneIcon />}
+              >
+                Products
+              </Button>
+            </ListItem>
+
             {/* COLLECTIONS */}
             <ListItem component="div">
               <Button
@@ -91,19 +105,6 @@ function SidebarMenu() {
                 startIcon={<DataUsageIcon />}
               >
                 Product Collections
-              </Button>
-            </ListItem>
-
-            {/* DATES */}
-            <ListItem component="div">
-              <Button
-                disableRipple
-                component={RouterLink}
-                onClick={closeSidebar}
-                to={RouterUrls.datesList}
-                startIcon={<EmergencyShareIcon />}
-              >
-                Dates
               </Button>
             </ListItem>
 
@@ -120,30 +121,16 @@ function SidebarMenu() {
               </Button>
             </ListItem>
 
-
-            {/* PRODUCTS */}
+            {/* DATES */}
             <ListItem component="div">
               <Button
                 disableRipple
                 component={RouterLink}
                 onClick={closeSidebar}
-                to="/"
-                startIcon={<CheckBoxTwoToneIcon />}
+                to={RouterUrls.datesList}
+                startIcon={<EmergencyShareIcon />}
               >
-                Products
-              </Button>
-            </ListItem>
-
-            {/* ORDERS */}
-            <ListItem component="div">
-              <Button
-                disableRipple
-                component={RouterLink}
-                onClick={closeSidebar}
-                to={RouterUrls.ordersList}
-                startIcon={<TableChartTwoToneIcon />}
-              >
-                Orders
+                Dates
               </Button>
             </ListItem>
 
@@ -157,19 +144,6 @@ function SidebarMenu() {
                 startIcon={<AccountCircleTwoToneIcon />}
               >
                 Customers
-              </Button>
-            </ListItem>
-
-            {/* ADDRESSES */}
-            <ListItem component="div">
-              <Button
-                disableRipple
-                component={RouterLink}
-                onClick={closeSidebar}
-                to={RouterUrls.addressesList}
-                startIcon={<BallotTwoToneIcon />}
-              >
-                Addresses
               </Button>
             </ListItem>
 
@@ -198,6 +172,7 @@ function SidebarMenu() {
                 FAQs
               </Button>
             </ListItem>
+
             {/* CONTACT MESSAGES */}
             <ListItem component="div">
               <Button
@@ -207,14 +182,16 @@ function SidebarMenu() {
                 to={RouterUrls.contactsList}
                 startIcon={<ContactMailIcon />}
               >
-                Complains
+                Complaints
               </Button>
             </ListItem>
+
           </List>
         </SubMenuWrapper>
       </List>
     </MenuWrapper>
   );
+
 }
 
 export default SidebarMenu;

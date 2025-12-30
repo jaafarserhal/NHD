@@ -43,3 +43,8 @@ export const enum SectionType {
     AboutNawaExperience = 509
 }
 
+export const enum CustomerStatusEnum {
+    Active = 601,
+    Inactive = 602
+}
+

@@ -1,5 +1,6 @@
 import { Typography, Button, Grid } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
+import FileDownloadTwoToneIcon from '@mui/icons-material/FileDownloadTwoTone';
 import { useNavigate } from 'react-router-dom';
 
 interface PageHeaderProps {
@@ -46,7 +47,7 @@ function PageHeader({
             onClick={handleExport}
             sx={{ mt: { xs: 2, md: 0 } }}
             variant="contained"
-            startIcon={<AddTwoToneIcon fontSize="small" />}
+            startIcon={<FileDownloadTwoToneIcon fontSize="small" />}
             disabled={isExporting}
           >
             {isExporting ? 'Exporting...' : 'Export'}

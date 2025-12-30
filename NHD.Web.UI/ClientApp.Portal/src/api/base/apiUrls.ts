@@ -38,5 +38,8 @@ export const apiUrls = {
     deleteFaq: '/Delete/',
     getFaqTypes: '/Types',
     contacts: '/Contact',
-    exportContacts: '/export'
+    exportContacts: '/export',
+    customers: '/Customer',
+    updateCustomerStatus: '/UpdateStatus',
+    addressesByCustomerId: '/Addresses' // New endpoint for addresses by customer ID
 };

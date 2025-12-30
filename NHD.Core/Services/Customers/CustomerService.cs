@@ -12,6 +12,7 @@ using NHD.Core.Repository.Addresses;
 using NHD.Core.Repository.Customers;
 using NHD.Core.Services.Model.Customer;
 using NHD.Core.Utilities;
+using Org.BouncyCastle.Asn1.Misc;
 
 namespace NHD.Core.Services.Customers
 {
@@ -34,6 +35,43 @@ namespace NHD.Core.Services.Customers
         }
 
         #region Addresses
+
+        public async Task<PagedServiceResult<IEnumerable<AddressViewModel>>> GetAddressesByCustomerId(int customerId, int page = 1, int limit = 10)
+        {
+            try
+            {
+                if (page <= 0 || limit <= 0)
+                {
+                    return PagedServiceResult<IEnumerable<AddressViewModel>>.Failure("Page and limit must be greater than 0");
+                }
+
+                var pagedResult = await _addressRepository.GetAddressByCustomerId(customerId, page, limit);
+                var addressDtos = pagedResult.Data.Select(c => new AddressViewModel
+                {
+                    Id = c.AddressId,
+                    FullName = c.ContactFirstName + " " + c.ContactLastName,
+                    Phone = c.ContactPhone,
+                    StreetName = c.StreetName,
+                    StreetNumber = c.StreetNumber,
+                    PostalCode = c.PostalCode,
+                    City = c.City,
+                    IsPrimary = c.IsPrimary,
+                    Type = c.AddressTypeLookup?.NameEn,
+                    CreatedAt = c.CreatedAt
+                }).ToList();
+                return PagedServiceResult<IEnumerable<AddressViewModel>>.Success(
+                    addressDtos,
+                    pagedResult.Total,
+                    pagedResult.Page,
+                    pagedResult.Limit
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving addresses for customer");
+                return PagedServiceResult<IEnumerable<AddressViewModel>>.Failure("An error occurred while retrieving addresses for customer");
+            }
+        }
         public async Task<Address?> SaveAddressAsync(int customerId, Address address)
         {
             await BeginTransactionAsync();
@@ -179,6 +217,39 @@ namespace NHD.Core.Services.Customers
         #endregion Addresses
 
         #region Customers
+        public async Task<PagedServiceResult<IEnumerable<CustomerViewModel>>> GetCustomersAsync(int page = 1, int limit = 10)
+        {
+            try
+            {
+                if (page <= 0 || limit <= 0)
+                {
+                    return PagedServiceResult<IEnumerable<CustomerViewModel>>.Failure("Page and limit must be greater than 0");
+                }
+
+                var pagedResult = await _customerRepository.GetCustomersAsync(page, limit);
+                var faqDtos = pagedResult.Data.Select(c => new CustomerViewModel
+                {
+                    Id = c.CustomerId,
+                    Email = c.EmailAddress,
+                    FullName = $"{c.FirstName} {c.LastName}",
+                    CreatedAt = c.CreatedAt,
+                    Mobile = c.Mobile,
+                    Status = c.StatusLookup.NameEn,
+                    StatusId = c.StatusLookupId
+                }).ToList();
+                return PagedServiceResult<IEnumerable<CustomerViewModel>>.Success(
+                    faqDtos,
+                    pagedResult.Total,
+                    pagedResult.Page,
+                    pagedResult.Limit
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving customers");
+                return PagedServiceResult<IEnumerable<CustomerViewModel>>.Failure("An error occurred while retrieving customers");
+            }
+        }
         public async Task<ServiceResult<string>> RegisterAsync(Customer customer)
         {
             await BeginTransactionAsync();
@@ -341,10 +412,18 @@ namespace NHD.Core.Services.Customers
                 }
 
                 var customer = await _customerRepository.AuthenticateLoginAsync(email);
-                var co = CommonUtilities.HashPassword(password);
+
                 if (customer == null || customer.Password != CommonUtilities.HashPassword(password))
                 {
                     return AppApiResponse<Customer>.Failure("Invalid email or password", HttpStatusCodeEnum.Unauthorized);
+                }
+                else if (customer.StatusLookupId == CustomerStatusLookup.Pending.AsInt())
+                {
+                    return AppApiResponse<Customer>.Failure("Email not verified. Please verify your email before logging in.", HttpStatusCodeEnum.Unauthorized);
+                }
+                else if (customer.StatusLookupId == CustomerStatusLookup.InActive.AsInt())
+                {
+                    return AppApiResponse<Customer>.Failure("Your account is deactivated. Please contact support.", HttpStatusCodeEnum.Unauthorized);
                 }
 
                 return AppApiResponse<Customer>.Success(customer, "Login successful");
@@ -396,6 +475,29 @@ namespace NHD.Core.Services.Customers
             await _customerRepository.UpdateAsync(customer);
             return customer;
         }
+
+        public async Task<ServiceResult<Customer>> UpdateCustomerStatusAsync(int customerId, int statusId)
+        {
+            try
+            {
+                var customer = await _customerRepository.GetByIdAsync(customerId);
+                if (customer == null)
+                {
+                    return ServiceResult<Customer>.Failure("Customer not found");
+                }
+
+                customer.StatusLookupId = statusId;
+                await _customerRepository.UpdateAsync(customer);
+
+                return ServiceResult<Customer>.Success(customer);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating customer status");
+                return ServiceResult<Customer>.Failure("Failed to update customer status");
+            }
+        }
+
         #endregion Customers
 
         #region Transactions

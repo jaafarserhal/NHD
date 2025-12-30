@@ -182,7 +182,7 @@ function Products() {
                                 columns={columns}
                                 onEdit={(prd) => navigate(`/products/edit/${prd.id}`)}
                                 onDelete={(prd) => handleDeleteClick(prd)}
-                                onManage={(prd) => navigate(`/products/gallery/${prd.id}/${prd.nameEn}`)}
+                                onRedirect={(prd) => navigate(`/products/gallery/${prd.id}/${prd.nameEn}`)}
                                 currentPage={page}
                                 pageSize={limit}
                                 totalCount={products.total || products.data.length}

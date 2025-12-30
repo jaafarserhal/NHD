@@ -96,7 +96,7 @@ namespace NHD.Web.UI.Controllers.Website
             if (authResult == null || authResult.StatusCode == HttpStatusCodeEnum.Unauthorized.AsInt())
             {
                 _logger.LogWarning("Invalid login attempt for email: {Email}", login.Email);
-                return Unauthorized(new { message = "Wrong email or password." });
+                return Unauthorized(new { message = authResult.Message });
             }
 
             // Generate JWT token
