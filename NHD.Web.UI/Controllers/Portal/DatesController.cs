@@ -96,6 +96,8 @@ namespace NHD.Web.UI.Portal.Controllers
                     Quality = dto.Quality,
                     UnitPrice = dto.UnitPrice,
                     WeightPrice = dto.WeightPrice,
+                    DescriptionEn = dto.DescriptionEn,
+                    DescriptionSv = dto.DescriptionSv,
                     ImageUrl = fileName,
                     IsFilled = dto.IsFilled,
                     IsActive = dto.IsActive,
@@ -155,6 +157,8 @@ namespace NHD.Web.UI.Portal.Controllers
             existingDate.Quality = dto.Quality;
             existingDate.UnitPrice = dto.UnitPrice;
             existingDate.WeightPrice = dto.WeightPrice;
+            existingDate.DescriptionEn = dto.DescriptionEn;
+            existingDate.DescriptionSv = dto.DescriptionSv;
             existingDate.IsFilled = dto.IsFilled;
             existingDate.IsActive = dto.IsActive;
             existingDate.CreatedAt = DateTime.UtcNow;

@@ -14,13 +14,14 @@ namespace NHD.Core.Services.Model.Dates
 
         public bool Quality { get; set; }
         public decimal UnitPrice { get; set; }
-
         public decimal WeightPrice { get; set; }
         public bool? IsFilled { get; set; }
         public bool IsActive { get; set; }
         public string ImageUrl { get; set; }
         public IFormFile ImageFile { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string DescriptionEn { get; set; }
+        public string DescriptionSv { get; set; }
 
     }
 

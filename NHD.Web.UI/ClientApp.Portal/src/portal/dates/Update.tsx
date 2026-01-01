@@ -13,6 +13,7 @@ import { PortalToastContainer } from "src/components/Toaster/Index";
 import { RouterUrls } from "src/common/RouterUrls";
 import { validateFileSize } from "src/common/fileValidation";
 import { getImageSrc } from "src/common/Utils";
+import Editor from "src/components/Editor/Index";
 
 export default function UpdateDate() {
     const navigate = useNavigate();
@@ -26,6 +27,8 @@ export default function UpdateDate() {
         unitPrice: undefined,
         weightPrice: undefined,
         isFilled: false,
+        descriptionEn: "",
+        descriptionSv: "",
         imageUrl: "",
         isActive: true
     });
@@ -57,6 +60,8 @@ export default function UpdateDate() {
                 quality: date.quality,
                 unitPrice: date.unitPrice,
                 weightPrice: date.weightPrice,
+                descriptionEn: date.descriptionEn,
+                descriptionSv: date.descriptionSv,
                 isFilled: date.isFilled,
                 imageUrl: date.imageUrl,
                 isActive: date.isActive
@@ -80,6 +85,18 @@ export default function UpdateDate() {
     useEffect(() => {
         loadDate();
     }, [id]);
+
+    const handleEditorChange = (field: string, content: string) => {
+        setForm((prev) => ({
+            ...prev,
+            [field]: content,
+        }));
+
+        // Clear errors when user starts typing in editor
+        if (errors.length > 0) {
+            setErrors([]);
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -211,6 +228,8 @@ export default function UpdateDate() {
                 quality: form.quality,
                 unitPrice: form.unitPrice,
                 weightPrice: form.weightPrice,
+                descriptionEn: form.descriptionEn,
+                descriptionSv: form.descriptionSv,
                 isFilled: form.isFilled,
                 isActive: form.isActive,
                 imageFile: image
@@ -317,7 +336,13 @@ export default function UpdateDate() {
                                             variant="standard"
                                             fullWidth
                                         />
-
+                                        <Box sx={{ m: 1 }}>
+                                            <Editor
+                                                label="Description (English)"
+                                                value={form.descriptionEn}
+                                                onChange={(content) => handleEditorChange('descriptionEn', content)}
+                                            />
+                                        </Box>
                                         <TextField
                                             required
                                             name="nameSv"
@@ -327,6 +352,14 @@ export default function UpdateDate() {
                                             variant="standard"
                                             fullWidth
                                         />
+
+                                        <Box sx={{ m: 1 }}>
+                                            <Editor
+                                                label="Description (Swedish)"
+                                                value={form.descriptionSv}
+                                                onChange={(content) => handleEditorChange('descriptionSv', content)}
+                                            />
+                                        </Box>
 
                                         <TextField
                                             name="unitPrice"

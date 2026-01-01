@@ -281,6 +281,8 @@ namespace NHD.Core.Services.Dates
                 IsActive = date.IsActive,
                 UnitPrice = date.UnitPrice,
                 WeightPrice = date.WeightPrice,
+                DescriptionEn = date.DescriptionEn,
+                DescriptionSv = date.DescriptionSv,
                 CreatedAt = date.CreatedAt,
                 Quality = date.Quality,
                 IsFilled = date.IsFilled,

@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { PortalToastContainer } from "src/components/Toaster/Index";
 import { RouterUrls } from "src/common/RouterUrls";
 import { validateFileSize } from "src/common/fileValidation";
+import Editor from "src/components/Editor/Index";
 
 export default function AddDate() {
 
@@ -21,6 +22,8 @@ export default function AddDate() {
         quality: false,
         unitPrice: undefined,
         weightPrice: undefined,
+        descriptionEn: "",
+        descriptionSv: "",
         isFilled: false,
         isActive: true,
     });
@@ -30,6 +33,19 @@ export default function AddDate() {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<string[]>([]);
     const errorBoxRef = React.useRef<HTMLDivElement>(null);
+
+    // Handle editor content changes
+    const handleEditorChange = (field: string, content: string) => {
+        setForm((prev) => ({
+            ...prev,
+            [field]: content,
+        }));
+
+        // Clear errors when user starts typing in editor
+        if (errors.length > 0) {
+            setErrors([]);
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -169,6 +185,8 @@ export default function AddDate() {
                 quality: false,
                 unitPrice: undefined,
                 weightPrice: undefined,
+                descriptionEn: "",
+                descriptionSv: "",
                 isFilled: false,
                 isActive: true,
             });
@@ -236,6 +254,13 @@ export default function AddDate() {
                                             variant="standard"
                                             fullWidth
                                         />
+                                        <Box sx={{ m: 1 }}>
+                                            <Editor
+                                                label="Description (English)"
+                                                value={form.descriptionEn}
+                                                onChange={(content) => handleEditorChange('descriptionEn', content)}
+                                            />
+                                        </Box>
 
                                         <TextField
                                             required
@@ -246,6 +271,14 @@ export default function AddDate() {
                                             variant="standard"
                                             fullWidth
                                         />
+
+                                        <Box sx={{ m: 1 }}>
+                                            <Editor
+                                                label="Description (Swedish)"
+                                                value={form.descriptionSv}
+                                                onChange={(content) => handleEditorChange('descriptionSv', content)}
+                                            />
+                                        </Box>
 
                                         <TextField
                                             name="unitPrice"

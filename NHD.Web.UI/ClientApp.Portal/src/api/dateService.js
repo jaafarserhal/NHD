@@ -63,6 +63,8 @@ class dateService extends apiService {
         formData.append('Quality', String(date.quality));
         formData.append('UnitPrice', String(date.unitPrice));
         formData.append('WeightPrice', String(date.weightPrice));
+        formData.append('DescriptionEn', date.descriptionEn || '');
+        formData.append('DescriptionSv', date.descriptionSv || '');
         formData.append('IsFilled', String(date.isFilled));
         formData.append('IsActive', String(date.isActive));
 
@@ -81,6 +83,8 @@ class dateService extends apiService {
         formData.append('Quality', String(date.quality));
         formData.append('UnitPrice', String(date.unitPrice));
         formData.append('WeightPrice', String(date.weightPrice));
+        formData.append('DescriptionEn', date.descriptionEn || '');
+        formData.append('DescriptionSv', date.descriptionSv || '');
         formData.append('IsFilled', String(date.isFilled));
         formData.append('IsActive', String(date.isActive));
 
