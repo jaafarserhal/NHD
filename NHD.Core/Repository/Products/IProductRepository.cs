@@ -17,5 +17,6 @@ namespace NHD.Core.Repository.Products
         Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId, bool IsCarousel, int take);
         Task<IEnumerable<Product>> GetHomeProductsByCategoryAsync(int categoryId = 0);
         Task<IEnumerable<Product>> GetProductsByTypeAsync(int typeId, int take);
+        Task<PagedResult<Product>> GetAllProductsAsync(int page, int limit, int category = 0, string? search = "");
     }
 }

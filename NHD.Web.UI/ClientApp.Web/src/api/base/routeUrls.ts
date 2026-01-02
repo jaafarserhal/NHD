@@ -11,4 +11,5 @@ export const routeUrls = {
     changePassword: '/auth/change-password',
     contactUs: '/contact-us',
     faqs: '/faqs/:typeId/:typeName',
+    shop: '/shop'
 };

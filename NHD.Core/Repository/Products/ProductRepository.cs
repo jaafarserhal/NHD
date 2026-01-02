@@ -41,6 +41,55 @@ namespace NHD.Core.Repository.Products
             };
         }
 
+        public async Task<PagedResult<Product>> GetAllProductsAsync(
+        int page,
+        int limit,
+        int category = 0,
+        string? search = ""
+    )
+        {
+            var query = _context.Products
+                .Include(p => p.PrdLookupCategory)
+                .Include(p => p.PrdLookupType)
+                .Include(p => p.PrdLookupSize)
+                .OrderByDescending(p => p.CreatedAt)
+                .AsQueryable();
+
+            // Filter by category if provided
+            if (category > 0)
+            {
+                query = query.Where(p => p.PrdLookupCategoryId == category);
+            }
+
+            // Search if provided
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+
+                query = query.Where(p =>
+                    EF.Functions.Like(p.NameEn, $"%{search}%")
+                );
+            }
+
+            // Count after filters
+            var total = await query.CountAsync();
+
+            // Paging
+            var products = await query
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .ToListAsync();
+
+            return new PagedResult<Product>
+            {
+                Data = products,
+                Total = total,
+                Page = page,
+                Limit = limit
+            };
+        }
+
+
         public async Task<Product> GetProductByIdAsync(int productId)
         {
             return await _context.Products

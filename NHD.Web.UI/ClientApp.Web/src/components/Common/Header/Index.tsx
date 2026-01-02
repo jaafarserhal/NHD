@@ -83,7 +83,7 @@ const Header: React.FC = () => {
                                             <span>About</span>
                                         </Link>
                                     </li>
-                                    <li><a href="/coming-soon" className="menu-item-link"><span>Shop</span></a></li>
+                                    <li><Link to={routeUrls.shop} className={`menu-item-link ${isActive(routeUrls.shop) ? 'active' : ''}`}><span>Shop</span></Link></li>
                                     <li><a href="/coming-soon" className="menu-item-link"><span>Our Dates</span></a></li>
                                     <li><Link to={routeUrls.contactUs} className={`menu-item-link ${isActive(routeUrls.contactUs) ? 'active' : ''}`}><span>Contact</span></Link></li>
                                 </ul>

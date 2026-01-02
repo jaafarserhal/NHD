@@ -20,4 +20,5 @@ export const apiUrls = {
     submitContact: 'SubmitContact',
     subjects: 'Subjects',
     faqs: 'Faqs',
+    product: 'Product',
 };

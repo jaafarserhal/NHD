@@ -25,6 +25,7 @@ export interface ProductsWithGallery {
     imageUrl: string;
     type: string;
     size: string;
+    categoryId: number;
     galleries: GalleryViewModel[];
 }
 
@@ -110,4 +111,12 @@ export interface FAQ {
     typeId: number;
     type: string;
     isActive: boolean;
+}
+
+export interface ProductsResponse {
+    data: ProductsWithGallery[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }

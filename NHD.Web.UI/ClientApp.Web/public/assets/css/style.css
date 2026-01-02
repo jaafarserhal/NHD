@@ -16862,6 +16862,25 @@ only screen and (max-width: 767px) {
   padding: 10px;
 }
 
+.shop-bottombar .pagination li.prev-disabled,
+.shop-bottombar .pagination li.next-disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+  color: #ccc;
+}
+
+.shop-bottombar .pagination li.disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+  color: #ccc;
+}
+
+.shop-bottombar .pagination li .active {
+  background-color: #DAAC00;
+  border-color: #DAAC00;
+  color: #fff;
+}
+
 /* ---------- Shop Cart Style Start -------- */
 .cart-table .remove-btn {
   border: 0px;

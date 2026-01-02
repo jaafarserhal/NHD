@@ -17,6 +17,7 @@ namespace NHD.Core.Services.Model.Products
         public string ImageUrl { get; set; }
         public decimal FromPrice { get; set; }
         public string Type { get; set; }
+        public int CategoryId { get; set; }
         public string Size { get; set; }
         public IEnumerable<GalleryViewModel> Galleries { get; set; }
     }

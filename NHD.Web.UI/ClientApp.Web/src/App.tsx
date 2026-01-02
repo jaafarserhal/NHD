@@ -14,6 +14,7 @@ import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ChangePassword from "./pages/Auth/ChangePassword";
 import ContactUs from "./pages/ContactUs";
 import Faqs from "./pages/Faqs";
+import Shop from "./pages/Shop";
 
 
 const App: React.FC = () => {
@@ -32,6 +33,7 @@ const App: React.FC = () => {
         <Route path={routeUrls.changePassword} element={<ChangePassword />} />
         <Route path={routeUrls.contactUs} element={<ContactUs />} />
         <Route path={routeUrls.faqs} element={<Faqs />} />
+        <Route path={routeUrls.shop} element={<Shop />} />
         <Route
           path={routeUrls.myAccount}
           element={
