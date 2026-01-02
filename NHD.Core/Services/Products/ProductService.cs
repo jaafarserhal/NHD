@@ -161,33 +161,13 @@ namespace NHD.Core.Services.Products
 
         #region Products
 
+
         public async Task<PagedServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetAllProductsByCategoryAsync(int page, int limit, int category = 0, string? search = "")
         {
             try
             {
                 var products = await _productRepository.GetAllProductsAsync(page, limit, category, search);
-                var productDtos = products.Data.Select(p => new ProductsWithGalleryViewModel()
-                {
-                    Id = p.PrdId,
-                    TitleEn = p.NameEn,
-                    TitleSv = p.NameSv,
-                    DescriptionEn = p.DescriptionEn,
-                    DescriptionSv = p.DescriptionSv,
-                    BadgeTextEn = p.BadgeEn,
-                    BadgeTextSv = p.BadgeSv,
-                    ImageUrl = $"/uploads/products/{p.ImageUrl}",
-                    FromPrice = p.FromPrice ?? 0,
-                    Type = p.PrdLookupType?.NameEn,
-                    Size = p.PrdLookupSize?.NameEn,
-                    CategoryId = p.PrdLookupCategoryId,
-                    Galleries = p.Galleries != null ? p.Galleries.Select(g => new GalleryViewModel
-                    {
-                        Id = g.GalleryId,
-                        AltText = g.AltText,
-                        ImageUrl = $"/uploads/products/{g.ImageUrl}",
-                    }).ToList() : new List<GalleryViewModel>()
-
-                }).ToList();
+                var productDtos = products.Data.Select(p => MapToProductWithGallery(p)).ToList();
                 return PagedServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Success(productDtos, products.Total, products.Page, products.Limit);
             }
             catch (Exception ex)
@@ -197,6 +177,25 @@ namespace NHD.Core.Services.Products
             }
         }
 
+        public async Task<ServiceResult<ProductsWithGalleryViewModel>> GetProductDetailsWithGalleryByIdAsync(int productId)
+        {
+            try
+            {
+                var product = await _productRepository.GetProductWithGalleryByIdAsync(productId);
+                if (product == null)
+                {
+                    return ServiceResult<ProductsWithGalleryViewModel>.Failure($"Product with ID {productId} not found.");
+                }
+
+                var productDto = MapToProductWithGallery(product);
+                return ServiceResult<ProductsWithGalleryViewModel>.Success(productDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving product with ID {productId}");
+                return ServiceResult<ProductsWithGalleryViewModel>.Failure("An error occurred while retrieving the product");
+            }
+        }
 
         public async Task<PagedServiceResult<IEnumerable<ProductViewModel>>> GetProductsAsync(int page = 1, int limit = 10)
         {
@@ -639,6 +638,30 @@ namespace NHD.Core.Services.Products
         #endregion Lookups
 
         #region Mappers
+        private ProductsWithGalleryViewModel MapToProductWithGallery(Product p)
+        {
+            return new ProductsWithGalleryViewModel
+            {
+                Id = p.PrdId,
+                TitleEn = p.NameEn,
+                TitleSv = p.NameSv,
+                DescriptionEn = p.DescriptionEn,
+                DescriptionSv = p.DescriptionSv,
+                BadgeTextEn = p.BadgeEn,
+                BadgeTextSv = p.BadgeSv,
+                ImageUrl = $"/uploads/products/{p.ImageUrl}",
+                FromPrice = p.FromPrice ?? 0,
+                Type = p.PrdLookupType?.NameEn,
+                Size = p.PrdLookupSize?.NameEn,
+                Galleries = p.Galleries != null ? p.Galleries.Select(g => new GalleryViewModel
+                {
+                    Id = g.GalleryId,
+                    AltText = g.AltText,
+                    ImageUrl = $"/uploads/products/{g.ImageUrl}",
+                }).ToList() : new List<GalleryViewModel>()
+
+            };
+        }
         private ProductViewModel MapToProductDto(Product product)
         {
             return new ProductViewModel

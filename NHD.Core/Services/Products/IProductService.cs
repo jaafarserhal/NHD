@@ -41,5 +41,6 @@ namespace NHD.Core.Services.Products
         Task<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetHomeProductsByCategoryAsync(int categoryId = 0);
         Task<ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetFillDatesProducts();
         Task<PagedServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetAllProductsByCategoryAsync(int page, int limit, int category = 0, string? search = "");
+        Task<ServiceResult<ProductsWithGalleryViewModel>> GetProductDetailsWithGalleryByIdAsync(int productId);
     }
 }

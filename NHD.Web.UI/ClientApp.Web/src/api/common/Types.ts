@@ -33,6 +33,7 @@ export interface GalleryViewModel {
     id: number;
     altText: string;
     imageUrl: string;
+    isPrimary: boolean;
 }
 
 export interface BrandItem {

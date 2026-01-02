@@ -1,3 +1,4 @@
+import { all } from "axios";
 
 export const apiUrls = {
     homepage: 'Home',
@@ -21,4 +22,7 @@ export const apiUrls = {
     subjects: 'Subjects',
     faqs: 'Faqs',
     product: 'Product',
+    allProductsByCategory: 'AllProductsByCategory',
+    categories: 'Categories',
+    details: 'Details'
 };

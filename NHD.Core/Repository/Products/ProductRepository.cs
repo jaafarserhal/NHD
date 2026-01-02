@@ -101,6 +101,16 @@ namespace NHD.Core.Repository.Products
                 .FirstOrDefaultAsync(p => p.PrdId == productId);
         }
 
+        public async Task<Product> GetProductWithGalleryByIdAsync(int productId)
+        {
+            return await _context.Products
+                .Include(p => p.PrdLookupCategory)
+                .Include(p => p.PrdLookupType)
+                .Include(p => p.PrdLookupSize)
+                .Include(p => p.Galleries)
+                .FirstOrDefaultAsync(p => p.PrdId == productId);
+        }
+
         public async Task<IEnumerable<Product>> GetCarouselProductsAsync()
         {
             return await _context.Products

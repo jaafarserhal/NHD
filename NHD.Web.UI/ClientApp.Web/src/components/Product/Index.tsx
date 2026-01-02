@@ -14,7 +14,7 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
             <div className={`product-item ${isByCategory ? '' : 'border'} text-center`}>
                 {product.badgeTextEn && <div className="product-item__badge">{product.badgeTextEn}</div>}
                 <div className={`product-item__image ${isByCategory ? 'border w-100' : ''}`} >
-                    <a href={`/product/${product.id}`}>
+                    <a href={`/product/${product.id}/${product.titleEn.replace(/\s+/g, '-').toLowerCase()}`}>
                         <img
                             width={500}
                             height={625}

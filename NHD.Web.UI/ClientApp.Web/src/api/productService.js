@@ -8,10 +8,13 @@ class productService extends apiService {
 
     async getAllProducts(page = 1, limit = 10, category = 0, search = "") {
         const params = { page, limit, category, search };
-        return this.get('AllProductsByCategory', params);
+        return this.get(apiUrls.allProductsByCategory, params);
     }
     async getCategories() {
-        return this.get('Categories');
+        return this.get(apiUrls.categories);
+    }
+    async getProductById(id) {
+        return this.get(`${apiUrls.details}/${id}`);
     }
 }
 

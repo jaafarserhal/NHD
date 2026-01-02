@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NHD.Core.Common.Models;
 using NHD.Core.Services.Model;
+using NHD.Core.Services.Model.Products;
 using NHD.Core.Services.Products;
 
 namespace NHD.Web.UI.Controllers.Website
@@ -40,7 +41,6 @@ namespace NHD.Web.UI.Controllers.Website
                 return BadRequest(new { message = result.ErrorMessage });
             }
 
-            // Return the structure that your frontend expects
             return Ok(new
             {
                 data = result.Data,
@@ -63,6 +63,16 @@ namespace NHD.Web.UI.Controllers.Website
 
                 return Ok(data);
             }
+            return BadRequest(data);
+        }
+
+        [HttpGet]
+        [Route("Details/{id}")]
+        public async Task<ActionResult<ServiceResult<ProductsWithGalleryViewModel>>> GetProductById(int id)
+        {
+            var data = await _productService.GetProductDetailsWithGalleryByIdAsync(id);
+            if (data.IsSuccess)
+                return Ok(data);
             return BadRequest(data);
         }
     }
