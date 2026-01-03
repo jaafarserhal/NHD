@@ -8,24 +8,8 @@ class dateService extends apiService {
 
     // Get all dates
     async getDates(page = 1, limit = 10) {
-        return this.get('', { page, limit });
+        return this.get('AllDates', { page, limit });
     }
-
-    async addDate(date) {
-        return this.post(date, apiUrls.addDate);
-    }
-
-    async updateDate(date) {
-        return this.put(date, apiUrls.updateDate);
-    }
-
-    async getDateById(dateId) {
-        return this.get(`${apiUrls.getDateById}${dateId}`);
-    }
-    async deleteDate(dateId) {
-        return this.delete(`${apiUrls.deleteDate}${dateId}`);
-    }
-
 }
 
 export default new dateService();

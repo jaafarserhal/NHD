@@ -10,6 +10,7 @@ using NHD.Core.Services.Model.Collections;
 using NHD.Core.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore;
+using NHD.Core.Services.Model.Products;
 
 namespace NHD.Core.Services.Dates
 {
@@ -114,6 +115,40 @@ namespace NHD.Core.Services.Dates
             {
                 _logger.LogError(ex, "Error retrieving dates");
                 return PagedServiceResult<IEnumerable<DateViewModel>>.Failure("An error occurred while retrieving dates");
+            }
+        }
+
+        public async Task<PagedServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetAllDatesAsync(int page = 1, int limit = 10)
+        {
+            try
+            {
+                if (page <= 0 || limit <= 0)
+                {
+                    return PagedServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Failure("Page and limit must be greater than 0");
+                }
+
+                var pagedResult = await _datesRepository.GetDatesAsync(page, limit);
+                var dateDtos = pagedResult.Data.Select(p => new ProductsWithGalleryViewModel()
+                {
+                    Id = p.DateId,
+                    TitleEn = p.NameEn,
+                    TitleSv = p.NameSv,
+                    DescriptionEn = p.DescriptionEn,
+                    DescriptionSv = p.DescriptionSv,
+                    ImageUrl = $"/uploads/dates/{p.ImageUrl}"
+                }).ToList();
+
+                return PagedServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Success(
+                    dateDtos,
+                    pagedResult.Total,
+                    pagedResult.Page,
+                    pagedResult.Limit
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving dates");
+                return PagedServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Failure("An error occurred while retrieving dates");
             }
         }
 

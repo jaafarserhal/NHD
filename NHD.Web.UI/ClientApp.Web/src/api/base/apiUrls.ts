@@ -24,5 +24,6 @@ export const apiUrls = {
     product: 'Product',
     allProductsByCategory: 'AllProductsByCategory',
     categories: 'Categories',
-    details: 'Details'
+    details: 'Details',
+    dates: 'Dates',
 };

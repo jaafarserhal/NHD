@@ -174,7 +174,7 @@ const Footer: React.FC<FooterProps> = ({ isDark = false }) => {
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link to={routeUrls.ourDates}>
+                                                    <Link to={routeUrls.comingSoon}>
                                                         Our Dates
                                                     </Link>
                                                 </li>

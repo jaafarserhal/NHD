@@ -7,6 +7,7 @@ using NHD.Core.Models;
 using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Collections;
 using NHD.Core.Services.Model.Dates;
+using NHD.Core.Services.Model.Products;
 
 namespace NHD.Core.Services.Dates
 {
@@ -27,5 +28,6 @@ namespace NHD.Core.Services.Dates
         Task<ServiceResult<IEnumerable<DatesWithGalleryViewModel>>> GetBannerDatesAsync();
         Task<ServiceResult<IEnumerable<CollectionViewModel>>> GetTop4CollectionsAsync();
         Task<Date> SaveDatesWithAdditionalInfo(Date date, List<DatesAdditionalInfoBindingModel> datesAdditionalInfo);
+        Task<PagedServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetAllDatesAsync(int page = 1, int limit = 10);
     }
 }

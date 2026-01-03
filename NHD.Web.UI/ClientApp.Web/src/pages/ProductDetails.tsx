@@ -186,10 +186,10 @@ const ProductDetails: React.FC = () => {
                             {/* Product Summery Start */}
                             <div className="product-summery position-relative">
                                 {/* Product Head Start */}
-                                <div className="product-head mb-3">
+                                <div className="product-head flex-column align-items-start mb-3 mb-md-5">
+                                    <h2 className="product-title mb-2">{productDetails?.titleEn}</h2>
                                     <span className="product-head-price">${productDetails?.fromPrice}</span>
                                 </div>
-
                                 <ul className="product-cta">
                                     <li>
                                         <div className="cart-btn">
