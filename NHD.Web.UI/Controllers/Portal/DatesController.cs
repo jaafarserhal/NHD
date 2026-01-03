@@ -101,9 +101,10 @@ namespace NHD.Web.UI.Portal.Controllers
                     ImageUrl = fileName,
                     IsFilled = dto.IsFilled,
                     IsActive = dto.IsActive,
+                    CreatedAt = DateTime.UtcNow
                 };
 
-                var created = await _datesService.AddDateAsync(date);
+                var created = await _datesService.SaveDatesWithAdditionalInfo(date, dto.AdditionalInfos);
                 return CreatedAtAction("GetDates", new { id = created.DateId });
             }
             catch (System.Exception ex)
@@ -164,7 +165,7 @@ namespace NHD.Web.UI.Portal.Controllers
             existingDate.CreatedAt = DateTime.UtcNow;
 
             // Save changes
-            var updatedDate = await _datesService.UpdateDateAsync(existingDate);
+            var updatedDate = await _datesService.SaveDatesWithAdditionalInfo(existingDate, dto.AdditionalInfos);
 
 
             // If update succeeded and a new image was uploaded, delete the old one

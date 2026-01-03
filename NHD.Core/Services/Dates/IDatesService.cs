@@ -26,5 +26,6 @@ namespace NHD.Core.Services.Dates
         Task<ServiceResult<CollectionViewModel>> GetCollectionByViewModel(int id);
         Task<ServiceResult<IEnumerable<DatesWithGalleryViewModel>>> GetBannerDatesAsync();
         Task<ServiceResult<IEnumerable<CollectionViewModel>>> GetTop4CollectionsAsync();
+        Task<Date> SaveDatesWithAdditionalInfo(Date date, List<DatesAdditionalInfoBindingModel> datesAdditionalInfo);
     }
 }

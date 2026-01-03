@@ -8,7 +8,8 @@ export const enum SectionType {
     HomeFillDates = 506,
     AboutMainSection = 507,
     AboutWeLoveDates = 508,
-    AboutNawaExperience = 509
+    AboutNawaExperience = 509,
+    ShopMainSection = 510,
 }
 
 export const enum AddressTypeEnum {

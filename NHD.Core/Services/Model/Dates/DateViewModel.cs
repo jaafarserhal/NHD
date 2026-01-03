@@ -22,7 +22,18 @@ namespace NHD.Core.Services.Model.Dates
         public DateTime CreatedAt { get; set; }
         public string DescriptionEn { get; set; }
         public string DescriptionSv { get; set; }
+        public List<DatesAdditionalInfoBindingModel> AdditionalInfos { get; set; }
 
+    }
+
+    public class DatesAdditionalInfoBindingModel
+    {
+        public int Id { get; set; }
+        public int DateId { get; set; }
+        public string KeyEn { get; set; }
+        public string KeySv { get; set; }
+        public string ValueEn { get; set; }
+        public string ValueSv { get; set; }
     }
 
     public class DatesWithGalleryViewModel

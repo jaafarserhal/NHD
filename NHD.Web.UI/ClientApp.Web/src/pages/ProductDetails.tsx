@@ -5,19 +5,16 @@ import { ProductsWithGallery } from "../api/common/Types";
 import { useParams } from "react-router-dom";
 import productService from "../api/productService";
 import Loader from "../components/Common/Loader/Index";
+import sectionService from '../api/sectionService';
+import { SectionType } from "../api/common/Enums";
 
 const ProductDetails: React.FC = () => {
-    const [imageLoaded, setImageLoaded] = useState(false);
     const [productDetails, setProductDetails] = useState<ProductsWithGallery | null>(null);
     const [error, setError] = useState<string | null>(null);
     const { productId } = useParams<{ productId: string }>();
     const [loading, setLoading] = useState(false);
-    // Preload image
-    useEffect(() => {
-        const img = new Image();
-        img.src = "/assets/images/banner/contact-us-banner.webp";
-        img.onload = () => setImageLoaded(true);
-    }, []);
+    const [mainSection, setMainSection] = useState<any>(null);
+    const [bannerImageLoaded, setBannerImageLoaded] = useState(false);
 
     const fetchProductDetails = async () => {
         try {
@@ -35,12 +32,15 @@ const ProductDetails: React.FC = () => {
                 setError("Invalid product identifier.");
                 return;
             }
+            const [mainSectionRes, productRes] = await Promise.all([
+                sectionService.getSectionsByType(SectionType.ShopMainSection, 1),
+                productService.getProductById(Number(productId))
+            ]);
 
-            const response = await productService.getProductById(Number(productId));
-            console.log(response);
-            setProductDetails(response.data);
+            setMainSection(mainSectionRes as any);
+            setProductDetails(productRes.data);
 
-            if (!response.data) {
+            if (!productRes.data) {
                 setError("No product details found for this product.");
             }
             setLoading(false);
@@ -90,6 +90,14 @@ const ProductDetails: React.FC = () => {
             setCurrentImageIndex((prev) => (prev - 1 + orderedGallery.length) % orderedGallery.length);
         }
     };
+    // Preload image
+    useEffect(() => {
+        if (mainSection?.[0].imageUrl) {
+            const img = new Image();
+            img.src = `${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${mainSection?.[0].imageUrl}`;
+            img.onload = () => setBannerImageLoaded(true);
+        }
+    }, [mainSection?.[0].imageUrl]);
 
     return (
         <>
@@ -99,11 +107,11 @@ const ProductDetails: React.FC = () => {
             <div
                 className="breadcrumb"
                 style={{
-                    backgroundImage: "url(/assets/images/banner/contact-us-banner.webp)",
+                    backgroundImage: `url(${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${mainSection?.[0].imageUrl})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
-                    opacity: imageLoaded ? 1 : 0.9,
+                    opacity: bannerImageLoaded ? 1 : 0.9,
                     transition: "opacity 0.3s ease-in-out"
                 }}
             >

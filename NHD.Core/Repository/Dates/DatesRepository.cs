@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NHD.Core.Common.Models;
@@ -64,6 +65,13 @@ namespace NHD.Core.Repository.Dates
                 .Where(d => d.IsActive == true && d.IsFilled == true)
                 .Take(take)
                 .ToListAsync();
+        }
+
+        public async Task<Date> GetDateDetails(int dateId)
+        {
+            return await _context.Dates
+                .Include(d => d.DatesAdditionalInfos)
+                .FirstOrDefaultAsync(d => d.DateId == dateId);
         }
     }
 }

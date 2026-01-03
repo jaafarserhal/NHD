@@ -68,6 +68,17 @@ class dateService extends apiService {
         formData.append('IsFilled', String(date.isFilled));
         formData.append('IsActive', String(date.isActive));
 
+        if (date.additionalInfos && Array.isArray(date.additionalInfos)) {
+            date.additionalInfos.forEach((info, index) => {
+                formData.append(`AdditionalInfos[${index}].Id`, String(info.id || 0));
+                formData.append(`AdditionalInfos[${index}].DateId`, String(info.dateId));
+                formData.append(`AdditionalInfos[${index}].KeyEn`, info.keyEn || '');
+                formData.append(`AdditionalInfos[${index}].ValueEn`, info.valueEn || '');
+                formData.append(`AdditionalInfos[${index}].KeySv`, info.keySv || '');
+                formData.append(`AdditionalInfos[${index}].ValueSv`, info.valueSv || '');
+            });
+        }
+
         if (date.imageFile && date.imageFile instanceof File) {
             formData.append('ImageFile', date.imageFile, date.imageFile.name);
         }
@@ -87,6 +98,17 @@ class dateService extends apiService {
         formData.append('DescriptionSv', date.descriptionSv || '');
         formData.append('IsFilled', String(date.isFilled));
         formData.append('IsActive', String(date.isActive));
+
+        if (date.additionalInfos && Array.isArray(date.additionalInfos)) {
+            date.additionalInfos.forEach((info, index) => {
+                formData.append(`AdditionalInfos[${index}].Id`, String(info.id || 0));
+                formData.append(`AdditionalInfos[${index}].DateId`, String(info.dateId));
+                formData.append(`AdditionalInfos[${index}].KeyEn`, info.keyEn || '');
+                formData.append(`AdditionalInfos[${index}].ValueEn`, info.valueEn || '');
+                formData.append(`AdditionalInfos[${index}].KeySv`, info.keySv || '');
+                formData.append(`AdditionalInfos[${index}].ValueSv`, info.valueSv || '');
+            });
+        }
 
         if (date.imageFile && date.imageFile instanceof File) {
             formData.append('ImageFile', date.imageFile, date.imageFile.name);

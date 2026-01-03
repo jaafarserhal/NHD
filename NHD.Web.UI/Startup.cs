@@ -191,6 +191,7 @@ namespace NHD.Web.UI
             services.AddScoped<IAddressRepository, AddressRepository>();
             services.AddScoped<IContactMessagesRepository, ContactMessagesRepository>();
             services.AddScoped<IFAQRepository, FAQRepository>();
+            services.AddScoped<IDatesAdditionalInfoRepository, DatesAdditionalInfoRepository>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();

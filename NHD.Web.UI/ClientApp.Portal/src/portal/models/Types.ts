@@ -29,6 +29,16 @@ export interface Date {
     isFilled: boolean;
     imageUrl: string;
     isActive: boolean;
+    additionalInfos: AdditionalInfo[];
+}
+
+export interface AdditionalInfo {
+    id?: number;
+    dateId: number;
+    keyEn: string;
+    keySv: string;
+    valueEn: string;
+    valueSv: string;
 }
 
 export interface DatesCollection {

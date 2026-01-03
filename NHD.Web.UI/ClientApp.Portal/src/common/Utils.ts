@@ -26,6 +26,9 @@ export const getImageResolutionLabel = (value: string): string => {
         case SectionType.AboutMainSection.toString():
             return "(1920 x 720)";
             break;
+        case SectionType.ShopMainSection.toString():
+            return "(1920 x 370)";
+            break;
         case SectionType.AboutWeLoveDates.toString():
             return "(1045 x 781)";
             break;

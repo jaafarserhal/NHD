@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, Button, Box, CardHeader, Container, Divider, FormControlLabel, Grid, Switch, TextField, Backdrop, CircularProgress } from "@mui/material";
+import { Card, CardContent, Button, Box, CardHeader, Container, Divider, FormControlLabel, Grid, Switch, TextField, Backdrop, CircularProgress, IconButton, Typography } from "@mui/material";
 import { Date } from "../models/Types";
 import dateService from '../../api/dateService';
 import { Helmet } from "react-helmet-async";
@@ -14,6 +14,8 @@ import { RouterUrls } from "src/common/RouterUrls";
 import { validateFileSize } from "src/common/fileValidation";
 import { getImageSrc } from "src/common/Utils";
 import Editor from "src/components/Editor/Index";
+import { DeleteIcon } from "lucide-react";
+import AddIcon from '@mui/icons-material/Add';
 
 export default function UpdateDate() {
     const navigate = useNavigate();
@@ -30,7 +32,8 @@ export default function UpdateDate() {
         descriptionEn: "",
         descriptionSv: "",
         imageUrl: "",
-        isActive: true
+        isActive: true,
+        additionalInfos: []
     });
 
     const [image, setImage] = useState<File | null>(null);
@@ -64,7 +67,8 @@ export default function UpdateDate() {
                 descriptionSv: date.descriptionSv,
                 isFilled: date.isFilled,
                 imageUrl: date.imageUrl,
-                isActive: date.isActive
+                isActive: date.isActive,
+                additionalInfos: date.additionalInfos || []
             });
             // Set preview to existing image if available
             if (date.imageUrl) {
@@ -176,7 +180,33 @@ export default function UpdateDate() {
             isFilled: e.target.checked,
         }));
     };
+    // Additional Info handlers
+    const handleAddAdditionalInfo = () => {
+        setForm((prev) => ({
+            ...prev,
+            additionalInfos: [...prev.additionalInfos, { keyEn: "", valueEn: "", keySv: "", valueSv: "", dateId: form.id }]
+        }));
+    };
 
+    const handleRemoveAdditionalInfo = (index: number) => {
+        setForm((prev) => ({
+            ...prev,
+            additionalInfos: prev.additionalInfos.filter((_, i) => i !== index)
+        }));
+    };
+
+    const handleAdditionalInfoChange = (index: number, field: 'keyEn' | 'valueEn' | 'keySv' | 'valueSv', value: string) => {
+        setForm((prev) => ({
+            ...prev,
+            additionalInfos: prev.additionalInfos.map((info, i) =>
+                i === index ? { ...info, [field]: value } : info
+            )
+        }));
+
+        if (errors.length > 0) {
+            setErrors([]);
+        }
+    };
 
     const validateForm = () => {
         const validationErrors: string[] = [];
@@ -197,9 +227,68 @@ export default function UpdateDate() {
             validationErrors.push("Image is required");
         }
 
+        if (form.additionalInfos.length === 0) {
+            validationErrors.push("At least one additional info is required");
+        }
+
+        // Validate additional info
+        form.additionalInfos.forEach((info, index) => {
+            const hasKeyEn = info.keyEn.trim().length > 0;
+            const hasKeySv = info.keySv.trim().length > 0;
+            const hasValueEn = info.valueEn.trim().length > 0;
+            const hasValueSv = info.valueSv.trim().length > 0;
+
+            // Check if the entry is completely empty
+            if (!hasKeyEn && !hasKeySv && !hasValueEn && !hasValueSv) {
+                validationErrors.push(`Additional info #${index + 1}: All fields are empty`);
+                return;
+            }
+
+            // If keyEn is provided, keySv must also be provided (and vice versa)
+            if (hasKeyEn && !hasKeySv) {
+                validationErrors.push(`Additional info #${index + 1}: Swedish key is required when English key is provided`);
+            }
+            if (!hasKeyEn && hasKeySv) {
+                validationErrors.push(`Additional info #${index + 1}: English key is required when Swedish key is provided`);
+            }
+
+            // If valueEn is provided, valueSv must also be provided (and vice versa)
+            if (hasValueEn && !hasValueSv) {
+                validationErrors.push(`Additional info #${index + 1}: Swedish value is required when English value is provided`);
+            }
+            if (!hasValueEn && hasValueSv) {
+                validationErrors.push(`Additional info #${index + 1}: English value is required when Swedish value is provided`);
+            }
+
+            // If keys are provided, values must be provided (and vice versa)
+            if ((hasKeyEn || hasKeySv) && !hasValueEn && !hasValueSv) {
+                validationErrors.push(`Additional info #${index + 1}: Values are required when keys are provided`);
+            }
+            if ((hasValueEn || hasValueSv) && !hasKeyEn && !hasKeySv) {
+                validationErrors.push(`Additional info #${index + 1}: Keys are required when values are provided`);
+            }
+        });
+
+        // Check for duplicate keys (English)
+        const keysEn = form.additionalInfos
+            .filter(info => info.keyEn.trim())
+            .map(info => info.keyEn.trim().toLowerCase());
+        const duplicatesEn = keysEn.filter((key, index) => keysEn.indexOf(key) !== index);
+        if (duplicatesEn.length > 0) {
+            validationErrors.push(`Duplicate English keys found: ${[...new Set(duplicatesEn)].join(', ')}`);
+        }
+
+        // Check for duplicate keys (Swedish)
+        const keysSv = form.additionalInfos
+            .filter(info => info.keySv.trim())
+            .map(info => info.keySv.trim().toLowerCase());
+        const duplicatesSv = keysSv.filter((key, index) => keysSv.indexOf(key) !== index);
+        if (duplicatesSv.length > 0) {
+            validationErrors.push(`Duplicate Swedish keys found: ${[...new Set(duplicatesSv)].join(', ')}`);
+        }
+
         setErrors(validationErrors);
 
-        // Scroll to error box if there are validation errors
         if (validationErrors.length > 0) {
             setTimeout(() => {
                 errorBoxRef.current?.scrollIntoView({
@@ -221,6 +310,10 @@ export default function UpdateDate() {
         setLoading(true);
 
         try {
+            // Filter out empty additional info entries
+            const filteredAdditionalInfos = form.additionalInfos.filter(
+                info => info.keyEn.trim() && info.valueEn.trim()
+            );
             const datesData = {
                 id: form.id,
                 nameEn: form.nameEn,
@@ -232,7 +325,8 @@ export default function UpdateDate() {
                 descriptionSv: form.descriptionSv,
                 isFilled: form.isFilled,
                 isActive: form.isActive,
-                imageFile: image
+                imageFile: image,
+                additionalInfos: filteredAdditionalInfos
             };
 
             await dateService.updateDate(datesData);
@@ -409,6 +503,86 @@ export default function UpdateDate() {
                                             }}
                                         />
                                     </Box>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                        {/* Additional Information Section */}
+                        <Grid item xs={12}>
+                            <Card>
+                                <CardHeader
+                                    title="Additional Information"
+                                    action={
+                                        <Button
+                                            startIcon={<AddIcon />}
+                                            onClick={handleAddAdditionalInfo}
+                                            variant="outlined"
+                                            size="small"
+                                        >
+                                            Add Info
+                                        </Button>
+                                    }
+                                />
+                                <Divider />
+                                <CardContent>
+                                    {form.additionalInfos.length === 0 ? (
+                                        <Typography color="text.secondary" align="center" sx={{ py: 2 }}>
+                                            No additional information added. Click "Add Info" to add key-value pairs.
+                                        </Typography>
+                                    ) : (
+                                        <Box>
+                                            {form.additionalInfos.map((info, index) => (
+                                                <Box
+                                                    key={index}
+                                                    sx={{
+                                                        display: 'flex',
+                                                        gap: 2,
+                                                        mb: 2,
+                                                        alignItems: 'flex-start'
+                                                    }}
+                                                >
+                                                    <TextField
+                                                        label="Key (English)"
+                                                        value={info.keyEn}
+                                                        onChange={(e) => handleAdditionalInfoChange(index, 'keyEn', e.target.value)}
+                                                        placeholder="e.g., Origin, Weight, etc."
+                                                        fullWidth
+                                                        variant="standard"
+                                                    />
+                                                    <TextField
+                                                        label="Value (English)"
+                                                        value={info.valueEn}
+                                                        onChange={(e) => handleAdditionalInfoChange(index, 'valueEn', e.target.value)}
+                                                        placeholder="e.g., Saudi Arabia, 500g, etc."
+                                                        fullWidth
+                                                        variant="standard"
+                                                    />
+                                                    <TextField
+                                                        label="Key (Swedish)"
+                                                        value={info.keySv}
+                                                        onChange={(e) => handleAdditionalInfoChange(index, 'keySv', e.target.value)}
+                                                        placeholder="e.g., Ursprung, Vikt, etc."
+                                                        fullWidth
+                                                        variant="standard"
+                                                    />
+                                                    <TextField
+                                                        label="Value (Swedish)"
+                                                        value={info.valueSv}
+                                                        onChange={(e) => handleAdditionalInfoChange(index, 'valueSv', e.target.value)}
+                                                        placeholder="e.g., Saudiarabien, 500g, etc."
+                                                        fullWidth
+                                                        variant="standard"
+                                                    />
+                                                    <IconButton
+                                                        onClick={() => handleRemoveAdditionalInfo(index)}
+                                                        color="error"
+                                                        sx={{ mt: 2 }}
+                                                    >
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    )}
                                 </CardContent>
                             </Card>
                         </Grid>

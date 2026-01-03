@@ -24,6 +24,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Date> Dates { get; set; }
 
+    public virtual DbSet<DatesAdditionalInfo> DatesAdditionalInfos { get; set; }
+
     public virtual DbSet<DatesProduct> DatesProducts { get; set; }
 
     public virtual DbSet<EmailSubscription> EmailSubscriptions { get; set; }
@@ -268,6 +270,30 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.WeightPrice)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("weight_price");
+        });
+
+        modelBuilder.Entity<DatesAdditionalInfo>(entity =>
+        {
+            entity.HasKey(e => e.DaId).HasName("PK__dates_ad__BF7A32952823213A");
+
+            entity.ToTable("dates_additional_info");
+
+            entity.Property(e => e.DaId).HasColumnName("da_id");
+            entity.Property(e => e.DateId).HasColumnName("date_id");
+            entity.Property(e => e.KeyEn)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("key_en");
+            entity.Property(e => e.KeySv)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("key_sv");
+            entity.Property(e => e.ValueEn).HasColumnName("value_en");
+            entity.Property(e => e.ValueSv).HasColumnName("value_sv");
+
+            entity.HasOne(d => d.Date).WithMany(p => p.DatesAdditionalInfos)
+                .HasForeignKey(d => d.DateId)
+                .HasConstraintName("FK_dates_additional_info_dates");
         });
 
         modelBuilder.Entity<DatesProduct>(entity =>

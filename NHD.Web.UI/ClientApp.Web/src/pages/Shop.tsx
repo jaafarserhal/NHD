@@ -3,19 +3,22 @@ import Footer from "../components/Common/Footer/Index";
 import Loader from "../components/Common/Loader/Index";
 import Header from "../components/Common/Header/Index";
 import productService from "../api/productService";
+import sectionService from '../api/sectionService';
 import { LookupItem, ProductsWithGallery } from "../api/common/Types";
+import { SectionType } from "../api/common/Enums";
 import Product from "../components/Product/Index";
 import QuickView from "../components/QuickView/Index";
 
 const Shop: React.FC = () => {
-    const [imageLoaded, setImageLoaded] = useState(false);
+    const [bannerImageLoaded, setBannerImageLoaded] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [mainLoading, setMainLoading] = useState(true);
 
     const [products, setProducts] = useState<ProductsWithGallery[]>([]);
     const [categories, setCategories] = useState<LookupItem[]>([]);
 
-    // Use ref to track if categories have been loaded
-    const categoriesLoadedRef = useRef(false);
+    // Use ref to track if initial data has been loaded
+    const initialDataLoadedRef = useRef(false);
 
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -28,6 +31,7 @@ const Shop: React.FC = () => {
     const pageSize = 6;
     const [totalPages, setTotalPages] = useState(1);
     const [totalResults, setTotalResults] = useState(0);
+    const [mainSection, setMainSection] = useState<any>(null);
 
     // Debounce search query - only search after 3 characters or if empty
     useEffect(() => {
@@ -44,62 +48,80 @@ const Shop: React.FC = () => {
         }
     }, [searchQuery]);
 
+    // Load initial data (categories and main section) only once
     useEffect(() => {
         let cancelled = false;
 
-        const fetchData = async () => {
+        const loadInitialData = async () => {
             try {
-                setLoading(true);
-
-                // Only fetch categories if not already loaded
-                const requests: Promise<any>[] = [
-                    productService.getAllProducts(
-                        page,
-                        pageSize,
-                        selectedCategory ?? 0,
-                        debouncedSearchQuery
-                    )
-                ];
-
-                if (!categoriesLoadedRef.current) {
-                    requests.push(productService.getCategories());
-                }
-
-                const results = await Promise.all(requests);
+                setMainLoading(true);
+                const [categoriesRes, mainSectionRes] = await Promise.all([
+                    productService.getCategories(),
+                    sectionService.getSectionsByType(SectionType.ShopMainSection, 1)
+                ]);
 
                 if (cancelled) return;
 
-                // Handle products
-                const productsRes = results[0] as any;
+                setCategories(categoriesRes.data ?? []);
+                setMainSection(mainSectionRes as any);
+
+                // Set first category as selected
+                if (categoriesRes.data && categoriesRes.data.length > 0) {
+                    setSelectedCategory(categoriesRes.data[0].id);
+                }
+
+                initialDataLoadedRef.current = true;
+                setMainLoading(false);
+            } catch (err) {
+                if (!cancelled) {
+                    console.error("Error loading initial data:", err);
+                }
+                if (!cancelled) setMainLoading(false);
+            }
+        };
+
+        if (!initialDataLoadedRef.current) {
+            loadInitialData();
+        }
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    // Load products whenever page, category, or search changes
+    useEffect(() => {
+        let cancelled = false;
+
+        const fetchProducts = async () => {
+            // Wait for initial data to load before fetching products
+            if (!initialDataLoadedRef.current) return;
+
+            try {
+                setLoading(true);
+
+                const result = await productService.getAllProducts(
+                    page,
+                    pageSize,
+                    selectedCategory ?? 0,
+                    debouncedSearchQuery
+                );
+
+                if (cancelled) return;
+                const productsRes = result as any;
                 setProducts(productsRes.data ?? []);
                 setTotalPages(productsRes.totalPages ?? 1);
                 setTotalResults(productsRes.total ?? 0);
-
-                // Handle categories (only on first load)
-                if (!categoriesLoadedRef.current && results.length > 1) {
-                    const categoriesRes = results[1];
-                    setCategories(categoriesRes.data ?? []);
-
-                    // Set first category as selected
-                    if (categoriesRes.data && categoriesRes.data.length > 0) {
-                        setSelectedCategory(categoriesRes.data[0].id);
-                    }
-
-                    categoriesLoadedRef.current = true;
-                }
             } catch (err) {
                 if (!cancelled) {
-                    console.error("Error loading shop data:", err);
+                    console.error("Error loading products:", err);
                 }
             } finally {
                 if (!cancelled) setLoading(false);
             }
         };
 
-        // Only fetch if categories are loaded OR this is the first load
-        if (categoriesLoadedRef.current || !categoriesLoadedRef.current) {
-            fetchData();
-        }
+        fetchProducts();
 
         return () => {
             cancelled = true;
@@ -108,26 +130,22 @@ const Shop: React.FC = () => {
 
     // Reset to page 1 when category or search changes
     useEffect(() => {
-        if (categoriesLoadedRef.current) {
+        if (initialDataLoadedRef.current) {
             setPage(1);
         }
     }, [selectedCategory, debouncedSearchQuery]);
 
     // Preload image
     useEffect(() => {
-        const img = new Image();
-        img.src = "/assets/images/banner/contact-us-banner.webp";
-        img.onload = () => setImageLoaded(true);
-    }, []);
-
-    // Derived filtered list (fast, memoized)
-    const visibleProducts = useMemo(() => {
-        if (!selectedCategory) return products;
-        return products.filter(p => p.categoryId === selectedCategory);
-    }, [products, selectedCategory]);
+        if (mainSection?.[0].imageUrl) {
+            const img = new Image();
+            img.src = `${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${mainSection?.[0].imageUrl}`;
+            img.onload = () => setBannerImageLoaded(true);
+        }
+    }, [mainSection?.[0].imageUrl]);
 
     const startIndex = totalResults === 0 ? 0 : (page - 1) * pageSize + 1;
-    const endIndex = totalResults === 0 ? 0 : Math.min(startIndex + visibleProducts.length - 1, totalResults);
+    const endIndex = totalResults === 0 ? 0 : Math.min(startIndex + products.length - 1, totalResults);
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -169,15 +187,16 @@ const Shop: React.FC = () => {
 
     return (
         <>
+            <Loader loading={mainLoading} />
             <Header />
             <div
                 className="breadcrumb"
                 style={{
-                    backgroundImage: "url(/assets/images/banner/contact-us-banner.webp)",
+                    backgroundImage: `url(${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${mainSection?.[0].imageUrl})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
-                    opacity: imageLoaded ? 1 : 0.9,
+                    opacity: bannerImageLoaded ? 1 : 0.9,
                     transition: "opacity 0.3s ease-in-out"
                 }}
             />
@@ -198,7 +217,7 @@ const Shop: React.FC = () => {
                             </div>
 
                             <div className="row row-cols-xl-3 row-cols-lg-2 row-cols-sm-2 row-cols-1 mb-n50" >
-                                {visibleProducts.map(product => (
+                                {products.map(product => (
                                     <Product
                                         key={product.id}
                                         product={product}

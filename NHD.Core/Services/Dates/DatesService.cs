@@ -7,6 +7,9 @@ using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Dates;
 using NHD.Core.Repository.Collections;
 using NHD.Core.Services.Model.Collections;
+using NHD.Core.Data;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
 
 namespace NHD.Core.Services.Dates
 {
@@ -15,14 +18,19 @@ namespace NHD.Core.Services.Dates
         private readonly IDatesRepository _datesRepository;
         private readonly ICollectionRepository _collectionRepository;
         private readonly IGalleryRepository _galleryRepository;
+        private readonly IDatesAdditionalInfoRepository _datesAdditionalInfoRepository;
+        protected internal AppDbContext _context;
+        protected internal IDbContextTransaction Transaction;
 
         private readonly ILogger<DatesService> _logger;
 
-        public DatesService(IDatesRepository datesRepository, ICollectionRepository collectionRepository, IGalleryRepository galleryRepository, ILogger<DatesService> logger)
+        public DatesService(AppDbContext context, IDatesRepository datesRepository, ICollectionRepository collectionRepository, IGalleryRepository galleryRepository, IDatesAdditionalInfoRepository datesAdditionalInfoRepository, ILogger<DatesService> logger)
         {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
             _datesRepository = datesRepository ?? throw new ArgumentNullException(nameof(datesRepository));
             _collectionRepository = collectionRepository ?? throw new ArgumentNullException(nameof(collectionRepository));
             _galleryRepository = galleryRepository ?? throw new ArgumentNullException(nameof(galleryRepository));
+            _datesAdditionalInfoRepository = datesAdditionalInfoRepository ?? throw new ArgumentNullException(nameof(datesAdditionalInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -144,7 +152,7 @@ namespace NHD.Core.Services.Dates
         {
             try
             {
-                var date = await _datesRepository.GetByIdAsync(id);
+                var date = await _datesRepository.GetDateDetails(id);
                 if (date == null)
                 {
                     return ServiceResult<DateViewModel>.Failure($"Date with ID {id} not found.");
@@ -207,6 +215,103 @@ namespace NHD.Core.Services.Dates
 
             await _collectionRepository.DeleteAsync(collection.CollectionId);
             return ServiceResult<bool>.Success(true);
+        }
+
+        public async Task<Date> SaveDatesWithAdditionalInfo(Date date, List<DatesAdditionalInfoBindingModel> datesAdditionalInfo)
+        {
+            await BeginTransactionAsync();
+
+            try
+            {
+                bool isNewDate = date.DateId == 0;
+
+                if (isNewDate)
+                {
+                    // Add new date
+                    await _context.Dates.AddAsync(date);
+                    await SaveChangesAsync(); // Need this to get product.PrdId
+                }
+                else
+                {
+                    // Get the existing date from DB
+                    var existingDate = await _context.Dates
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(p => p.DateId == date.DateId);
+
+                    if (existingDate == null)
+                        throw new Exception("Date not found");
+
+                    // Update the date
+                    _context.Dates.Update(date);
+                    await SaveChangesAsync();
+                }
+                // Save additional info
+                if (datesAdditionalInfo != null && datesAdditionalInfo.Any())
+                {
+                    foreach (var dp in datesAdditionalInfo)
+                    {
+                        dp.DateId = date.DateId;
+                    }
+
+                    await SaveDatesAdditionalInfo(datesAdditionalInfo);
+                }
+
+                await CommitTransactionAsync();
+                return date;
+            }
+            catch (Exception ex)
+            {
+                await RollbackTransactionAsync();
+                _logger.LogError(ex, "Error saving date with additional info");
+                return null;
+            }
+        }
+
+        private async Task<List<DatesAdditionalInfo>> SaveDatesAdditionalInfo(List<DatesAdditionalInfoBindingModel> datesAdditionalInfo)
+        {
+            if (datesAdditionalInfo == null || !datesAdditionalInfo.Any())
+                return new List<DatesAdditionalInfo>();
+
+            var prdId = datesAdditionalInfo.First().DateId;
+
+            // 1. Remove ALL existing date products for this product
+            var existingRecords = await _datesAdditionalInfoRepository.GetAdditionalInfoByDateIdAsync(prdId);
+            if (existingRecords.Any())
+            {
+                _context.DatesAdditionalInfos.RemoveRange(existingRecords);
+            }
+
+            var resultList = new List<DatesAdditionalInfo>();
+            var processedDateIds = new HashSet<(int, string)>();
+
+            foreach (var item in datesAdditionalInfo)
+            {
+                if (item.KeyEn != null)
+                {
+                    // Skip if we already processed this DateId in current batch
+                    if (processedDateIds.Contains((item.DateId, item.KeyEn)))
+                        continue;
+
+                    var entity = new DatesAdditionalInfo
+                    {
+                        DaId = item.Id,
+                        DateId = item.DateId,
+                        KeyEn = item.KeyEn,
+                        ValueEn = item.ValueEn,
+                        KeySv = item.KeySv,
+                        ValueSv = item.ValueSv
+                    };
+
+                    await _context.DatesAdditionalInfos.AddAsync(entity);
+                    resultList.Add(entity);
+                    processedDateIds.Add((item.DateId, item.KeyEn));
+                }
+            }
+
+            // 3. Save all changes in one transaction
+            await _context.SaveChangesAsync();
+
+            return resultList;
         }
 
         #endregion Dates
@@ -286,7 +391,16 @@ namespace NHD.Core.Services.Dates
                 CreatedAt = date.CreatedAt,
                 Quality = date.Quality,
                 IsFilled = date.IsFilled,
-                ImageUrl = date.ImageUrl
+                ImageUrl = date.ImageUrl,
+                AdditionalInfos = date.DatesAdditionalInfos?.Select(ai => new DatesAdditionalInfoBindingModel
+                {
+                    Id = ai.DaId,
+                    DateId = ai.DateId,
+                    KeyEn = ai.KeyEn,
+                    KeySv = ai.KeySv,
+                    ValueEn = ai.ValueEn,
+                    ValueSv = ai.ValueSv
+                }).ToList()
             };
         }
 
@@ -306,5 +420,40 @@ namespace NHD.Core.Services.Dates
             };
         }
         #endregion Mappers
+
+        #region Transactions
+        public async Task BeginTransactionAsync()
+        {
+            if (Transaction == null && !_context.InMemoryDatabase)
+            {
+                Transaction = await _context.Database.BeginTransactionAsync();
+            }
+        }
+
+        public async Task CommitTransactionAsync()
+        {
+            if (Transaction != null)
+            {
+                await Transaction.CommitAsync();
+            }
+
+            Transaction?.Dispose();
+            Transaction = null;
+        }
+
+        public async Task RollbackTransactionAsync()
+        {
+            if (Transaction != null)
+            {
+                await Transaction.RollbackAsync();
+            }
+        }
+
+        public Task<int> SaveChangesAsync()
+        {
+            return _context.SaveChangesAsync();
+        }
+
+        #endregion Transactions
     }
 }

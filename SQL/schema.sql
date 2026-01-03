@@ -379,6 +379,20 @@ CREATE TABLE dbo.faq (
        REFERENCES dbo.gen_lookup(lookup_id)
 );
 
+CREATE TABLE dbo.dates_additional_info (
+    da_id INT IDENTITY(1,1) PRIMARY KEY,
+    date_id INT NOT NULL,
+    [key_en] NVARCHAR(100) NOT NULL,
+    [value_en] NVARCHAR(MAX) NULL,
+    [key_sv] NVARCHAR(100) NULL,
+    [value_sv] NVARCHAR(MAX) NULL,
+    CONSTRAINT FK_dates_additional_info_dates
+        FOREIGN KEY (date_id)
+        REFERENCES dbo.dates(date_id)
+        ON DELETE CASCADE
+);
+
+
 
 -- =============================================
 -- CREATE INDEXES FOR PERFORMANCE
