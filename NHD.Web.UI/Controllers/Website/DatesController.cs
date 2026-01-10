@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NHD.Core.Common.Models;
 using NHD.Core.Services.Dates;
+using NHD.Core.Services.Model.Dates;
 
 namespace NHD.Web.UI.Controllers.Website
 {
@@ -45,6 +47,16 @@ namespace NHD.Web.UI.Controllers.Website
                 limit = result.Limit,
                 totalPages = result.TotalPages
             });
+        }
+
+        [HttpGet]
+        [Route("DatesDetails/{id}")]
+        public async Task<ActionResult<ServiceResult<DatesDetailsViewModel>>> GetDatesDetails(int id)
+        {
+            var data = await _datesService.GetDatesDetails(id);
+            if (data.IsSuccess)
+                return Ok(data);
+            return BadRequest(data);
         }
     }
 }

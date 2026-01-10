@@ -50,7 +50,7 @@ namespace NHD.Core.Services.Dates
                         Id = d.DateId,
                         NameEn = d.NameEn,
                         NameSv = d.NameSv,
-                        ImageUrl = d.ImageUrl
+                        ImageUrl = d.BannerImageUrl != null ? "/uploads/dates/" + d.BannerImageUrl : "/uploads/dates/" + d.ImageUrl
                     };
                 })
                 .ToList();
@@ -200,6 +200,26 @@ namespace NHD.Core.Services.Dates
             {
                 _logger.LogError(ex, $"Error retrieving date with ID {id}");
                 return ServiceResult<DateViewModel>.Failure("An error occurred while retrieving the date");
+            }
+        }
+
+        public async Task<ServiceResult<DatesDetailsViewModel>> GetDatesDetails(int id)
+        {
+            try
+            {
+                var date = await _datesRepository.GetDateDetails(id);
+                if (date == null)
+                {
+                    return ServiceResult<DatesDetailsViewModel>.Failure($"Date with ID {id} not found.");
+                }
+
+                var dateDto = MapToDatesDetailsDto(date);
+                return ServiceResult<DatesDetailsViewModel>.Success(dateDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error retrieving date with ID {id}");
+                return ServiceResult<DatesDetailsViewModel>.Failure("An error occurred while retrieving the date");
             }
         }
 
@@ -427,6 +447,7 @@ namespace NHD.Core.Services.Dates
                 Quality = date.Quality,
                 IsFilled = date.IsFilled,
                 ImageUrl = date.ImageUrl,
+                BannerImageUrl = date.BannerImageUrl,
                 AdditionalInfos = date.DatesAdditionalInfos?.Select(ai => new DatesAdditionalInfoBindingModel
                 {
                     Id = ai.DaId,
@@ -435,6 +456,34 @@ namespace NHD.Core.Services.Dates
                     KeySv = ai.KeySv,
                     ValueEn = ai.ValueEn,
                     ValueSv = ai.ValueSv
+                }).ToList()
+            };
+        }
+
+        private DatesDetailsViewModel MapToDatesDetailsDto(Date date)
+        {
+            return new DatesDetailsViewModel
+            {
+                Id = date.DateId,
+                TitleEn = date.NameEn,
+                TitleSv = date.NameSv,
+                DescriptionEn = date.DescriptionEn,
+                DescriptionSv = date.DescriptionSv,
+                ImageUrl = "/uploads/dates/" + date.ImageUrl,
+                AdditionalInfos = date.DatesAdditionalInfos?.Select(ai => new DatesAdditionalInfoBindingModel
+                {
+                    Id = ai.DaId,
+                    DateId = ai.DateId,
+                    KeyEn = ai.KeyEn,
+                    KeySv = ai.KeySv,
+                    ValueEn = ai.ValueEn,
+                    ValueSv = ai.ValueSv
+                }).ToList(),
+                Galleries = date.Galleries?.Select(g => new ImagesViewModel
+                {
+                    Id = g.GalleryId,
+                    ImageUrl = "/uploads/dates/" + g.ImageUrl,
+                    AltText = g.AltText
                 }).ToList()
             };
         }

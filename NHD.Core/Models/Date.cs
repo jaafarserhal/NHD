@@ -29,6 +29,8 @@ public partial class Date
 
     public string ImageUrl { get; set; }
 
+    public string BannerImageUrl { get; set; }
+
     public virtual ICollection<DatesAdditionalInfo> DatesAdditionalInfos { get; set; } = new List<DatesAdditionalInfo>();
 
     public virtual ICollection<DatesProduct> DatesProducts { get; set; } = new List<DatesProduct>();

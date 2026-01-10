@@ -51,7 +51,7 @@ const OffcanvasMenu: React.FC<OffcanvasMenuProps> = ({ isOpen, onClose }) => {
                             </Link>
                         </li>
                         <li>
-                            <Link to={routeUrls.comingSoon} className="menu-item-link" onClick={onClose}>
+                            <Link to={routeUrls.ourDates} className="menu-item-link" onClick={onClose}>
                                 <span>Our Dates</span>
                             </Link>
                         </li>

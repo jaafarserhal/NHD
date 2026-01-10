@@ -244,6 +244,9 @@ public partial class AppDbContext : DbContext
             entity.ToTable("dates");
 
             entity.Property(e => e.DateId).HasColumnName("date_id");
+            entity.Property(e => e.BannerImageUrl)
+                .HasMaxLength(500)
+                .HasColumnName("banner_image_url");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
@@ -285,7 +288,6 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("key_en");
             entity.Property(e => e.KeySv)
-                .IsRequired()
                 .HasMaxLength(100)
                 .HasColumnName("key_sv");
             entity.Property(e => e.ValueEn).HasColumnName("value_en");

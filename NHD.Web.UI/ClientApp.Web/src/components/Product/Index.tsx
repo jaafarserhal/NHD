@@ -6,15 +6,16 @@ interface ProductProps {
     onQuickView?: (product: ProductsWithGallery) => void;
     isByCategory?: boolean;
     modalId?: string;
+    urlPrefix?: string;
 }
 //product-item border text-center
-const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, modalId }) => {
+const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, modalId, urlPrefix = '/product' }) => {
     return (
         <div className={isByCategory ? 'col mb-50' : 'col-lg-4 col-md-6'}>
             <div className={`product-item ${isByCategory ? '' : 'border'} text-center`}>
                 {product.badgeTextEn && <div className="product-item__badge">{product.badgeTextEn}</div>}
                 <div className={`product-item__image ${isByCategory ? 'border w-100' : ''}`} >
-                    <a href={`/product/${product.id}/${product.titleEn.replace(/\s+/g, '-').toLowerCase()}`}>
+                    <a href={`${urlPrefix}/${product.id}/${product.titleEn.replace(/\s+/g, '-').toLowerCase()}`}>
                         <img
                             width={500}
                             height={625}
@@ -47,7 +48,7 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
 
                 <div className={`product-item__content ${isByCategory ? 'pt-5' : 'pb-3'}`}>
                     <h5 className="product-item__title">
-                        <a href={`/product/${product.id}`}>{product.titleEn}</a>
+                        <a href={`${urlPrefix}/${product.id}/${product.titleEn.replace(/\s+/g, '-').toLowerCase()}`}>{product.titleEn}</a>
                     </h5>
                     {(product.fromPrice || product.fromPrice !== 0) && <span className={`product-item__price ${isByCategory ? '' : 'fs-2'}`}>
                         ${product.fromPrice?.toFixed(2)}

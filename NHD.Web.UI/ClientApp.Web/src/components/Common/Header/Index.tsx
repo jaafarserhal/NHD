@@ -84,7 +84,7 @@ const Header: React.FC = () => {
                                         </Link>
                                     </li>
                                     <li><Link to={routeUrls.shop} className={`menu-item-link ${isActive(routeUrls.shop) ? 'active' : ''}`}><span>Shop</span></Link></li>
-                                    <li><Link to={routeUrls.comingSoon} className={`menu-item-link ${isActive(routeUrls.comingSoon) ? 'active' : ''}`}><span>Our Dates</span></Link></li>
+                                    <li><Link to={routeUrls.ourDates} className={`menu-item-link ${isActive(routeUrls.ourDates) ? 'active' : ''}`}><span>Our Dates</span></Link></li>
                                     <li><Link to={routeUrls.contactUs} className={`menu-item-link ${isActive(routeUrls.contactUs) ? 'active' : ''}`}><span>Contact</span></Link></li>
                                 </ul>
                             </div>

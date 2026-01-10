@@ -18,7 +18,7 @@ export default function AddDate() {
     const navigate = useNavigate();
 
 
-    const [form, setForm] = useState<Omit<Date, "id" | "imageUrl">>({
+    const [form, setForm] = useState<Omit<Date, "id" | "imageUrl" | "bannerImageUrl">>({
         nameEn: "",
         nameSv: "",
         quality: false,
@@ -32,6 +32,8 @@ export default function AddDate() {
     });
 
     const [image, setImage] = useState<File | null>(null);
+    const [bannerImage, setBannerImage] = useState<File | null>(null);
+    const [bannerPreview, setBannerPreview] = useState<string | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<string[]>([]);
@@ -100,6 +102,42 @@ export default function AddDate() {
         } else {
             setImage(null);
             setPreview(null);
+        }
+
+        // Clear errors when user selects a valid file
+        if (errors.length > 0) {
+            setErrors([]);
+        }
+    };
+
+    const handleBannerFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+
+        if (file) {
+            const validation = validateFileSize(file, 2); // 2MB limit
+
+            if (!validation.isValid) {
+                setErrors([validation.error!]);
+                // Clear the file input
+                e.target.value = '';
+                setBannerImage(null);
+                setBannerPreview(null);
+
+                // Scroll to error box
+                setTimeout(() => {
+                    errorBoxRef.current?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }, 100);
+                return;
+            }
+
+            setBannerImage(file);
+            setBannerPreview(URL.createObjectURL(file));
+        } else {
+            setBannerImage(null);
+            setBannerPreview(null);
         }
 
         // Clear errors when user selects a valid file
@@ -268,7 +306,8 @@ export default function AddDate() {
             const dateData = {
                 ...form,
                 additionalInfos: filteredAdditionalInfos,
-                imageFile: image
+                imageFile: image,
+                bannerImageFile: bannerImage
             };
 
             await dateService.addDate(dateData);
@@ -525,6 +564,27 @@ export default function AddDate() {
                                         label=''
                                     />
                                 </CardContent>
+                                <CardContent>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleBannerFileChange}
+                                        style={{ marginBottom: '1rem' }}
+                                        required
+                                    />
+                                    {!bannerPreview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
+                                        (max size: 2MB) <span style={{ color: "red" }}>192 x 148</span>
+                                    </Box>}
+                                    {bannerPreview && (
+                                        <Box sx={{ mt: 2 }}>
+                                            <img
+                                                src={bannerPreview}
+                                                alt="Preview"
+                                                style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
+                                            />
+                                        </Box>
+                                    )}
+                                </CardContent>
                             </Card>
                         </Grid>
                         <Grid item xs={12}>
@@ -546,7 +606,7 @@ export default function AddDate() {
                                         required
                                     />
                                     {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
-                                        * Image is required (max size: 2MB) <span style={{ color: "red" }}>{form.quality ? "192 x 148" : "500 x 625"}</span>
+                                        * Image is required (max size: 2MB) <span style={{ color: "red" }}>500 x 625</span>
                                     </Box>}
                                     {preview && (
                                         <Box sx={{ mt: 2 }}>

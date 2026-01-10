@@ -19,6 +19,8 @@ namespace NHD.Core.Services.Model.Dates
         public bool IsActive { get; set; }
         public string ImageUrl { get; set; }
         public IFormFile ImageFile { get; set; }
+        public IFormFile BannerImageFile { get; set; }
+        public string BannerImageUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public string DescriptionEn { get; set; }
         public string DescriptionSv { get; set; }
@@ -41,6 +43,26 @@ namespace NHD.Core.Services.Model.Dates
         public int Id { get; set; }
         public string NameEn { get; set; }
         public string NameSv { get; set; }
+        public string ImageUrl { get; set; }
+        public string AltText { get; set; }
+    }
+
+    public class DatesDetailsViewModel
+    {
+        public int Id { get; set; }
+        public string TitleEn { get; set; }
+        public string TitleSv { get; set; }
+
+        public string DescriptionEn { get; set; }
+        public string DescriptionSv { get; set; }
+        public string ImageUrl { get; set; }
+        public List<DatesAdditionalInfoBindingModel> AdditionalInfos { get; set; }
+        public List<ImagesViewModel> Galleries { get; set; }
+    }
+
+    public class ImagesViewModel
+    {
+        public int Id { get; set; }
         public string ImageUrl { get; set; }
         public string AltText { get; set; }
     }

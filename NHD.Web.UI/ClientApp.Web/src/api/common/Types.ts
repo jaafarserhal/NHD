@@ -29,6 +29,26 @@ export interface ProductsWithGallery {
     galleries: GalleryViewModel[];
 }
 
+export interface AdditionalInfo {
+    id?: number;
+    dateId: number;
+    keyEn: string;
+    keySv: string;
+    valueEn: string;
+    valueSv: string;
+}
+
+export interface DatesWithGallery {
+    id: number;
+    titleEn: string;
+    titleSv: string;
+    descriptionEn: string;
+    descriptionSv: string;
+    imageUrl: string;
+    additionalInfos: AdditionalInfo[];
+    galleries: GalleryViewModel[];
+}
+
 export interface GalleryViewModel {
     id: number;
     altText: string;

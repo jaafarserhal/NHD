@@ -27,7 +27,7 @@ const Brands: React.FC<BrandsProps> = ({ brands }) => {
                         <SwiperSlide key={brand.id}>
                             <div className="brand-item flex justify-center">
                                 <img
-                                    src={(process.env.REACT_APP_BASE_URL || "") + `/uploads/dates/${brand.imageUrl}`}
+                                    src={(process.env.REACT_APP_BASE_URL || "") + brand.imageUrl}
                                     alt={brand.altText}
                                     loading="lazy"
                                     className="max-h-20 object-contain"

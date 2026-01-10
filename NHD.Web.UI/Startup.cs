@@ -134,9 +134,9 @@ namespace NHD.Web.UI
             });
 
 
-            app.UseRouting();
-
             app.UseCors("AllowReactApp");
+
+            app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();

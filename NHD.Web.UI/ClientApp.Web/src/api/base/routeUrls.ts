@@ -14,4 +14,5 @@ export const routeUrls = {
     shop: '/shop',
     ourDates: '/our-dates',
     productDetails: '/product/:productId/:productName',
+    DatesDetails: '/dates/:datesId/:datesName',
 };

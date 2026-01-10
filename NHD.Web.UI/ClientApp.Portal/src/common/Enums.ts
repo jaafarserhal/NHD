@@ -42,6 +42,7 @@ export const enum SectionType {
     AboutWeLoveDates = 508,
     AboutNawaExperience = 509,
     ShopMainSection = 510,
+    OurDatesMainSection = 511
 }
 
 export const enum CustomerStatusEnum {

@@ -1,77 +1,75 @@
 import React, { useEffect, useState } from "react";
 import Footer from "../components/Common/Footer/Index";
 import Header from "../components/Common/Header/Index";
-import { ProductsWithGallery } from "../api/common/Types";
+import { DatesWithGallery } from "../api/common/Types";
 import { Link, useParams } from "react-router-dom";
-import productService from "../api/productService";
+import dateService from "../api/dateService";
 import Loader from "../components/Common/Loader/Index";
 import sectionService from '../api/sectionService';
 import { SectionType } from "../api/common/Enums";
 import { routeUrls } from "../api/base/routeUrls";
 
-const ProductDetails: React.FC = () => {
-    const [productDetails, setProductDetails] = useState<ProductsWithGallery | null>(null);
+const DatesDetails: React.FC = () => {
+    const [datesDetails, setDatesDetails] = useState<DatesWithGallery | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const { productId } = useParams<{ productId: string }>();
+    const { datesId } = useParams<{ datesId: string }>();
     const [loading, setLoading] = useState(false);
     const [mainSection, setMainSection] = useState<any>(null);
     const [bannerImageLoaded, setBannerImageLoaded] = useState(false);
 
-    const fetchProductDetails = async () => {
+    const fetchDatesDetails = async () => {
         try {
             setError(null);
             setLoading(true);
 
             // validate params
-            if (!productId) {
-                setError("Missing product identifier.");
+            if (!datesId) {
+                setError("Missing dates identifier.");
                 return;
             }
 
-            // ensure numeric productId
-            if (isNaN(Number(productId))) {
+            // ensure numeric datesId
+            if (isNaN(Number(datesId))) {
                 setError("Invalid product identifier.");
                 return;
             }
-            const [mainSectionRes, productRes] = await Promise.all([
-                sectionService.getSectionsByType(SectionType.ShopMainSection, 1),
-                productService.getProductById(Number(productId))
+            const [mainSectionRes, dateRes] = await Promise.all([
+                sectionService.getSectionsByType(SectionType.OurDatesMainSection, 1),
+                dateService.getDatesDetails(Number(datesId))
             ]);
 
             setMainSection(mainSectionRes as any);
-            setProductDetails(productRes.data);
-
-            if (!productRes.data) {
-                setError("No product details found for this product.");
+            setDatesDetails(dateRes.data);
+            if (!dateRes.data) {
+                setError("No date details found for this date.");
             }
             setLoading(false);
         } catch (err) {
-            setError("Failed to load product details. Please try again later.");
+            setError("Failed to load date details. Please try again later.");
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchProductDetails();
-    }, [productId]);
+        fetchDatesDetails();
+    }, [datesId]);
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     // Add this helper function
     const getOrderedGallery = () => {
-        if (!productDetails?.galleries || productDetails.galleries.length === 0) {
+        if (!datesDetails?.galleries || datesDetails.galleries.length === 0) {
             return [];
         }
 
-        const primaryIndex = productDetails.galleries.findIndex(img => img.isPrimary);
-
+        const primaryIndex = datesDetails.galleries.findIndex(img => img.isPrimary);
         if (primaryIndex === -1) {
-            return productDetails.galleries;
+            return datesDetails.galleries;
         }
 
         // Move primary image to the front
-        const ordered = [...productDetails.galleries];
+        const ordered = [...datesDetails.galleries];
         const [primaryImage] = ordered.splice(primaryIndex, 1);
         ordered.unshift(primaryImage);
 
@@ -138,9 +136,9 @@ const ProductDetails: React.FC = () => {
                                 <h1 className="breadcrumb_title">{mainSection?.[0]?.titleEn ?? ""}</h1>
                                 <ul className="breadcrumb_list">
                                     <li>
-                                        <Link to={routeUrls.shop}>Shop</Link>
+                                        <Link to={routeUrls.ourDates}>Our Dates</Link>
                                     </li>
-                                    <li>Product Details</li>
+                                    <li>Dates Details</li>
                                 </ul>
                             </div>
                         </div>
@@ -209,45 +207,8 @@ const ProductDetails: React.FC = () => {
                             <div className="product-summery position-relative">
                                 {/* Product Head Start */}
                                 <div className="product-head flex-column align-items-start mb-3 mb-md-5">
-                                    <h2 className="product-title mb-2">{productDetails?.titleEn}</h2>
-                                    <span className="product-head-price">${productDetails?.fromPrice}</span>
+                                    <h2 className="product-title mb-2">{datesDetails?.titleEn}</h2>
                                 </div>
-                                <ul className="product-cta">
-                                    <li>
-                                        <div className="cart-btn">
-                                            <div className="add-to_cart">
-                                                <a
-                                                    className="btn btn-dark btn-hover-primary"
-                                                    href="#/"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalCart"
-                                                >
-                                                    Add to cart
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-
-                                {/* <ul className="product-meta">
-                                    <li className="product-meta-wrapper">
-                                        <span className="product-meta-name">SKU:</span>
-                                        <span className="product-meta-detail">REF. LA-199</span>
-                                    </li>
-                                    <li className="product-meta-wrapper">
-                                        <span className="product-meta-name">category:</span>
-                                        <span className="product-meta-detail">
-                                            <a href="#">Cake, </a>
-                                            <a href="#">New</a>
-                                        </span>
-                                    </li>
-                                    <li className="product-meta-wrapper">
-                                        <span className="product-meta-name">Tags:</span>
-                                        <span className="product-meta-detail">
-                                            <a href="#">Cake 1</a>
-                                        </span>
-                                    </li>
-                                </ul> */}
 
                                 <div className="product-share">
                                     <a href="#">
@@ -269,7 +230,7 @@ const ProductDetails: React.FC = () => {
                     </div>
                     <div className="row section-margin">
                         <div className="col-lg-12 single-product-tab" style={{ margin: '0x' }}>
-                            <ul className="nav nav-tabs" id="myTab" role="tablist">
+                            <ul className="nav nav-tabs" id="myTab" role="tablist" style={{ margin: '30px' }}>
                                 <li className="nav-item">
                                     <a
                                         className="nav-link active"
@@ -306,11 +267,11 @@ const ProductDetails: React.FC = () => {
                                 >
                                     <div className="product-desc-row">
                                         <div className="product-desc-img">
-                                            <img src={`${(process.env.REACT_APP_BASE_URL || "")}${productDetails?.imageUrl ?? "/assets/images/placeholder.png"}`} alt="Image" />
+                                            <img src={`${(process.env.REACT_APP_BASE_URL || "")}${datesDetails?.imageUrl ?? "/assets/images/placeholder.png"}`} alt="Image" />
                                         </div>
                                         <div className="product-desc-content">
                                             <p className="product-desc-text">
-                                                {productDetails?.descriptionEn}
+                                                {datesDetails?.descriptionEn}
                                             </p>
                                         </div>
                                     </div>
@@ -326,22 +287,13 @@ const ProductDetails: React.FC = () => {
                                     <div className="size-tab table-responsive-lg">
                                         <table className="table border mb-0">
                                             <tbody>
-                                                {productDetails?.type && (
-                                                    <tr>
-                                                        <td className="cun-name">
-                                                            <span>Type</span>
-                                                        </td>
-                                                        <td>{productDetails?.type}</td>
+
+                                                {datesDetails?.additionalInfos.map((info) => (
+                                                    <tr key={info.id}>
+                                                        <th className="cun-name">{info.keyEn}</th>
+                                                        <td>{info.valueEn}</td>
                                                     </tr>
-                                                )}
-                                                {productDetails?.size && (
-                                                    <tr>
-                                                        <td className="cun-name">
-                                                            <span>Size</span>
-                                                        </td>
-                                                        <td>{productDetails?.size}</td>
-                                                    </tr>
-                                                )}
+                                                ))}
                                             </tbody>
                                         </table>
                                     </div>
@@ -358,4 +310,4 @@ const ProductDetails: React.FC = () => {
     );
 };
 
-export default ProductDetails;
+export default DatesDetails;

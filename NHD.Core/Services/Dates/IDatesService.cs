@@ -29,5 +29,6 @@ namespace NHD.Core.Services.Dates
         Task<ServiceResult<IEnumerable<CollectionViewModel>>> GetTop4CollectionsAsync();
         Task<Date> SaveDatesWithAdditionalInfo(Date date, List<DatesAdditionalInfoBindingModel> datesAdditionalInfo);
         Task<PagedServiceResult<IEnumerable<ProductsWithGalleryViewModel>>> GetAllDatesAsync(int page = 1, int limit = 10);
+        Task<ServiceResult<DatesDetailsViewModel>> GetDatesDetails(int id);
     }
 }

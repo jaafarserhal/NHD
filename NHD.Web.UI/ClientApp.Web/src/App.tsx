@@ -17,6 +17,7 @@ import Faqs from "./pages/Faqs";
 import Shop from "./pages/Shop";
 import OurDates from "./pages/OurDates";
 import ProductDetails from "./pages/ProductDetails";
+import DatesDetails from "./pages/DatesDetails";
 
 
 const App: React.FC = () => {
@@ -38,6 +39,7 @@ const App: React.FC = () => {
         <Route path={routeUrls.shop} element={<Shop />} />
         <Route path={routeUrls.ourDates} element={<OurDates />} />
         <Route path={routeUrls.productDetails} element={<ProductDetails />} />
+        <Route path={routeUrls.DatesDetails} element={<DatesDetails />} />
         <Route
           path={routeUrls.myAccount}
           element={

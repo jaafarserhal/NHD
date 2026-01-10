@@ -32,10 +32,13 @@ export default function UpdateDate() {
         descriptionEn: "",
         descriptionSv: "",
         imageUrl: "",
+        bannerImageUrl: "",
         isActive: true,
         additionalInfos: []
     });
 
+    const [bannerImage, setBannerImage] = useState<File | null>(null);
+    const [bannerPreview, setBannerPreview] = useState<string | null>(null);
     const [image, setImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -67,6 +70,7 @@ export default function UpdateDate() {
                 descriptionSv: date.descriptionSv,
                 isFilled: date.isFilled,
                 imageUrl: date.imageUrl,
+                bannerImageUrl: date.bannerImageUrl,
                 isActive: date.isActive,
                 additionalInfos: date.additionalInfos || []
             });
@@ -75,8 +79,13 @@ export default function UpdateDate() {
                 setPreview(date.imageUrl);
             }
 
+            if (date.bannerImageUrl) {
+                setBannerPreview(date.bannerImageUrl);
+            }
+
             // Clear the selected file when loading fresh data
             setImage(null);
+            setBannerImage(null);
 
         } catch (error: any) {
             console.error("Error loading date:", error);
@@ -153,6 +162,43 @@ export default function UpdateDate() {
             setImage(null);
             // Reset to original image if no new file selected
             setPreview(form.imageUrl || null);
+        }
+
+        // Clear errors when user selects a valid file
+        if (errors.length > 0) {
+            setErrors([]);
+        }
+    };
+    const handleBannerFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+
+        if (file) {
+            const validation = validateFileSize(file, 2); // 2MB limit
+
+            if (!validation.isValid) {
+                setErrors([validation.error!]);
+                // Clear the file input
+                e.target.value = '';
+                setBannerImage(null);
+                // Reset to original image
+                setBannerPreview(form.bannerImageUrl || null);
+
+                // Scroll to error box
+                setTimeout(() => {
+                    errorBoxRef.current?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }, 100);
+                return;
+            }
+
+            setBannerImage(file);
+            setBannerPreview(URL.createObjectURL(file));
+        } else {
+            setBannerImage(null);
+            // Reset to original image if no new file selected
+            setBannerPreview(form.bannerImageUrl || null);
         }
 
         // Clear errors when user selects a valid file
@@ -326,6 +372,7 @@ export default function UpdateDate() {
                 isFilled: form.isFilled,
                 isActive: form.isActive,
                 imageFile: image,
+                bannerImageFile: bannerImage,
                 additionalInfos: filteredAdditionalInfos
             };
 
@@ -602,6 +649,27 @@ export default function UpdateDate() {
                                         label=''
                                     />
                                 </CardContent>
+                                <CardContent>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleBannerFileChange}
+                                        style={{ marginBottom: '1rem' }}
+                                        required
+                                    />
+                                    {!bannerPreview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
+                                        * (max size: 2MB) <span style={{ color: "red" }}>192 x 148</span>
+                                    </Box>}
+                                    {bannerPreview && (
+                                        <Box sx={{ mt: 2 }}>
+                                            <img
+                                                src={getImageSrc(bannerPreview, 'dates')}
+                                                alt="Preview"
+                                                style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
+                                            />
+                                        </Box>
+                                    )}
+                                </CardContent>
                             </Card>
                         </Grid>
 
@@ -625,7 +693,7 @@ export default function UpdateDate() {
                                         required
                                     />
                                     {!preview && <Box sx={{ color: 'text.secondary', fontSize: '0.875rem', mt: 1 }}>
-                                        * Image is required (max size: 2MB) <span style={{ color: "red" }}>{form.quality ? "192 x 148" : "500 x 625"}</span>
+                                        * Image is required (max size: 2MB) <span style={{ color: "red" }}>500 x 625</span>
                                     </Box>}
                                     {preview && (
                                         <Box sx={{ mt: 2 }}>

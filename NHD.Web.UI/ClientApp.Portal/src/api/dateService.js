@@ -83,6 +83,10 @@ class dateService extends apiService {
             formData.append('ImageFile', date.imageFile, date.imageFile.name);
         }
 
+        if (date.bannerImageFile && date.bannerImageFile instanceof File) {
+            formData.append('BannerImageFile', date.bannerImageFile, date.bannerImageFile.name);
+        }
+
         return this.post(formData, apiUrls.addDate);
     }
 
@@ -112,6 +116,10 @@ class dateService extends apiService {
 
         if (date.imageFile && date.imageFile instanceof File) {
             formData.append('ImageFile', date.imageFile, date.imageFile.name);
+        }
+
+        if (date.bannerImageFile && date.bannerImageFile instanceof File) {
+            formData.append('BannerImageFile', date.bannerImageFile, date.bannerImageFile.name);
         }
 
         return this.put(formData, apiUrls.updateDate);

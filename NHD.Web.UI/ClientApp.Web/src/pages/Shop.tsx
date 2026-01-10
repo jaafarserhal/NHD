@@ -137,12 +137,25 @@ const Shop: React.FC = () => {
 
     // Preload image
     useEffect(() => {
-        if (mainSection?.[0].imageUrl) {
-            const img = new Image();
-            img.src = `${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${mainSection?.[0].imageUrl}`;
-            img.onload = () => setBannerImageLoaded(true);
+        let isMounted = true;
+        const imageUrl = mainSection?.[0]?.imageUrl;
+
+        if (!imageUrl) {
+            setBannerImageLoaded(false);
+            return;
         }
-    }, [mainSection?.[0].imageUrl]);
+
+        const img = new Image();
+        img.src = `${process.env.REACT_APP_BASE_URL || ""}/uploads/sections/${imageUrl}`;
+
+        img.onload = () => {
+            if (isMounted) setBannerImageLoaded(true);
+        };
+
+        return () => {
+            isMounted = false;
+        };
+    }, [mainSection]);
 
     const startIndex = totalResults === 0 ? 0 : (page - 1) * pageSize + 1;
     const endIndex = totalResults === 0 ? 0 : Math.min(startIndex + products.length - 1, totalResults);
@@ -192,14 +205,27 @@ const Shop: React.FC = () => {
             <div
                 className="breadcrumb"
                 style={{
-                    backgroundImage: `url(${(process.env.REACT_APP_BASE_URL || "")}/uploads/sections/${mainSection?.[0].imageUrl})`,
+                    backgroundImage: mainSection?.[0]?.imageUrl
+                        ? `url(${process.env.REACT_APP_BASE_URL || ""}/uploads/sections/${mainSection?.[0]?.imageUrl})`
+                        : undefined,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
                     opacity: bannerImageLoaded ? 1 : 0.9,
                     transition: "opacity 0.3s ease-in-out"
                 }}
-            />
+
+            >
+                <div className="container">
+                    <div className="row">
+                        <div className="col-12">
+                            <div className="breadcrumb_content">
+                                <h1 className="breadcrumb_title">{mainSection?.[0]?.titleEn ?? ""}</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div className="shop-product-section sidebar-left overflow-hidden">
                 <div className="container" style={{

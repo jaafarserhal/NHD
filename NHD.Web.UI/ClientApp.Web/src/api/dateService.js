@@ -10,6 +10,11 @@ class dateService extends apiService {
     async getDates(page = 1, limit = 10) {
         return this.get('AllDates', { page, limit });
     }
+
+    // Get date by ID
+    async getDatesDetails(datesId) {
+        return this.get(`DatesDetails/${datesId}`);
+    }
 }
 
 export default new dateService();

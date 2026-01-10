@@ -89,6 +89,25 @@ namespace NHD.Web.UI.Portal.Controllers
                     await dto.ImageFile.CopyToAsync(stream);
                 }
 
+                var bannerFileName = "";
+                if (dto.BannerImageFile != null && dto.BannerImageFile.Length > 0)
+                {
+                    // Create unique file name for banner
+                    bannerFileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.BannerImageFile.FileName)}";
+                    var bannerFolderPath = Path.Combine("wwwroot/uploads", "dates");
+
+                    if (!Directory.Exists(bannerFolderPath))
+                        Directory.CreateDirectory(bannerFolderPath);
+
+                    var bannerFilePath = Path.Combine(bannerFolderPath, bannerFileName);
+
+                    // Save the uploaded banner file
+                    using (var bannerStream = new FileStream(bannerFilePath, FileMode.Create))
+                    {
+                        await dto.BannerImageFile.CopyToAsync(bannerStream);
+                    }
+                }
+
                 var date = new Date
                 {
                     NameEn = dto.NameEn,
@@ -99,6 +118,7 @@ namespace NHD.Web.UI.Portal.Controllers
                     DescriptionEn = dto.DescriptionEn,
                     DescriptionSv = dto.DescriptionSv,
                     ImageUrl = fileName,
+                    BannerImageUrl = bannerFileName,
                     IsFilled = dto.IsFilled,
                     IsActive = dto.IsActive,
                     CreatedAt = DateTime.UtcNow
@@ -152,6 +172,30 @@ namespace NHD.Web.UI.Portal.Controllers
 
                 existingDate.ImageUrl = newFileName;
             }
+
+            string oldBannerFileName = existingDate.BannerImageUrl;
+            string? newBannerFileName = null;
+
+            // Handle new banner image upload if provided
+            if (dto.BannerImageFile != null && dto.BannerImageFile.Length > 0)
+            {
+                // Create unique file name for banner
+                newBannerFileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.BannerImageFile.FileName)}";
+                var bannerFolderPath = Path.Combine("wwwroot/uploads", "dates");
+
+                if (!Directory.Exists(bannerFolderPath))
+                    Directory.CreateDirectory(bannerFolderPath);
+
+                var bannerFilePath = Path.Combine(bannerFolderPath, newBannerFileName);
+
+                // Save the uploaded banner file
+                using (var bannerStream = new FileStream(bannerFilePath, FileMode.Create))
+                {
+                    await dto.BannerImageFile.CopyToAsync(bannerStream);
+                }
+                existingDate.BannerImageUrl = newBannerFileName;
+            }
+
             // Update fields
             existingDate.NameEn = dto.NameEn;
             existingDate.NameSv = dto.NameSv;
@@ -181,6 +225,23 @@ namespace NHD.Web.UI.Portal.Controllers
                     catch (Exception ex)
                     {
                         _logger.LogWarning(ex, "Failed to delete old image file: {FilePath}", oldFilePath);
+                    }
+                }
+            }
+
+            // If update succeeded and a new banner image was uploaded, delete the old one
+            if (newBannerFileName != null && !string.IsNullOrEmpty(oldBannerFileName))
+            {
+                var oldBannerFilePath = Path.Combine("wwwroot/uploads/dates", oldBannerFileName);
+                if (System.IO.File.Exists(oldBannerFilePath))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(oldBannerFilePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to delete old banner image file: {FilePath}", oldBannerFilePath);
                     }
                 }
             }

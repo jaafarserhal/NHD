@@ -28,6 +28,7 @@ export interface Date {
     descriptionSv: string;
     isFilled: boolean;
     imageUrl: string;
+    bannerImageUrl: string;
     isActive: boolean;
     additionalInfos: AdditionalInfo[];
 }

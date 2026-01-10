@@ -118,6 +118,7 @@ namespace NHD.Core.Utilities
         AboutWeLoveDates = 508,
         AboutNawaExperience = 509,
         ShopMainSection = 510,
+        OurDatesMainSection = 511,
     }
 
     public enum AddressType

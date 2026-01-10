@@ -71,6 +71,7 @@ namespace NHD.Core.Repository.Dates
         {
             return await _context.Dates
                 .Include(d => d.DatesAdditionalInfos)
+                .Include(d => d.Galleries)
                 .FirstOrDefaultAsync(d => d.DateId == dateId);
         }
     }
