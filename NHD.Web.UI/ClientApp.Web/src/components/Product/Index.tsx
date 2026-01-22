@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { ProductsWithGallery } from "../../api/common/Types";
+import PromptModal from "../Common/PromptModal/Index";
+import { useCart } from "../../contexts/CartContext";
+import styles from "./index.module.css";
 
 interface ProductProps {
     product: ProductsWithGallery;
@@ -10,6 +13,18 @@ interface ProductProps {
 }
 //product-item border text-center
 const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, modalId, urlPrefix = '/product' }) => {
+    const { addToCart } = useCart();
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        addToCart(product);
+        setShowSuccessModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowSuccessModal(false);
+    };
     return (
         <div className={isByCategory ? 'col mb-50' : 'col-lg-4 col-md-6'}>
             <div className={`product-item ${isByCategory ? '' : 'border'} text-center`}>
@@ -41,7 +56,14 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
                             />
                         </li>
                         <li className="product-item__meta-action">
-                            <a className="labtn-icon-cart" href="#" />
+                            <a
+                                className="labtn-icon-cart"
+                                href="#"
+                                onClick={handleAddToCart}
+                                data-bs-tooltip="tooltip"
+                                data-bs-placement="top"
+                                title="Add to Cart"
+                            />
                         </li>
                     </ul>}
                 </div>
@@ -55,6 +77,78 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
                     </span>}
                 </div>
             </div>
+
+            {/* Success Modal */}
+            <PromptModal
+                isOpen={showSuccessModal}
+                onClose={handleCloseModal}
+                className="success-modal"
+            >
+                <div className="text-center p-4">
+                    <div className="success-icon mb-3">
+                        <i className="lastudioicon lastudioicon-check-1" style={{ fontSize: '48px', color: '#28a745' }}></i>
+                    </div>
+                    <h4 className="success-title mb-3">Added To Cart Successfully!</h4>
+                    <p className="success-message mb-4">
+                        <strong>{product.titleEn}</strong> has been added to your cart.
+                    </p>
+                    <div className="d-flex gap-3 justify-content-center">
+                        <button
+                            className={`btn btn-outline-secondary ${styles.shoppingBtn} pointer-cursor`}
+                            onClick={handleCloseModal}
+                        >
+                            Continue Shopping
+                        </button>
+                        <button
+                            className={`btn btn-primary ${styles.shoppingBtn} pointer-cursor`}
+                            onClick={() => {
+                                handleCloseModal();
+                                // Trigger cart offcanvas
+                                const cartElement = document.getElementById('offcanvasCart');
+                                if (cartElement) {
+                                    try {
+                                        // Try Bootstrap 5 method first
+                                        if (typeof (window as any).bootstrap !== 'undefined' && (window as any).bootstrap.Offcanvas) {
+                                            const bsOffcanvas = (window as any).bootstrap.Offcanvas.getInstance(cartElement) ||
+                                                new (window as any).bootstrap.Offcanvas(cartElement);
+                                            bsOffcanvas.show();
+                                        } else {
+                                            // Fallback: trigger using data attributes
+                                            const button = document.createElement('button');
+                                            button.setAttribute('data-bs-toggle', 'offcanvas');
+                                            button.setAttribute('data-bs-target', '#offcanvasCart');
+                                            button.style.display = 'none';
+                                            document.body.appendChild(button);
+                                            button.click();
+                                            document.body.removeChild(button);
+                                        }
+                                    } catch (error) {
+                                        console.error('Error opening cart:', error);
+                                        // Final fallback: manually show the offcanvas
+                                        cartElement.classList.add('show');
+                                        cartElement.style.visibility = 'visible';
+                                        const backdrop = document.querySelector('.offcanvas-backdrop');
+                                        if (backdrop) {
+                                            backdrop.classList.add('show');
+                                        } else {
+                                            const newBackdrop = document.createElement('div');
+                                            newBackdrop.className = 'offcanvas-backdrop fade show';
+                                            newBackdrop.onclick = () => {
+                                                cartElement.classList.remove('show');
+                                                cartElement.style.visibility = 'hidden';
+                                                newBackdrop.remove();
+                                            };
+                                            document.body.appendChild(newBackdrop);
+                                        }
+                                    }
+                                }
+                            }}
+                        >
+                            View Cart
+                        </button>
+                    </div>
+                </div>
+            </PromptModal>
         </div>
     );
 };

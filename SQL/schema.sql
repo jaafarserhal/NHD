@@ -193,6 +193,7 @@ CREATE TABLE dbo.[dates] (
     description_sv NVARCHAR(MAX) NULL,
 	is_filled BIT NOT NULL DEFAULT 0,
 	image_url NVARCHAR(500),
+	banner_image_url NVARCHAR(500),
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_product_created DEFAULT SYSUTCDATETIME(),
     is_active BIT NOT NULL DEFAULT 1
