@@ -4,7 +4,7 @@ import { routeUrls } from "../../../api/base/routeUrls";
 import Loader from "../Loader/Index";
 import { storage } from "../../../api/base/storage";
 import OffcanvasMenu from "../OffCanvasMenu/Index";
-
+import { useCart } from "../../../contexts/CartContext";
 
 const Header: React.FC = () => {
     const [isSticky, setIsSticky] = useState(false);
@@ -14,6 +14,7 @@ const Header: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [showOffcanvasMenu, setShowOffcanvasMenu] = useState(false);
+    const { getTotalItems } = useCart();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -96,7 +97,9 @@ const Header: React.FC = () => {
                                     <li>
                                         <button className="action" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart">
                                             <i className="lastudioicon-shopping-cart-2" />
-                                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">3</span>
+                                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                                {getTotalItems()}
+                                            </span>
                                         </button>
                                     </li>
 
