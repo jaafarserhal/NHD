@@ -7,6 +7,7 @@ export const apiUrls = {
     registerCustomer: 'Register',
     verifyCustomerEmail: 'VerifyEmail',
     loginCustomer: 'Customer/Login',
+    loginWithApple: 'Customer/LoginWithApple',
     customerInfo: 'Info',
     changeCustomerPassword: 'ChangePassword',
     updateCustomerInfo: 'UpdateCustomerInfo',

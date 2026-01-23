@@ -435,6 +435,66 @@ namespace NHD.Core.Services.Customers
             }
         }
 
+        public async Task<AppApiResponse<Customer>> LoginWithAppleAsync(AppleLoginModel appleLogin)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(appleLogin.IdentityToken) || string.IsNullOrWhiteSpace(appleLogin.Email))
+                {
+                    return AppApiResponse<Customer>.Failure("Apple identity token and email are required", HttpStatusCodeEnum.BadRequest);
+                }
+
+                // Try to find existing customer by Provider ID or email
+                var existingCustomer = await _customerRepository.GetByEmailAsync(appleLogin.Email);
+
+                if (existingCustomer != null)
+                {
+                    // Customer exists - update Provider ID if not set and log them in
+                    if (string.IsNullOrEmpty(existingCustomer.ProviderId))
+                    {
+                        existingCustomer.ProviderId = appleLogin.ProviderId;
+                        await _customerRepository.UpdateAsync(existingCustomer);
+                    }
+
+                    if (existingCustomer.StatusLookupId == CustomerStatusLookup.Pending.AsInt())
+                    {
+                        // Auto-verify Apple users since Apple has already verified their email
+                        existingCustomer.StatusLookupId = CustomerStatusLookup.Active.AsInt();
+                        existingCustomer.EmailVerificationToken = null;
+                        await _customerRepository.UpdateAsync(existingCustomer);
+                    }
+                    else if (existingCustomer.StatusLookupId == CustomerStatusLookup.InActive.AsInt())
+                    {
+                        return AppApiResponse<Customer>.Failure("Your account is deactivated. Please contact support.", HttpStatusCodeEnum.Unauthorized);
+                    }
+
+                    return AppApiResponse<Customer>.Success(existingCustomer, "Apple login successful");
+                }
+                else
+                {
+                    // New customer - create account
+                    var newCustomer = new Customer
+                    {
+                        EmailAddress = appleLogin.Email,
+                        FirstName = appleLogin.FirstName ?? "Apple",
+                        LastName = appleLogin.LastName ?? "User",
+                        ProviderId = appleLogin.ProviderId,
+                        StatusLookupId = CustomerStatusLookup.Active.AsInt(), // Auto-verify Apple users
+                        Password = CommonUtilities.HashPassword(Guid.NewGuid().ToString()), // Random password since they use Apple
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    await _customerRepository.AddAsync(newCustomer);
+                    return AppApiResponse<Customer>.Success(newCustomer, "Apple account created and logged in successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during Apple login");
+                return AppApiResponse<Customer>.Failure("Apple login failed");
+            }
+        }
+
         public async Task<AppApiResponse<Customer>> GetCustomerByEmailAsync(string email)
         {
             try

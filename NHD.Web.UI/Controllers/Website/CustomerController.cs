@@ -117,6 +117,48 @@ namespace NHD.Web.UI.Controllers.Website
             });
         }
 
+        [HttpPost("LoginWithApple")]
+        public async Task<IActionResult> LoginWithApple([FromBody] AppleLoginModel appleLogin)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                // Verify Apple identity token (simplified - in production, verify with Apple's public keys)
+                var authResult = await _customerService.LoginWithAppleAsync(appleLogin);
+
+                if (authResult == null || authResult.StatusCode == HttpStatusCodeEnum.Unauthorized.AsInt())
+                {
+                    _logger.LogWarning("Invalid Apple login attempt for email: {Email}", appleLogin.Email);
+                    return Unauthorized(new { message = authResult?.Message ?? "Apple authentication failed" });
+                }
+
+                // Generate JWT token
+                var token = GenerateJwtToken(authResult.Data.EmailAddress);
+
+                var userResponse = new UserLoginResponse
+                {
+                    Email = authResult.Data.EmailAddress,
+                    FullName = $"{authResult.Data.FirstName} {authResult.Data.LastName}"
+                };
+
+                _logger.LogInformation("User {Email} logged in with Apple successfully", appleLogin.Email);
+
+                return Ok(new
+                {
+                    token,
+                    user = userResponse,
+                    message = authResult.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during Apple login");
+                return BadRequest(new { message = "Apple login failed. Please try again." });
+            }
+        }
+
         [HttpPost("VerifyEmail")]
         public async Task<IActionResult> VerifyEmail([FromBody] string token)
         {

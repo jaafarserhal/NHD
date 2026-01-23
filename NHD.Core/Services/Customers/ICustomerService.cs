@@ -29,6 +29,7 @@ namespace NHD.Core.Services.Customers
         Task<ServiceResult<bool>> SetAddressAsDefaultAsync(int customerId, int addressId, int addressTypeId);
         Task<ServiceResult<bool>> DeleteAddressAsync(int addressId);
         Task<ServiceResult<bool>> ResendVerificationEmail(string email);
+        Task<AppApiResponse<Customer>> LoginWithAppleAsync(AppleLoginModel appleLogin);
         Task<PagedServiceResult<IEnumerable<CustomerViewModel>>> GetCustomersAsync(int page = 1, int limit = 10);
         Task<ServiceResult<Customer>> UpdateCustomerStatusAsync(int customerId, int statusId);
         Task<PagedServiceResult<IEnumerable<AddressViewModel>>> GetAddressesByCustomerId(int customerId, int page = 1, int limit = 10);

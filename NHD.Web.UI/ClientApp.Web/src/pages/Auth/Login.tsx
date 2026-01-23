@@ -9,6 +9,7 @@ import Loader from "../../components/Common/Loader/Index";
 import { apiUrls } from "../../api/base/apiUrls";
 import { showAlert, validateEmail } from "../../api/common/Utils";
 import { storage } from "../../api/base/storage";
+import { AppleSignInManager, AppleSignInResponse } from "../../api/common/AppleSignIn";
 
 
 export default function Login() {
@@ -28,7 +29,25 @@ export default function Login() {
         const img = new Image();
         img.src = '/assets/images/banner/auth-banner.webp';
         img.onload = () => setImageLoaded(true);
+
+        // Initialize Apple Sign-In
+        initializeAppleSignIn();
     }, []);
+
+    const initializeAppleSignIn = async () => {
+        try {
+            await AppleSignInManager.initialize({
+                clientId: process.env.REACT_APP_APPLE_CLIENT_ID || 'com.nawa.service-id',
+                scope: 'name email',
+                redirectURI: process.env.REACT_APP_APPLE_REDIRECT_URI || `${window.location.origin}/auth/apple/callback`,
+                state: AppleSignInManager.generateRandomString(16),
+                nonce: AppleSignInManager.generateRandomString(32),
+                usePopup: true
+            });
+        } catch (error) {
+            console.error('Failed to initialize Apple Sign-In:', error);
+        }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -110,6 +129,56 @@ export default function Login() {
         navigate(routeUrls.register);
     };
 
+    const handleAppleSignIn = async () => {
+        if (isLoading) return;
+
+        setIsLoading(true);
+
+        try {
+            const response: AppleSignInResponse = await AppleSignInManager.signIn();
+
+            // Extract user information from Apple response
+            const appleLoginData = {
+                identityToken: response.authorization.id_token,
+                authCode: response.authorization.code,
+                firstName: response.user?.name?.firstName || '',
+                lastName: response.user?.name?.lastName || '',
+                email: response.user?.email || '',
+                providerId: '' // This will be extracted from the JWT token on the backend
+            };
+
+            // Send to backend for verification and login
+            const loginResponse: LoginResponse = await apiClient.post(apiUrls.loginWithApple, appleLoginData);
+
+            // Store the JWT token
+            storage.set('webAuthToken', loginResponse.token);
+
+            setTimeout(() => {
+                setIsLoading(false);
+                navigate(routeUrls.myAccount);
+            }, 1000);
+
+        } catch (err: any) {
+            console.error('Apple Sign-In error:', err);
+            let message = "Apple Sign-In failed. Please try again.";
+
+            if (err.response?.status === 401) {
+                message = err.response.data.message || "Apple authentication failed";
+            } else if (err.response?.data?.message) {
+                message = err.response.data.message;
+            } else if (err.error === 'popup_closed_by_user') {
+                // User cancelled the popup - don't show error
+                setIsLoading(false);
+                return;
+            }
+
+            setTimeout(() => {
+                setIsLoading(false);
+                showAlert("error", message);
+            }, 1000);
+        }
+    };
+
     return (
         <>
             <Header />
@@ -138,7 +207,14 @@ export default function Login() {
                                 <div className="account-details-form" style={{ marginBottom: '30px' }}>
                                     <p className="social-text"><strong>Login with your social account</strong></p>
                                     <div className="login-group">
-                                        <button className="login-btn apple">Login with Apple</button>
+                                        {/* <button
+                                            className="login-btn apple"
+                                            type="button"
+                                            onClick={handleAppleSignIn}
+                                            disabled={isLoading}
+                                        >
+                                            Login with Apple
+                                        </button> */}
                                         <button className="login-btn google">Login with Google</button>
                                     </div>
 

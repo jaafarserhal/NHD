@@ -14,6 +14,7 @@
     "flag-icon-css": "^4.1.7",
     "keycloak-js": "^26.2.0",
     "react": "^19.2.0",
+    "react-apple-signin-auth": "^1.1.2",
     "react-dom": "^19.2.0",
     "react-hot-toast": "^2.6.0",
     "react-phone-input-2": "^2.15.1",
