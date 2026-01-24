@@ -10,6 +10,7 @@ import { apiUrls } from "../../api/base/apiUrls";
 import { showAlert, validateEmail } from "../../api/common/Utils";
 import { storage } from "../../api/base/storage";
 import { AppleSignInManager, AppleSignInResponse } from "../../api/common/AppleSignIn";
+import { GoogleSignInManager, GoogleSignInResponse, GoogleUserInfo } from "../../api/common/GoogleSignIn";
 
 
 export default function Login() {
@@ -30,8 +31,25 @@ export default function Login() {
         img.src = '/assets/images/banner/auth-banner.webp';
         img.onload = () => setImageLoaded(true);
 
-        // Initialize Apple Sign-In
-        initializeAppleSignIn();
+        // Initialize Google Sign-In
+        const initGoogle = async () => {
+            await initializeGoogleSignIn();
+
+            // Render the button after initialization
+            setTimeout(() => {
+                const buttonDiv = document.getElementById('google-signin-button');
+                if (buttonDiv) {
+                    GoogleSignInManager.renderButton(buttonDiv, {
+                        theme: 'outline',
+                        size: 'large',
+                        text: 'signin_with',
+                        width: 280
+                    });
+                }
+            }, 100);
+        };
+
+        initGoogle();
     }, []);
 
     const initializeAppleSignIn = async () => {
@@ -46,6 +64,20 @@ export default function Login() {
             });
         } catch (error) {
             console.error('Failed to initialize Apple Sign-In:', error);
+        }
+    };
+
+    const initializeGoogleSignIn = async () => {
+        try {
+            await GoogleSignInManager.initialize({
+                client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || '',
+                callback: handleGoogleResponse,
+                auto_select: false,
+                cancel_on_tap_outside: true,
+                use_fedcm_for_prompt: false  // Disable FedCM to prevent AbortError
+            });
+        } catch (error) {
+            console.error('Failed to initialize Google Sign-In:', error);
         }
     };
 
@@ -127,6 +159,70 @@ export default function Login() {
 
     const handleCreateAccount = () => {
         navigate(routeUrls.register);
+    };
+
+    const handleGoogleResponse = async (response: GoogleSignInResponse) => {
+        if (isLoading) return;
+
+        setIsLoading(true);
+
+        try {
+            console.log('Google Sign-In response received:', response);
+
+            // Parse the JWT token to get user info
+            const userInfo: GoogleUserInfo = GoogleSignInManager.parseJWT(response.credential);
+            console.log('Parsed user info:', userInfo);
+
+            // Prepare data for backend
+            const googleLoginData = {
+                idToken: response.credential,
+                accessToken: '', // Not provided in credential response
+                firstName: userInfo.given_name || '',
+                lastName: userInfo.family_name || '',
+                email: userInfo.email,
+                providerId: userInfo.sub, // Google user ID
+                picture: userInfo.picture || ''
+            };
+
+            console.log('Sending to backend:', { ...googleLoginData, idToken: '[REDACTED]' });
+
+            // Send to backend for verification and login
+            const loginResponse: LoginResponse = await apiClient.post(apiUrls.loginWithGoogle, googleLoginData);
+
+            // Store the JWT token
+            storage.set('webAuthToken', loginResponse.token);
+
+            setTimeout(() => {
+                setIsLoading(false);
+                navigate(routeUrls.myAccount);
+            }, 1000);
+
+        } catch (err: any) {
+            console.error('Google Sign-In error:', err);
+            let message = "Google Sign-In failed. Please try again.";
+
+            if (err.response?.status === 401) {
+                message = err.response.data.message || "Google authentication failed";
+            } else if (err.response?.data?.message) {
+                message = err.response.data.message;
+            }
+
+            setTimeout(() => {
+                setIsLoading(false);
+                showAlert("error", message);
+            }, 1000);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        if (isLoading) return;
+
+        try {
+            await GoogleSignInManager.promptWithErrorHandling();
+        } catch (error) {
+            console.error('Google Sign-In prompt error:', error);
+            showAlert("error", "Google Sign-In is currently unavailable. Please try again later or use email login.");
+        }
     };
 
     const handleAppleSignIn = async () => {
@@ -215,7 +311,7 @@ export default function Login() {
                                         >
                                             Login with Apple
                                         </button> */}
-                                        <button className="login-btn google">Login with Google</button>
+                                        <div id="google-signin-button"></div>
                                     </div>
 
                                     <div className="login-separator">

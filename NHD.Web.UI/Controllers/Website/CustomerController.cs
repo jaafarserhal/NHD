@@ -159,6 +159,48 @@ namespace NHD.Web.UI.Controllers.Website
             }
         }
 
+        [HttpPost("LoginWithGoogle")]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] GoogleLoginModel googleLogin)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                // Verify Google identity token (simplified - in production, verify with Google's public keys)
+                var authResult = await _customerService.LoginWithGoogleAsync(googleLogin);
+
+                if (authResult == null || authResult.StatusCode == HttpStatusCodeEnum.Unauthorized.AsInt())
+                {
+                    _logger.LogWarning("Invalid Google login attempt for email: {Email}", googleLogin.Email);
+                    return Unauthorized(new { message = authResult?.Message ?? "Google authentication failed" });
+                }
+
+                // Generate JWT token
+                var token = GenerateJwtToken(authResult.Data.EmailAddress);
+
+                var userResponse = new UserLoginResponse
+                {
+                    Email = authResult.Data.EmailAddress,
+                    FullName = $"{authResult.Data.FirstName} {authResult.Data.LastName}"
+                };
+
+                _logger.LogInformation("User {Email} logged in with Google successfully", googleLogin.Email);
+
+                return Ok(new
+                {
+                    token,
+                    user = userResponse,
+                    message = authResult.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during Google login");
+                return BadRequest(new { message = "Google login failed. Please try again." });
+            }
+        }
+
         [HttpPost("VerifyEmail")]
         public async Task<IActionResult> VerifyEmail([FromBody] string token)
         {

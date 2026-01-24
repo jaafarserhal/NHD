@@ -79,8 +79,7 @@ namespace NHD.Web.UI
                         "https://nawahomeofdates.com"          // Production (without www)
                     )
                     .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials(); // Add this if you're using cookies/credentials
+                    .AllowAnyMethod();
                 });
             });
 

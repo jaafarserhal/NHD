@@ -495,6 +495,66 @@ namespace NHD.Core.Services.Customers
             }
         }
 
+        public async Task<AppApiResponse<Customer>> LoginWithGoogleAsync(GoogleLoginModel googleLogin)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(googleLogin.IdToken) || string.IsNullOrWhiteSpace(googleLogin.Email))
+                {
+                    return AppApiResponse<Customer>.Failure("Google identity token and email are required", HttpStatusCodeEnum.BadRequest);
+                }
+
+                // Try to find existing customer by Provider ID or email
+                var existingCustomer = await _customerRepository.GetByEmailAsync(googleLogin.Email);
+
+                if (existingCustomer != null)
+                {
+                    // Customer exists - update Provider ID if not set and log them in
+                    if (string.IsNullOrEmpty(existingCustomer.ProviderId))
+                    {
+                        existingCustomer.ProviderId = googleLogin.ProviderId;
+                        await _customerRepository.UpdateAsync(existingCustomer);
+                    }
+
+                    if (existingCustomer.StatusLookupId == CustomerStatusLookup.Pending.AsInt())
+                    {
+                        // Auto-verify Google users since Google has already verified their email
+                        existingCustomer.StatusLookupId = CustomerStatusLookup.Active.AsInt();
+                        existingCustomer.EmailVerificationToken = null;
+                        await _customerRepository.UpdateAsync(existingCustomer);
+                    }
+                    else if (existingCustomer.StatusLookupId == CustomerStatusLookup.InActive.AsInt())
+                    {
+                        return AppApiResponse<Customer>.Failure("Your account is deactivated. Please contact support.", HttpStatusCodeEnum.Unauthorized);
+                    }
+
+                    return AppApiResponse<Customer>.Success(existingCustomer, "Google login successful");
+                }
+                else
+                {
+                    // New customer - create account
+                    var newCustomer = new Customer
+                    {
+                        EmailAddress = googleLogin.Email,
+                        FirstName = googleLogin.FirstName ?? "Google",
+                        LastName = googleLogin.LastName ?? "User",
+                        ProviderId = googleLogin.ProviderId,
+                        StatusLookupId = CustomerStatusLookup.Active.AsInt(), // Auto-verify Google users
+                        Password = CommonUtilities.HashPassword(Guid.NewGuid().ToString()), // Random password since they use Google
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    await _customerRepository.AddAsync(newCustomer);
+                    return AppApiResponse<Customer>.Success(newCustomer, "Google account created and logged in successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during Google login");
+                return AppApiResponse<Customer>.Failure("Google login failed");
+            }
+        }
+
         public async Task<AppApiResponse<Customer>> GetCustomerByEmailAsync(string email)
         {
             try
