@@ -14,5 +14,6 @@ namespace NHD.Core.Repository.Customers
         Task<Customer> GetByVerificationTokenAsync(string token);
         Task<Customer> AuthenticateLoginAsync(string username);
         Task<PagedResult<Customer>> GetCustomersAsync(int page, int limit);
+        Task<int> GetCustomerIdByEmailAsync(string email);
     }
 }

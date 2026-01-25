@@ -393,6 +393,35 @@ CREATE TABLE dbo.dates_additional_info (
         ON DELETE CASCADE
 );
 
+-- CART TABLE
+CREATE TABLE dbo.cart (
+    cart_id INT IDENTITY(1,1) PRIMARY KEY,
+    customer_id INT NOT NULL,
+    created_at DATETIME2 NOT NULL 
+        CONSTRAINT DF_cart_created DEFAULT SYSUTCDATETIME(),
+    is_active BIT NOT NULL DEFAULT 1,
+    CONSTRAINT FK_cart_customer
+        FOREIGN KEY (customer_id)
+        REFERENCES dbo.customer(customer_id)
+);
+
+-- CART ITEMS TABLE
+CREATE TABLE dbo.cart_items (
+    cart_item_id INT IDENTITY(1,1) PRIMARY KEY,
+    cart_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    created_at DATETIME2 NOT NULL
+        CONSTRAINT DF_cart_items_created DEFAULT SYSUTCDATETIME(),
+    is_active BIT NOT NULL DEFAULT 1,
+    CONSTRAINT FK_cart_items_cart
+        FOREIGN KEY (cart_id)
+        REFERENCES dbo.cart(cart_id),
+    CONSTRAINT FK_cart_items_product
+        FOREIGN KEY (product_id)
+        REFERENCES dbo.product(prd_id)
+);
+
 
 
 -- =============================================

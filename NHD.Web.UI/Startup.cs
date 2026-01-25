@@ -27,6 +27,8 @@ using NHD.Core.Repository.ContactMessages;
 using NHD.Core.Services.ContactMessages;
 using NHD.Core.Repository.FAQ;
 using NHD.Core.Services.FAQ;
+using NHD.Core.Repository.CustomerCart;
+using NHD.Core.Services.CustomerCart;
 
 
 namespace NHD.Web.UI
@@ -191,6 +193,7 @@ namespace NHD.Web.UI
             services.AddScoped<IContactMessagesRepository, ContactMessagesRepository>();
             services.AddScoped<IFAQRepository, FAQRepository>();
             services.AddScoped<IDatesAdditionalInfoRepository, DatesAdditionalInfoRepository>();
+            services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
@@ -200,6 +203,7 @@ namespace NHD.Web.UI
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IContactMessagesService, ContactMessagesService>();
             services.AddScoped<IFAQService, FAQService>();
+            services.AddScoped<ICartService, CartService>();
         }
     }
 }

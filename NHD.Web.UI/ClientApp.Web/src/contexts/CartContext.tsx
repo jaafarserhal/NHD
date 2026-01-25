@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { ProductsWithGallery } from '../api/common/Types';
 import { storage } from '../api/base/storage';
+import { cartApi } from '../api/cart/cartApi';
 
 interface CartItem {
     product: ProductsWithGallery;
@@ -9,10 +10,13 @@ interface CartItem {
 
 interface CartContextType {
     cartItems: CartItem[];
-    addToCart: (product: ProductsWithGallery) => void;
-    removeFromCart: (productId: number) => void;
-    updateQuantity: (productId: number, quantity: number) => void;
-    clearCart: () => void;
+    isLoading: boolean;
+    addToCart: (product: ProductsWithGallery) => Promise<void>;
+    removeFromCart: (productId: number) => Promise<void>;
+    updateQuantity: (productId: number, quantity: number) => Promise<void>;
+    clearCart: () => Promise<void>;
+    clearCartOnLogout: () => void;
+    syncCartOnLogin: () => Promise<void>;
     getTotalItems: () => number;
     getTotalPrice: () => number;
 }
@@ -22,10 +26,12 @@ type CartAction =
     | { type: 'REMOVE_FROM_CART'; payload: number }
     | { type: 'UPDATE_QUANTITY'; payload: { productId: number; quantity: number } }
     | { type: 'CLEAR_CART' }
-    | { type: 'LOAD_CART'; payload: CartItem[] };
+    | { type: 'LOAD_CART'; payload: CartItem[] }
+    | { type: 'SET_LOADING'; payload: boolean };
 
 interface CartState {
     cartItems: CartItem[];
+    isLoading: boolean;
 }
 
 const CART_STORAGE_KEY = 'nhd_cart';
@@ -129,6 +135,11 @@ const saveCartToStorage = (cartItems: CartItem[]) => {
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
     switch (action.type) {
+        case 'SET_LOADING':
+            return {
+                ...state,
+                isLoading: action.payload,
+            };
         case 'ADD_TO_CART': {
             const existingItem = state.cartItems.find(
                 item => item.product.id === action.payload.id
@@ -204,7 +215,14 @@ interface CartProviderProps {
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const [state, dispatch] = useReducer(cartReducer, {
         cartItems: [],
+        isLoading: false,
     });
+
+    // Check if user is authenticated (you'll need to implement this based on your auth system)
+    const isAuthenticated = () => {
+        // Example: Check for auth token in localStorage or context
+        return !!storage.get('webAuthToken'); // Adjust this based on your auth implementation
+    };
 
     // Load cart from localStorage on mount
     useEffect(() => {
@@ -214,25 +232,185 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         }
     }, []);
 
-    // Save cart to localStorage whenever it changes
+    // Listen for storage changes (e.g., when cart is cleared during logout)
     useEffect(() => {
-        saveCartToStorage(state.cartItems);
-    }, [state.cartItems]);
+        const handleStorageChange = (event: StorageEvent) => {
+            if (event.key === CART_STORAGE_KEY && event.newValue === null) {
+                // Cart was removed from storage, clear local state
+                dispatch({ type: 'CLEAR_CART' });
+            }
+        };
 
-    const addToCart = (product: ProductsWithGallery) => {
-        dispatch({ type: 'ADD_TO_CART', payload: product });
+        // Listen for storage events from other tabs/windows
+        window.addEventListener('storage', handleStorageChange);
+
+        // Custom event for same-tab storage changes
+        const handleCustomStorageChange = (event: CustomEvent) => {
+            if (event.detail.key === CART_STORAGE_KEY && event.detail.newValue === null) {
+                dispatch({ type: 'CLEAR_CART' });
+            }
+        };
+
+        window.addEventListener('cartStorageChanged', handleCustomStorageChange as EventListener);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('cartStorageChanged', handleCustomStorageChange as EventListener);
+        };
+    }, []);
+
+    // Save cart to localStorage whenever it changes (for non-authenticated users or as backup)
+    useEffect(() => {
+        if (!state.isLoading) {
+            saveCartToStorage(state.cartItems);
+        }
+    }, [state.cartItems, state.isLoading]);
+
+    const syncCartOnLogin = async () => {
+        try {
+            dispatch({ type: 'SET_LOADING', payload: true });
+
+            // Get local cart items
+            const localCartItems = state.cartItems.map(item => ({
+                productId: item.product.id,
+                quantity: item.quantity,
+            }));
+
+            // Sync with server
+            if (localCartItems.length > 0) {
+                const serverCart = await cartApi.syncCart(localCartItems);
+                // Convert server cart to UI format
+                const uiCartItems = serverCart.cartItems.map((item: any) => ({
+                    product: item.product,
+                    quantity: item.quantity,
+                }));
+                dispatch({ type: 'LOAD_CART', payload: uiCartItems });
+            } else {
+                // Load existing server cart
+                const token = storage.get('webAuthToken');
+                if (!token) return;
+                const serverCart = await cartApi.getCart();
+                if (serverCart && serverCart.cartItems) {
+                    const uiCartItems = serverCart.cartItems.map((item: any) => ({
+                        product: item.product,
+                        quantity: item.quantity,
+                    }));
+                    dispatch({ type: 'LOAD_CART', payload: uiCartItems });
+                }
+            }
+        } catch (error) {
+            console.error('Error syncing cart on login:', error);
+        } finally {
+            dispatch({ type: 'SET_LOADING', payload: false });
+        }
     };
 
-    const removeFromCart = (productId: number) => {
-        dispatch({ type: 'REMOVE_FROM_CART', payload: productId });
+    const addToCart = async (product: ProductsWithGallery) => {
+        try {
+            dispatch({ type: 'SET_LOADING', payload: true });
+
+            if (isAuthenticated()) {
+                // Add to server cart
+                const token = storage.get('webAuthToken');
+                if (token) {
+                    await cartApi.addToCart(product.id, 1);
+                }
+                // Update local state
+                dispatch({ type: 'ADD_TO_CART', payload: product });
+            } else {
+                // Add to local storage only
+                dispatch({ type: 'ADD_TO_CART', payload: product });
+            }
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            // Fallback to local storage
+            dispatch({ type: 'ADD_TO_CART', payload: product });
+        } finally {
+            dispatch({ type: 'SET_LOADING', payload: false });
+        }
     };
 
-    const updateQuantity = (productId: number, quantity: number) => {
-        dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } });
+    const removeFromCart = async (productId: number) => {
+        try {
+            dispatch({ type: 'SET_LOADING', payload: true });
+
+            if (isAuthenticated()) {
+                // Remove from server cart
+                const token = storage.get('webAuthToken');
+                if (token) {
+                    await cartApi.removeFromCart(productId);
+                }
+                // Update local state
+                dispatch({ type: 'REMOVE_FROM_CART', payload: productId });
+            } else {
+                // Remove from local storage only
+                dispatch({ type: 'REMOVE_FROM_CART', payload: productId });
+            }
+        } catch (error) {
+            console.error('Error removing from cart:', error);
+            // Fallback to local operation
+            dispatch({ type: 'REMOVE_FROM_CART', payload: productId });
+        } finally {
+            dispatch({ type: 'SET_LOADING', payload: false });
+        }
     };
 
-    const clearCart = () => {
+    const updateQuantity = async (productId: number, quantity: number) => {
+        try {
+            dispatch({ type: 'SET_LOADING', payload: true });
+
+            if (isAuthenticated()) {
+                // Update server cart
+                const token = storage.get('webAuthToken');
+                if (token) {
+                    await cartApi.updateQuantity(productId, quantity);
+                }
+                // Update local state
+                dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } });
+            } else {
+                // Update local storage only
+                dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } });
+            }
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+            // Fallback to local operation
+            dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } });
+        } finally {
+            dispatch({ type: 'SET_LOADING', payload: false });
+        }
+    };
+
+    const clearCart = async () => {
+        try {
+            dispatch({ type: 'SET_LOADING', payload: true });
+
+            if (isAuthenticated()) {
+                // Clear server cart
+                await cartApi.clearCart();
+                // Clear local state
+                dispatch({ type: 'CLEAR_CART' });
+            } else {
+                // Clear local storage only
+                dispatch({ type: 'CLEAR_CART' });
+            }
+        } catch (error) {
+            console.error('Error clearing cart:', error);
+            // Fallback to local operation
+            dispatch({ type: 'CLEAR_CART' });
+        } finally {
+            dispatch({ type: 'SET_LOADING', payload: false });
+        }
+    };
+
+    const clearCartOnLogout = () => {
+        // Clear local state immediately
         dispatch({ type: 'CLEAR_CART' });
+        // Clear storage and trigger custom event
+        storage.remove(CART_STORAGE_KEY);
+        // Dispatch custom event for same-tab detection
+        window.dispatchEvent(new CustomEvent('cartStorageChanged', {
+            detail: { key: CART_STORAGE_KEY, newValue: null }
+        }));
     };
 
     const getTotalItems = () => {
@@ -247,10 +425,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     const value: CartContextType = {
         cartItems: state.cartItems,
+        isLoading: state.isLoading,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
+        clearCartOnLogout,
+        syncCartOnLogin,
         getTotalItems,
         getTotalPrice,
     };

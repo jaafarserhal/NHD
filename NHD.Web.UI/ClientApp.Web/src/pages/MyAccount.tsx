@@ -14,12 +14,14 @@ import { routeUrls } from "../api/base/routeUrls";
 import { CustomerInfo, Address } from "../api/common/Types";
 import OrdersTab from "../components/MyAccount/OrdersTab";
 import { storage } from "../api/base/storage";
+import { useCart } from "../contexts/CartContext";
 
 const MyAccount: React.FC = () => {
     const navigate = useNavigate();
     const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
     const [loading, setLoading] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
+    const { clearCartOnLogout } = useCart();
 
     // Preload the banner image for better performance
     useEffect(() => {
@@ -49,6 +51,7 @@ const MyAccount: React.FC = () => {
         setLoading(true);
         setTimeout(() => {
             storage.remove('webAuthToken');
+            clearCartOnLogout();
             setLoading(false);
             navigate(routeUrls.login);
         }, 3000);

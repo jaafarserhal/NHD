@@ -11,6 +11,7 @@ import { showAlert, validateEmail } from "../../api/common/Utils";
 import { storage } from "../../api/base/storage";
 import { AppleSignInManager, AppleSignInResponse } from "../../api/common/AppleSignIn";
 import { GoogleSignInManager, GoogleSignInResponse, GoogleUserInfo } from "../../api/common/GoogleSignIn";
+import { useCart } from "../../contexts/CartContext";
 
 
 export default function Login() {
@@ -24,6 +25,8 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const navigate = useNavigate();
+    const { syncCartOnLogin } = useCart();
+
 
     // Preload the banner image for better performance
     useEffect(() => {
@@ -125,6 +128,18 @@ export default function Login() {
 
             // Store the JWT token
             storage.set('webAuthToken', response.token);
+
+            // Extract user ID from token and sync cart
+            const token = response.token;
+            if (token) {
+                try {
+                    await syncCartOnLogin();
+                } catch (cartError) {
+                    console.error('Error syncing cart on login:', cartError);
+                    // Don't block login if cart sync fails
+                }
+            }
+
             setTimeout(() => {
                 setIsLoading(false);
                 navigate(routeUrls.myAccount);
@@ -192,6 +207,17 @@ export default function Login() {
             // Store the JWT token
             storage.set('webAuthToken', loginResponse.token);
 
+            // Extract user ID from token and sync cart
+            const token = loginResponse.token;
+            if (token) {
+                try {
+                    await syncCartOnLogin();
+                } catch (cartError) {
+                    console.error('Error syncing cart on Google login:', cartError);
+                    // Don't block login if cart sync fails
+                }
+            }
+
             setTimeout(() => {
                 setIsLoading(false);
                 navigate(routeUrls.myAccount);
@@ -248,6 +274,17 @@ export default function Login() {
 
             // Store the JWT token
             storage.set('webAuthToken', loginResponse.token);
+
+            // Extract user ID from token and sync cart
+            const token = loginResponse.token;
+            if (token) {
+                try {
+                    await syncCartOnLogin();
+                } catch (cartError) {
+                    console.error('Error syncing cart on Apple login:', cartError);
+                    // Don't block login if cart sync fails
+                }
+            }
 
             setTimeout(() => {
                 setIsLoading(false);

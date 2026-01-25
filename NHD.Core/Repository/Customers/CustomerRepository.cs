@@ -39,6 +39,13 @@ namespace NHD.Core.Repository.Customers
             };
         }
 
+        public async Task<int> GetCustomerIdByEmailAsync(string email)
+        {
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.EmailAddress == email);
+            return customer.CustomerId;
+        }
+
         public async Task<Customer> GetByEmailAsync(string email)
         {
             return await Task.FromResult(_context.Customers
