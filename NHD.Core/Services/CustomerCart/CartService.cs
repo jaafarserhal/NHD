@@ -5,6 +5,7 @@ using NHD.Core.Repository.CustomerCart;
 using NHD.Core.Repository.Customers;
 using NHD.Core.Repository.Products;
 using NHD.Core.Services.Model.CustomerCart;
+using NHD.Core.Utilities;
 
 namespace NHD.Core.Services.CustomerCart
 {
@@ -300,17 +301,17 @@ namespace NHD.Core.Services.CustomerCart
             return new ProductModel
             {
                 Id = product.PrdId,
-                TitleEn = product.NameEn,
-                TitleSv = product.NameSv,
-                DescriptionEn = product.DescriptionEn,
-                DescriptionSv = product.DescriptionSv,
+                TitleEn = CommonUtilities.CleanUtf8Text(product.NameEn),
+                TitleSv = CommonUtilities.CleanUtf8Text(product.NameSv),
+                DescriptionEn = CommonUtilities.CleanUtf8Text(product.DescriptionEn),
+                DescriptionSv = CommonUtilities.CleanUtf8Text(product.DescriptionSv),
                 ImageUrl = "/uploads/products/" + product.ImageUrl,
                 FromPrice = product.FromPrice,
                 IsActive = product.IsActive,
                 CreatedAt = product.CreatedAt,
                 IsCarousel = product.IsCarousel,
-                BadgeEn = product.BadgeEn,
-                BadgeSv = product.BadgeSv
+                BadgeEn = CommonUtilities.CleanUtf8Text(product.BadgeEn),
+                BadgeSv = CommonUtilities.CleanUtf8Text(product.BadgeSv)
             };
         }
     }

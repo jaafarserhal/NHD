@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useCart } from "../../contexts/CartContext";
 import styles from "./index.module.css";
+import { routeUrls } from "../../api/base/routeUrls";
 
 const Cart: React.FC = () => {
     const { cartItems, removeFromCart, updateQuantity, getTotalItems, getTotalPrice } = useCart();
@@ -140,7 +141,7 @@ const Cart: React.FC = () => {
                     </div>
 
                     <div className="mini-cart-btn d-flex flex-column gap-2">
-                        <a className="d-block btn btn-secondary btn-hover-primary" href="#">View cart</a>
+                        <a className="d-block btn btn-secondary btn-hover-primary" href={routeUrls.cart}>View cart</a>
                         <a className="d-block btn btn-secondary btn-hover-primary" href="#">Checkout</a>
                     </div>
                 </div>

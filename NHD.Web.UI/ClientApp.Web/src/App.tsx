@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Cart from "./components/Cart/Index";
+import CartPage from "./pages/CartPage";
 import ComingSoon from "./components/ComingSoon/Index";
 import Register from "./pages/Auth/Register";
 import Login from "./pages/Auth/Login";
@@ -42,6 +43,7 @@ const App: React.FC = () => {
           <Route path={routeUrls.ourDates} element={<OurDates />} />
           <Route path={routeUrls.productDetails} element={<ProductDetails />} />
           <Route path={routeUrls.DatesDetails} element={<DatesDetails />} />
+          <Route path={routeUrls.cart} element={<CartPage />} />
           <Route
             path={routeUrls.myAccount}
             element={

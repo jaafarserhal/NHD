@@ -72,12 +72,12 @@ namespace NHD.Core.Services.Products
                 var productDtos = products.Select(p => new ProductsWithGalleryViewModel()
                 {
                     Id = p.PrdId,
-                    TitleEn = p.NameEn,
-                    TitleSv = p.NameSv,
-                    DescriptionEn = p.DescriptionEn,
-                    DescriptionSv = p.DescriptionSv,
-                    BadgeTextEn = p.BadgeEn,
-                    BadgeTextSv = p.BadgeSv,
+                    TitleEn = CommonUtilities.CleanUtf8Text(p.NameEn),
+                    TitleSv = CommonUtilities.CleanUtf8Text(p.NameSv),
+                    DescriptionEn = CommonUtilities.CleanUtf8Text(p.DescriptionEn),
+                    DescriptionSv = CommonUtilities.CleanUtf8Text(p.DescriptionSv),
+                    BadgeTextEn = CommonUtilities.CleanUtf8Text(p.BadgeEn),
+                    BadgeTextSv = CommonUtilities.CleanUtf8Text(p.BadgeSv),
                     Quantity = p.Quantity,
                     ImageUrl = $"/uploads/products/{p.ImageUrl}",
                     FromPrice = p.FromPrice ?? 0,
@@ -86,7 +86,7 @@ namespace NHD.Core.Services.Products
                     Galleries = p.Galleries != null ? p.Galleries.Select(g => new GalleryViewModel
                     {
                         Id = g.GalleryId,
-                        AltText = g.AltText,
+                        AltText = CommonUtilities.CleanUtf8Text(g.AltText),
                         ImageUrl = $"/uploads/products/{g.ImageUrl}",
                     }).ToList() : new List<GalleryViewModel>()
 
@@ -109,10 +109,10 @@ namespace NHD.Core.Services.Products
                 var productDtos = products.Select(p => new ProductsWithGalleryViewModel()
                 {
                     Id = p.DateId,
-                    TitleEn = p.NameEn,
-                    TitleSv = p.NameSv,
-                    DescriptionEn = p.DescriptionEn,
-                    DescriptionSv = p.DescriptionSv,
+                    TitleEn = CommonUtilities.CleanUtf8Text(p.NameEn),
+                    TitleSv = CommonUtilities.CleanUtf8Text(p.NameSv),
+                    DescriptionEn = CommonUtilities.CleanUtf8Text(p.DescriptionEn),
+                    DescriptionSv = CommonUtilities.CleanUtf8Text(p.DescriptionSv),
                     ImageUrl = $"/uploads/dates/{p.ImageUrl}"
                 }).ToList();
                 return ServiceResult<IEnumerable<ProductsWithGalleryViewModel>>.Success(productDtos);
@@ -132,12 +132,12 @@ namespace NHD.Core.Services.Products
                 var productDtos = products.Select(p => new ProductsWithGalleryViewModel()
                 {
                     Id = p.PrdId,
-                    TitleEn = p.NameEn,
-                    TitleSv = p.NameSv,
-                    DescriptionEn = p.DescriptionEn,
-                    DescriptionSv = p.DescriptionSv,
-                    BadgeTextEn = p.BadgeEn,
-                    BadgeTextSv = p.BadgeSv,
+                    TitleEn = CommonUtilities.CleanUtf8Text(p.NameEn),
+                    TitleSv = CommonUtilities.CleanUtf8Text(p.NameSv),
+                    DescriptionEn = CommonUtilities.CleanUtf8Text(p.DescriptionEn),
+                    DescriptionSv = CommonUtilities.CleanUtf8Text(p.DescriptionSv),
+                    BadgeTextEn = CommonUtilities.CleanUtf8Text(p.BadgeEn),
+                    BadgeTextSv = CommonUtilities.CleanUtf8Text(p.BadgeSv),
                     ImageUrl = $"/uploads/products/{p.ImageUrl}",
                     FromPrice = p.FromPrice ?? 0,
                     Quantity = p.Quantity,
@@ -146,7 +146,7 @@ namespace NHD.Core.Services.Products
                     Galleries = p.Galleries != null ? p.Galleries.Where(ga => ga.IsPrimary == false).Select(g => new GalleryViewModel
                     {
                         Id = g.GalleryId,
-                        AltText = g.AltText,
+                        AltText = CommonUtilities.CleanUtf8Text(g.AltText),
                         ImageUrl = $"/uploads/products/{g.ImageUrl}",
                     }).ToList() : new List<GalleryViewModel>()
 
@@ -645,12 +645,12 @@ namespace NHD.Core.Services.Products
             return new ProductsWithGalleryViewModel
             {
                 Id = p.PrdId,
-                TitleEn = p.NameEn,
-                TitleSv = p.NameSv,
-                DescriptionEn = p.DescriptionEn,
-                DescriptionSv = p.DescriptionSv,
-                BadgeTextEn = p.BadgeEn,
-                BadgeTextSv = p.BadgeSv,
+                TitleEn = CommonUtilities.CleanUtf8Text(p.NameEn),
+                TitleSv = CommonUtilities.CleanUtf8Text(p.NameSv),
+                DescriptionEn = CommonUtilities.CleanUtf8Text(p.DescriptionEn),
+                DescriptionSv = CommonUtilities.CleanUtf8Text(p.DescriptionSv),
+                BadgeTextEn = CommonUtilities.CleanUtf8Text(p.BadgeEn),
+                BadgeTextSv = CommonUtilities.CleanUtf8Text(p.BadgeSv),
                 ImageUrl = $"/uploads/products/{p.ImageUrl}",
                 FromPrice = p.FromPrice ?? 0,
                 Quantity = p.Quantity,
@@ -659,7 +659,7 @@ namespace NHD.Core.Services.Products
                 Galleries = p.Galleries != null ? p.Galleries.Select(g => new GalleryViewModel
                 {
                     Id = g.GalleryId,
-                    AltText = g.AltText,
+                    AltText = CommonUtilities.CleanUtf8Text(g.AltText),
                     ImageUrl = $"/uploads/products/{g.ImageUrl}",
                 }).ToList() : new List<GalleryViewModel>()
 
@@ -670,10 +670,10 @@ namespace NHD.Core.Services.Products
             return new ProductViewModel
             {
                 Id = product.PrdId,
-                NameEn = product.NameEn,
-                NameSv = product.NameSv,
-                DescriptionEn = product.DescriptionEn,
-                DescriptionSv = product.DescriptionSv,
+                NameEn = CommonUtilities.CleanUtf8Text(product.NameEn),
+                NameSv = CommonUtilities.CleanUtf8Text(product.NameSv),
+                DescriptionEn = CommonUtilities.CleanUtf8Text(product.DescriptionEn),
+                DescriptionSv = CommonUtilities.CleanUtf8Text(product.DescriptionSv),
                 Category = product.PrdLookupCategory?.NameEn,
                 CategoryId = product.PrdLookupCategoryId,
                 TypeId = product.PrdLookupTypeId,
@@ -681,8 +681,8 @@ namespace NHD.Core.Services.Products
                 Type = product.PrdLookupType?.NameEn,
                 Size = product.PrdLookupSize?.NameEn,
                 Quantity = product.Quantity,
-                BadgeTextEn = product.BadgeEn,
-                BadgeTextSv = product.BadgeSv,
+                BadgeTextEn = CommonUtilities.CleanUtf8Text(product.BadgeEn),
+                BadgeTextSv = CommonUtilities.CleanUtf8Text(product.BadgeSv),
                 ImageUrl = product.ImageUrl ?? null,
                 FromPrice = product.FromPrice ?? 0,
                 IsCarousel = product.IsCarousel ?? false,
@@ -712,9 +712,9 @@ namespace NHD.Core.Services.Products
             return new GalleryViewModel
             {
                 Id = gallery.GalleryId,
-                Name = gallery.DateId != null ? gallery.Date?.NameEn : gallery.Prd?.NameEn,
+                Name = gallery.DateId != null ? CommonUtilities.CleanUtf8Text(gallery.Date?.NameEn) : CommonUtilities.CleanUtf8Text(gallery.Prd?.NameEn),
                 Type = gallery.DateId != null ? "date" : "product",
-                AltText = gallery.AltText,
+                AltText = CommonUtilities.CleanUtf8Text(gallery.AltText),
                 ImageUrl = gallery.ImageUrl,
                 IsPrimary = gallery.IsPrimary,
                 SortOrder = gallery.SortOrder,

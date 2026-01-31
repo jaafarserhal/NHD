@@ -22,5 +22,30 @@ namespace NHD.Core.Utilities
             var random = new Random();
             return random.Next(100000, 999999).ToString();
         }
+        public static string CleanUtf8Text(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            try
+            {
+                // Handle common encoding issues where text was incorrectly decoded
+                // This fixes issues where UTF-8 text was incorrectly interpreted as Latin-1
+                var bytes = System.Text.Encoding.GetEncoding("ISO-8859-1").GetBytes(input);
+                var correctedText = System.Text.Encoding.UTF8.GetString(bytes);
+
+                // Only return the corrected text if it's actually different and doesn't contain replacement characters
+                if (correctedText != input && !correctedText.Contains("\uFFFD"))
+                {
+                    return correctedText;
+                }
+            }
+            catch
+            {
+                // If conversion fails, return original
+            }
+
+            return input;
+        }
     }
 }
