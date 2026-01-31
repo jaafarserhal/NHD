@@ -142,7 +142,7 @@ const Cart: React.FC = () => {
 
                     <div className="mini-cart-btn d-flex flex-column gap-2">
                         <a className="d-block btn btn-secondary btn-hover-primary" href={routeUrls.cart}>View cart</a>
-                        <a className="d-block btn btn-secondary btn-hover-primary" href="#">Checkout</a>
+                        <a className="d-block btn btn-secondary btn-hover-primary" href={routeUrls.checkout}>Checkout</a>
                     </div>
                 </div>
             )}

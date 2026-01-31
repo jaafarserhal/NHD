@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Loader from "../components/Common/Loader/Index";
 import Header from "../components/Common/Header/Index";
 import Footer from "../components/Common/Footer/Index";
 import { useCart } from "../contexts/CartContext";
@@ -8,7 +7,6 @@ const CartPage: React.FC = () => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const { cartItems, isLoading, removeFromCart, updateQuantity, clearCart, getTotalItems, getTotalPrice } = useCart();
-    console.log("Cart Items:", cartItems);
     // preload image
     useEffect(() => {
         const img = new Image();
@@ -54,7 +52,6 @@ const CartPage: React.FC = () => {
 
     return (
         <>
-            <Loader loading={isLoading} />
             <Header />
             <div
                 className="breadcrumb"
