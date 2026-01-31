@@ -15,6 +15,7 @@ namespace NHD.Core.Services.Model.Products
         public string BadgeTextEn { get; set; }
         public string BadgeTextSv { get; set; }
         public string ImageUrl { get; set; }
+        public int Quantity { get; set; }
         public decimal FromPrice { get; set; }
         public string Type { get; set; }
         public int CategoryId { get; set; }

@@ -22,6 +22,7 @@ export interface ProductsWithGallery {
     badgeTextEn: string;
     badgeTextSv: string;
     fromPrice: number;
+    quantity: number;
     imageUrl: string;
     type: string;
     size: string;

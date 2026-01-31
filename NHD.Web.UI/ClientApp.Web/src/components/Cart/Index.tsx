@@ -1,9 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCart } from "../../contexts/CartContext";
 import styles from "./index.module.css";
 
 const Cart: React.FC = () => {
     const { cartItems, removeFromCart, updateQuantity, getTotalItems, getTotalPrice } = useCart();
+    const [errorMessage, setErrorMessage] = useState<string>('');
+
+    const handleQuantityUpdate = async (productId: number, newQuantity: number) => {
+        try {
+            await updateQuantity(productId, newQuantity);
+            setErrorMessage(''); // Clear any previous errors
+        } catch (error: any) {
+            setErrorMessage(error.message || 'Failed to update quantity');
+            // Show error for a few seconds then clear
+            setTimeout(() => setErrorMessage(''), 5000);
+        }
+    };
 
     return (
         <div className={`offcanvas offcanvas-end offcanvas-cart ${styles.cartCanvas}`} id="offcanvasCart">
@@ -13,6 +25,13 @@ const Cart: React.FC = () => {
                     <i className="lastudioicon lastudioicon-e-remove"></i>
                 </button>
             </div>
+
+            {errorMessage && (
+                <div className="alert alert-danger alert-dismissible fade show" role="alert" style={{ margin: '10px' }}>
+                    <small>{errorMessage}</small>
+                    <button type="button" className="btn-close" onClick={() => setErrorMessage('')}></button>
+                </div>
+            )}
 
             <div className="offcanvas-body">
                 {cartItems.length === 0 ? (
@@ -52,11 +71,24 @@ const Cart: React.FC = () => {
                                                     {item.product.titleEn}
                                                 </a>
                                             </h6>
+                                            <div className="mb-1">
+                                                <small className="text-muted">
+                                                    {item.product.quantity > 0 ? (
+                                                        item.product.quantity <= 5 ? (
+                                                            <span className="text-warning">Only {item.product.quantity} left</span>
+                                                        ) : (
+                                                            <span className="text-success">{item.product.quantity} available</span>
+                                                        )
+                                                    ) : (
+                                                        <span className="text-danger">Out of stock</span>
+                                                    )}
+                                                </small>
+                                            </div>
                                             <div className="d-flex align-items-center gap-2">
                                                 <div className="quantity-controls d-flex align-items-center">
                                                     <button
                                                         className="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
-                                                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                                                        onClick={() => handleQuantityUpdate(item.product.id, item.quantity - 1)}
                                                         style={{
                                                             width: '28px',
                                                             height: '28px',
@@ -71,15 +103,18 @@ const Cart: React.FC = () => {
                                                     <span className="mx-2" style={{ minWidth: '20px', textAlign: 'center' }}>{item.quantity}</span>
                                                     <button
                                                         className="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center"
-                                                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                                                        onClick={() => handleQuantityUpdate(item.product.id, item.quantity + 1)}
+                                                        disabled={item.quantity >= item.product.quantity}
                                                         style={{
                                                             width: '28px',
                                                             height: '28px',
                                                             padding: '0',
                                                             fontSize: '14px',
                                                             lineHeight: '1',
-                                                            border: '1px solid #dee2e6'
+                                                            border: '1px solid #dee2e6',
+                                                            opacity: item.quantity >= item.product.quantity ? 0.5 : 1
                                                         }}
+                                                        title={item.quantity >= item.product.quantity ? `Only ${item.product.quantity} available` : 'Increase quantity'}
                                                     >
                                                         +
                                                     </button>

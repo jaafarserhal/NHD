@@ -145,11 +145,13 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
                 item => item.product.id === action.payload.id
             );
             if (existingItem) {
+                const newQuantity = existingItem.quantity + 1;
+                // Quantity validation is handled in the addToCart function, so this should be safe
                 return {
                     ...state,
                     cartItems: state.cartItems.map(item =>
                         item.product.id === action.payload.id
-                            ? { ...item, quantity: item.quantity + 1 }
+                            ? { ...item, quantity: newQuantity }
                             : item
                     ),
                 };
@@ -174,6 +176,7 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
                     ),
                 };
             }
+            // Quantity validation is handled in the updateQuantity function, so this should be safe
             return {
                 ...state,
                 cartItems: state.cartItems.map(item =>
@@ -309,6 +312,15 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         try {
             dispatch({ type: 'SET_LOADING', payload: true });
 
+            // Check quantity availability
+            const existingItem = state.cartItems.find(item => item.product.id === product.id);
+            const currentQuantityInCart = existingItem ? existingItem.quantity : 0;
+            const requestedQuantity = currentQuantityInCart + 1;
+
+            if (requestedQuantity > product.quantity) {
+                throw new Error(`Cannot add more items. Only ${product.quantity} available in stock, and you already have ${currentQuantityInCart} in your cart.`);
+            }
+
             if (isAuthenticated()) {
                 // Add to server cart
                 const token = storage.get('webAuthToken');
@@ -358,6 +370,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const updateQuantity = async (productId: number, quantity: number) => {
         try {
             dispatch({ type: 'SET_LOADING', payload: true });
+
+            // Check quantity availability
+            const existingItem = state.cartItems.find(item => item.product.id === productId);
+            if (existingItem && quantity > existingItem.product.quantity) {
+                throw new Error(`Cannot update quantity. Only ${existingItem.product.quantity} available in stock.`);
+            }
 
             if (isAuthenticated()) {
                 // Update server cart

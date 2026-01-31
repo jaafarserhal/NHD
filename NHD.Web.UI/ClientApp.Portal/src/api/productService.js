@@ -20,6 +20,7 @@ class productService extends apiService {
         formData.append('NameEn', product.nameEn || '');
         formData.append('NameSv', product.nameSv || '');
         formData.append('FromPrice', String(product.fromPrice));
+        formData.append('Quantity', String(product.quantity));
         formData.append('DescriptionEn', product.descriptionEn || '');
         formData.append('DescriptionSv', product.descriptionSv || '');
         formData.append('BadgeTextEn', product.badgeTextEn || '');
@@ -63,6 +64,7 @@ class productService extends apiService {
         formData.append('SizeId', String(product.sizeId));
         formData.append('NameEn', product.nameEn || '');
         formData.append('NameSv', product.nameSv || '');
+        formData.append('Quantity', String(product.quantity));
         formData.append('FromPrice', String(product.fromPrice));
         formData.append('DescriptionEn', product.descriptionEn || '');
         formData.append('DescriptionSv', product.descriptionSv || '');

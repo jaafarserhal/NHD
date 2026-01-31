@@ -107,6 +107,7 @@ namespace NHD.Web.UI.Portal.Controllers
                     BadgeEn = dto.BadgeTextEn,
                     BadgeSv = dto.BadgeTextSv,
                     FromPrice = dto.FromPrice,
+                    Quantity = dto.Quantity,
                     IsCarousel = dto.IsCarousel,
                     IsActive = dto.IsActive,
                     ImageUrl = fileName
@@ -191,6 +192,7 @@ namespace NHD.Web.UI.Portal.Controllers
                 existingProduct.BadgeEn = dto.BadgeTextEn;
                 existingProduct.BadgeSv = dto.BadgeTextSv;
                 existingProduct.FromPrice = dto.FromPrice;
+                existingProduct.Quantity = dto.Quantity;
                 existingProduct.IsCarousel = dto.IsCarousel;
                 existingProduct.IsActive = dto.IsActive;
                 existingProduct.CreatedAt = DateTime.UtcNow;

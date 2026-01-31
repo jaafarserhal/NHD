@@ -3,6 +3,7 @@ using NHD.Core.Common.Models;
 using NHD.Core.Models;
 using NHD.Core.Repository.CustomerCart;
 using NHD.Core.Repository.Customers;
+using NHD.Core.Repository.Products;
 using NHD.Core.Services.Model.CustomerCart;
 
 namespace NHD.Core.Services.CustomerCart
@@ -11,12 +12,14 @@ namespace NHD.Core.Services.CustomerCart
     {
         private readonly ICartRepository _cartRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IProductRepository _productRepository;
         private readonly ILogger<CartService> _logger;
 
-        public CartService(ICartRepository cartRepository, ICustomerRepository customerRepository, ILogger<CartService> logger)
+        public CartService(ICartRepository cartRepository, ICustomerRepository customerRepository, IProductRepository productRepository, ILogger<CartService> logger)
         {
             _cartRepository = cartRepository ?? throw new ArgumentNullException(nameof(cartRepository));
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
+            _productRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -35,7 +38,7 @@ namespace NHD.Core.Services.CustomerCart
             }
         }
 
-        public async Task<Cart?> GetUserCartAsync(int customerId)
+        public async Task<Cart> GetUserCartAsync(int customerId)
         {
             try
             {
@@ -62,6 +65,13 @@ namespace NHD.Core.Services.CustomerCart
         {
             try
             {
+                // First, get the product to validate quantity
+                var product = await _productRepository.GetByIdAsync(productId);
+                if (product == null)
+                {
+                    throw new InvalidOperationException($"Product with ID {productId} not found.");
+                }
+
                 var cart = await _cartRepository.GetCartByUserIdAsync(customerId);
                 if (cart == null)
                 {
@@ -69,10 +79,18 @@ namespace NHD.Core.Services.CustomerCart
                 }
 
                 var existingCartItem = await _cartRepository.GetCartItemAsync(cart.CartId, productId);
+                var currentQuantityInCart = existingCartItem?.Quantity ?? 0;
+                var newTotalQuantity = currentQuantityInCart + quantity;
+
+                // Validate quantity against available stock
+                if (newTotalQuantity > product.Quantity)
+                {
+                    throw new InvalidOperationException($"Cannot add {quantity} item(s). Only {product.Quantity} available in stock, and you already have {currentQuantityInCart} in your cart.");
+                }
 
                 if (existingCartItem != null)
                 {
-                    existingCartItem.Quantity += quantity;
+                    existingCartItem.Quantity = newTotalQuantity;
                     await _cartRepository.UpdateCartItemAsync(existingCartItem);
                 }
                 else
@@ -101,6 +119,13 @@ namespace NHD.Core.Services.CustomerCart
         {
             try
             {
+                // First, get the product to validate quantity
+                var product = await _productRepository.GetByIdAsync(productId);
+                if (product == null)
+                {
+                    throw new InvalidOperationException($"Product with ID {productId} not found.");
+                }
+
                 var cart = await _cartRepository.GetCartByUserIdAsync(customerId);
                 if (cart == null)
                 {
@@ -119,6 +144,12 @@ namespace NHD.Core.Services.CustomerCart
                 }
                 else
                 {
+                    // Validate quantity against available stock
+                    if (quantity > product.Quantity)
+                    {
+                        throw new InvalidOperationException($"Cannot update quantity to {quantity}. Only {product.Quantity} available in stock.");
+                    }
+
                     cartItem.Quantity = quantity;
                     await _cartRepository.UpdateCartItemAsync(cartItem);
                 }

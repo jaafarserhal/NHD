@@ -55,6 +55,7 @@ export default function AddProduct() {
         badgeTextEn: "",
         badgeTextSv: "",
         fromPrice: 0,
+        quantity: 0,
         isActive: true,
         isCarousel: false,
         dates: [],
@@ -299,6 +300,9 @@ export default function AddProduct() {
         if (!form.sizeId) {
             validationErrors.push("Size is required");
         }
+        if (form.quantity <= 0) {
+            validationErrors.push("Quantity must be greater than 0");
+        }
         if (!image) {
             validationErrors.push("Image is required");
         }
@@ -363,6 +367,7 @@ export default function AddProduct() {
                 badgeTextEn: "",
                 badgeTextSv: "",
                 fromPrice: 0,
+                quantity: 0,
                 isActive: true,
                 isCarousel: false,
                 dates: [],
@@ -540,6 +545,30 @@ export default function AddProduct() {
                                             onChange={handleChange}
                                             variant="standard"
                                             fullWidth
+                                        />
+                                        <TextField
+                                            required
+                                            name="quantity"
+                                            label="Quantity"
+                                            type="number"
+                                            value={form.quantity || 0}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                            inputProps={{ min: 1 }}
+                                            sx={{
+                                                '& input[type=number]': {
+                                                    '-moz-appearance': 'textfield',
+                                                },
+                                                '& input[type=number]::-webkit-outer-spin-button': {
+                                                    '-webkit-appearance': 'none',
+                                                    margin: 0,
+                                                },
+                                                '& input[type=number]::-webkit-inner-spin-button': {
+                                                    '-webkit-appearance': 'none',
+                                                    margin: 0,
+                                                },
+                                            }}
                                         />
                                     </Box>
                                 </CardContent>

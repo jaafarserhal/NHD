@@ -87,6 +87,7 @@ export default function UpdateProduct() {
         descriptionSv: "",
         badgeTextEn: "",
         badgeTextSv: "",
+        quantity: 0,
         fromPrice: 0,
         isActive: true,
         isCarousel: false,
@@ -127,6 +128,7 @@ export default function UpdateProduct() {
                 badgeTextEn: product.badgeTextEn || "",
                 badgeTextSv: product.badgeTextSv || "",
                 fromPrice: product.fromPrice || 0,
+                quantity: product.quantity || 0,
                 isActive: product.isActive,
                 isCarousel: product.isCarousel,
                 imageUrl: product.imageUrl || "",
@@ -391,6 +393,9 @@ export default function UpdateProduct() {
         if (!form.sizeId) {
             validationErrors.push("Size is required");
         }
+        if (form.quantity <= 0) {
+            validationErrors.push("Quantity must be greater than 0");
+        }
         if (!image && !form.imageUrl) {
             validationErrors.push("Image is required");
         }
@@ -445,6 +450,7 @@ export default function UpdateProduct() {
                 descriptionSv: form.descriptionSv,
                 badgeTextEn: form.badgeTextEn,
                 badgeTextSv: form.badgeTextSv,
+                quantity: form.quantity,
                 fromPrice: form.fromPrice,
                 isActive: form.isActive,
                 isCarousel: false,
@@ -662,6 +668,30 @@ export default function UpdateProduct() {
                                             onChange={handleChange}
                                             variant="standard"
                                             fullWidth
+                                        />
+                                        <TextField
+                                            required
+                                            name="quantity"
+                                            label="Quantity"
+                                            type="number"
+                                            value={form.quantity || 0}
+                                            onChange={handleChange}
+                                            variant="standard"
+                                            fullWidth
+                                            inputProps={{ min: 1 }}
+                                            sx={{
+                                                '& input[type=number]': {
+                                                    '-moz-appearance': 'textfield',
+                                                },
+                                                '& input[type=number]::-webkit-outer-spin-button': {
+                                                    '-webkit-appearance': 'none',
+                                                    margin: 0,
+                                                },
+                                                '& input[type=number]::-webkit-inner-spin-button': {
+                                                    '-webkit-appearance': 'none',
+                                                    margin: 0,
+                                                },
+                                            }}
                                         />
                                     </Box>
                                 </CardContent>

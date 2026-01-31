@@ -78,6 +78,7 @@ namespace NHD.Core.Services.Products
                     DescriptionSv = p.DescriptionSv,
                     BadgeTextEn = p.BadgeEn,
                     BadgeTextSv = p.BadgeSv,
+                    Quantity = p.Quantity,
                     ImageUrl = $"/uploads/products/{p.ImageUrl}",
                     FromPrice = p.FromPrice ?? 0,
                     Type = p.PrdLookupType?.NameEn,
@@ -139,6 +140,7 @@ namespace NHD.Core.Services.Products
                     BadgeTextSv = p.BadgeSv,
                     ImageUrl = $"/uploads/products/{p.ImageUrl}",
                     FromPrice = p.FromPrice ?? 0,
+                    Quantity = p.Quantity,
                     Type = p.PrdLookupType?.NameEn,
                     Size = p.PrdLookupSize?.NameEn,
                     Galleries = p.Galleries != null ? p.Galleries.Where(ga => ga.IsPrimary == false).Select(g => new GalleryViewModel
@@ -651,6 +653,7 @@ namespace NHD.Core.Services.Products
                 BadgeTextSv = p.BadgeSv,
                 ImageUrl = $"/uploads/products/{p.ImageUrl}",
                 FromPrice = p.FromPrice ?? 0,
+                Quantity = p.Quantity,
                 Type = p.PrdLookupType?.NameEn,
                 Size = p.PrdLookupSize?.NameEn,
                 Galleries = p.Galleries != null ? p.Galleries.Select(g => new GalleryViewModel
@@ -677,6 +680,7 @@ namespace NHD.Core.Services.Products
                 SizeId = product.PrdLookupSizeId,
                 Type = product.PrdLookupType?.NameEn,
                 Size = product.PrdLookupSize?.NameEn,
+                Quantity = product.Quantity,
                 BadgeTextEn = product.BadgeEn,
                 BadgeTextSv = product.BadgeSv,
                 ImageUrl = product.ImageUrl ?? null,

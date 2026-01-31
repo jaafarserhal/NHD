@@ -13,17 +13,38 @@ interface ProductProps {
 }
 //product-item border text-center
 const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, modalId, urlPrefix = '/product' }) => {
+    console.log('Product quantity:', product);
     const { addToCart } = useCart();
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
-    const handleAddToCart = (e: React.MouseEvent) => {
+    const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();
-        addToCart(product);
-        setShowSuccessModal(true);
+
+        // Check if product is out of stock
+        if (product.quantity === 0) {
+            setErrorMessage('This item is currently out of stock');
+            setShowErrorModal(true);
+            return;
+        }
+
+        try {
+            await addToCart(product);
+            setShowSuccessModal(true);
+        } catch (error: any) {
+            setErrorMessage(error.message || 'Failed to add item to cart');
+            setShowErrorModal(true);
+        }
     };
 
     const handleCloseModal = () => {
         setShowSuccessModal(false);
+    };
+
+    const handleCloseErrorModal = () => {
+        setShowErrorModal(false);
+        setErrorMessage('');
     };
     return (
         <div className={isByCategory ? 'col mb-50' : 'col-lg-4 col-md-6'}>
@@ -57,12 +78,16 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
                         </li>
                         <li className="product-item__meta-action">
                             <a
-                                className="labtn-icon-cart"
+                                className={`labtn-icon-cart ${product.quantity === 0 ? 'disabled' : ''}`}
                                 href="#"
-                                onClick={handleAddToCart}
+                                onClick={product.quantity === 0 ? (e) => e.preventDefault() : handleAddToCart}
                                 data-bs-tooltip="tooltip"
                                 data-bs-placement="top"
-                                title="Add to Cart"
+                                title={product.quantity === 0 ? "Out of Stock" : "Add to Cart"}
+                                style={{
+                                    opacity: product.quantity === 0 ? 0.5 : 1,
+                                    cursor: product.quantity === 0 ? 'not-allowed' : 'pointer'
+                                }}
                             />
                         </li>
                     </ul>}
@@ -75,6 +100,15 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
                     {(product.fromPrice || product.fromPrice !== 0) && <span className={`product-item__price ${isByCategory ? '' : 'fs-2'}`}>
                         ${product.fromPrice?.toFixed(2)}
                     </span>}
+                    <div className="mt-2">
+                        {product.quantity === 0 ? (
+                            <small className="text-danger">Out of stock</small>
+                        ) : product.quantity <= 5 ? (
+                            <small className="text-warning">Only {product.quantity} left</small>
+                        ) : (
+                            <small className="text-success">In stock</small>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -145,6 +179,31 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
                             }}
                         >
                             View Cart
+                        </button>
+                    </div>
+                </div>
+            </PromptModal>
+
+            {/* Error Modal */}
+            <PromptModal
+                isOpen={showErrorModal}
+                onClose={handleCloseErrorModal}
+                id={`errorModal-${product.id}`}
+            >
+                <div className="modal-header">
+                    <h4 className="modal-title">Unable to Add Item</h4>
+                </div>
+                <div className="modal-body">
+                    <p>{errorMessage}</p>
+                </div>
+                <div className="modal-footer">
+                    <div className="d-flex justify-content-center w-100">
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={handleCloseErrorModal}
+                        >
+                            OK
                         </button>
                     </div>
                 </div>

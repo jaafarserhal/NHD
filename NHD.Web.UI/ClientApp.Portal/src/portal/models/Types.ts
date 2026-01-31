@@ -13,6 +13,7 @@ export interface Product {
     imageUrl: string;
     isActive: boolean;
     isCarousel: boolean;
+    quantity: number;
     dates: DatesProduct[];
     collections: ProductCollection[];
 }

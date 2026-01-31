@@ -717,6 +717,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PrdLookupCategoryId).HasColumnName("prd_lookup_category_id");
             entity.Property(e => e.PrdLookupSizeId).HasColumnName("prd_lookup_size_id");
             entity.Property(e => e.PrdLookupTypeId).HasColumnName("prd_lookup_type_id");
+            entity.Property(e => e.Quantity).HasColumnName("quantity");
 
             entity.HasOne(d => d.PrdLookupCategory).WithMany(p => p.ProductPrdLookupCategories)
                 .HasForeignKey(d => d.PrdLookupCategoryId)

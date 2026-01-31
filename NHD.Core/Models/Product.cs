@@ -35,6 +35,8 @@ public partial class Product
 
     public string BadgeSv { get; set; }
 
+    public int Quantity { get; set; }
+
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     public virtual ICollection<DatesProduct> DatesProducts { get; set; } = new List<DatesProduct>();
