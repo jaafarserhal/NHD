@@ -131,8 +131,9 @@ namespace NHD.Core.Utilities
 
     public enum AddressType
     {
-        Shipping = 700,
-        Billing = 701
+        Billing = 700,
+        Shipping = 701,
+        Both = 702
     }
 
     public enum SubjectType

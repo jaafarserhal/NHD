@@ -200,6 +200,24 @@ namespace NHD.Core.Services.Customers
             }
         }
 
+        public async Task<ServiceResult<IEnumerable<Address>>> GetCustomerAddressesAsync(int customerId)
+        {
+            try
+            {
+                var address = await _addressRepository.GetAddressesByCustomerIdAsync(customerId);
+                if (address == null || !address.Any())
+                {
+                    return ServiceResult<IEnumerable<Address>>.Validate("Address not found for this customer.");
+                }
+
+                return ServiceResult<IEnumerable<Address>>.Success(address);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving address");
+                return ServiceResult<IEnumerable<Address>>.Failure("An error occurred while retrieving the address.");
+            }
+        }
 
         public async Task<Address> AddAddressAsync(Address address)
         {
@@ -622,130 +640,172 @@ namespace NHD.Core.Services.Customers
 
         #endregion Customers
 
-        #region Guest Checkout
+        #region Checkout
 
         public async Task<ServiceResult<int>> PlaceOrderAsGuest(GuestCheckoutModel guestCheckout)
         {
             try
             {
+                // Validate input
                 if (guestCheckout == null)
-                {
                     return ServiceResult<int>.Failure("Guest checkout model is required.");
-                }
 
                 if (string.IsNullOrEmpty(guestCheckout.Email))
-                {
                     return ServiceResult<int>.Failure("Email is required.");
-                }
 
                 if (guestCheckout.Items == null || !guestCheckout.Items.Any())
-                {
                     return ServiceResult<int>.Failure("At least one item is required.");
-                }
 
                 if (guestCheckout.Shipping == null)
-                {
                     return ServiceResult<int>.Failure("Shipping address is required.");
-                }
 
                 await BeginTransactionAsync();
 
-                try
+                // Create or get guest customer
+                var guestCustomer = await GetOrCreateGuestCustomerAsync(guestCheckout.Email);
+                if (guestCustomer == null)
                 {
-                    // Create or get guest customer
-                    var guestCustomer = await GetOrCreateGuestCustomerAsync(guestCheckout.Email);
+                    await RollbackTransactionAsync();
+                    return ServiceResult<int>.Failure("Failed to create guest customer.");
+                }
 
-                    if (guestCustomer == null)
+                Address shippingAddress;
+                Address billingAddress;
+
+                // Handle addresses based on whether billing is same as shipping
+                if (guestCheckout.IsBillingSameAsShipping)
+                {
+                    // Check if a "Both" address type already exists for this customer
+                    var existingBothAddress = await context.Addresses
+                        .FirstOrDefaultAsync(a =>
+                            a.CustomerId == guestCustomer.CustomerId &&
+                            a.AddressTypeLookupId == AddressType.Both.AsInt() &&
+                            a.IsActive);
+
+                    if (existingBothAddress != null)
                     {
-                        return ServiceResult<int>.Failure("Failed to create guest customer.");
-                    }
+                        // Update the existing "Both" address with new shipping info
+                        existingBothAddress.ContactFirstName = guestCheckout.Shipping.FirstName;
+                        existingBothAddress.ContactLastName = guestCheckout.Shipping.LastName;
+                        existingBothAddress.ContactPhone = guestCheckout.Shipping.Phone;
+                        existingBothAddress.StreetName = guestCheckout.Shipping.StreetName;
+                        existingBothAddress.StreetNumber = guestCheckout.Shipping.StreetNumber;
+                        existingBothAddress.PostalCode = guestCheckout.Shipping.PostalCode;
+                        existingBothAddress.City = guestCheckout.Shipping.City;
+                        existingBothAddress.CreatedAt = DateTime.UtcNow;
 
-                    // Create shipping address
-                    var shippingAddress = await CreateAddressFromGuestModelAsync(guestCustomer.CustomerId, guestCheckout.Shipping, AddressType.Shipping.AsInt());
+                        context.Addresses.Update(existingBothAddress);
+                        await SaveChangesAsync();
 
-                    // Create billing address if different from shipping
-                    Address billingAddress = null;
-                    if (!guestCheckout.IsBillingSameAsShipping && guestCheckout.Billing != null)
-                    {
-                        billingAddress = await CreateAddressFromGuestModelAsync(guestCustomer.CustomerId, guestCheckout.Billing, AddressType.Billing.AsInt());
+                        shippingAddress = existingBothAddress;
+                        billingAddress = existingBothAddress;
                     }
                     else
                     {
-                        // Use shipping address as billing address
+                        // Create new address with "Both" type
+                        shippingAddress = await CreateAddressFromGuestModelAsync(
+                            guestCustomer.CustomerId,
+                            guestCheckout.Shipping,
+                            AddressType.Both.AsInt());
+
                         billingAddress = shippingAddress;
                     }
-
-                    // Create order
-                    var order = new Order
+                }
+                else
+                {
+                    // Billing is different from shipping
+                    if (guestCheckout.Billing == null)
                     {
-                        CustomerId = guestCustomer.CustomerId,
-                        GuestEmail = guestCheckout.Email,
-                        OrderDate = DateTime.UtcNow,
-                        OrderStatusLookupId = OrderStatusLookup.Pending.AsInt(), // Pending order status
-                        TotalAmount = guestCheckout.TotalPrice,
-                        CreatedAt = DateTime.UtcNow,
+                        await RollbackTransactionAsync();
+                        return ServiceResult<int>.Failure("Billing address is required when different from shipping.");
+                    }
+
+                    // Create separate shipping and billing addresses
+                    shippingAddress = await CreateAddressFromGuestModelAsync(
+                        guestCustomer.CustomerId,
+                        guestCheckout.Shipping,
+                        AddressType.Shipping.AsInt());
+
+                    billingAddress = await CreateAddressFromGuestModelAsync(
+                        guestCustomer.CustomerId,
+                        guestCheckout.Billing,
+                        AddressType.Billing.AsInt());
+                }
+
+                // Validate product availability
+                foreach (var item in guestCheckout.Items)
+                {
+                    var product = await context.Products
+                        .FirstOrDefaultAsync(p => p.PrdId == item.ProductId);
+
+                    if (product == null)
+                    {
+                        await RollbackTransactionAsync();
+                        return ServiceResult<int>.Failure($"Product with ID {item.ProductId} not found.");
+                    }
+
+                    if (product.Quantity < item.Quantity)
+                    {
+                        await RollbackTransactionAsync();
+                        return ServiceResult<int>.Failure(
+                            $"Insufficient stock for product ID {item.ProductId}. " +
+                            $"Available: {product.Quantity}, Requested: {item.Quantity}");
+                    }
+                }
+
+                // Create order
+                var order = new Order
+                {
+                    CustomerId = guestCustomer.CustomerId,
+                    GuestEmail = guestCheckout.Email,
+                    OrderDate = DateTime.UtcNow,
+                    OrderStatusLookupId = OrderStatusLookup.Pending.AsInt(),
+                    TotalAmount = guestCheckout.TotalPrice,
+                    Note = guestCheckout.Note,
+                    BillingAddressId = billingAddress.AddressId,
+                    ShippingAddressId = shippingAddress.AddressId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var createdOrder = context.Orders.Add(order);
+                await SaveChangesAsync();
+
+                // Update product quantities and create order items
+                foreach (var item in guestCheckout.Items)
+                {
+                    var product = await context.Products
+                        .FirstOrDefaultAsync(p => p.PrdId == item.ProductId);
+
+                    product.Quantity -= item.Quantity;
+                    context.Products.Update(product);
+
+                    var orderItem = new OrderItem
+                    {
+                        OrderId = createdOrder.Entity.OrderId,
+                        PrdId = item.ProductId,
+                        Quantity = item.Quantity,
+                        UnitPrice = (decimal)item.Price,
+                        CreatedAt = DateTime.UtcNow
                     };
 
-                    var createdOrder = context.Orders.Add(order);
-                    await SaveChangesAsync();
-
-                    // Check product availability and update quantities
-                    foreach (var item in guestCheckout.Items)
-                    {
-                        var product = await context.Products.FirstOrDefaultAsync(p => p.PrdId == item.ProductId);
-                        if (product == null)
-                        {
-                            await RollbackTransactionAsync();
-                            return ServiceResult<int>.Failure($"Product with ID {item.ProductId} not found.");
-                        }
-
-                        if (product.Quantity < item.Quantity)
-                        {
-                            await RollbackTransactionAsync();
-                            return ServiceResult<int>.Failure($"Insufficient stock for product ID {item.ProductId}. Available: {product.Quantity}, Requested: {item.Quantity}");
-                        }
-
-                        // Subtract ordered quantity from product stock
-                        product.Quantity -= item.Quantity;
-                        context.Products.Update(product);
-                    }
-
-                    // Create order items
-                    foreach (var item in guestCheckout.Items)
-                    {
-                        var orderItem = new OrderItem
-                        {
-                            OrderId = createdOrder.Entity.OrderId,
-                            PrdId = item.ProductId,
-                            Quantity = item.Quantity,
-                            UnitPrice = (decimal)item.Price,
-                            CreatedAt = DateTime.UtcNow
-                        };
-
-                        context.OrderItems.Add(orderItem);
-                    }
-
-                    await SaveChangesAsync();
-
-                    await CommitTransactionAsync();
-
-                    _logger.LogInformation("Guest checkout created successfully. OrderId: {OrderId}, Email: {Email}", createdOrder.Entity.OrderId, guestCheckout.Email);
-
-                    return ServiceResult<int>.Success(createdOrder.Entity.OrderId);
-                }
-                catch (Exception ex)
-                {
-                    await RollbackTransactionAsync();
-                    _logger.LogError(ex, "Error creating guest checkout for email: {Email}", guestCheckout.Email);
-                    throw;
+                    context.OrderItems.Add(orderItem);
                 }
 
+                await SaveChangesAsync();
+                await CommitTransactionAsync();
+
+                _logger.LogInformation(
+                    "Guest checkout created successfully. OrderId: {OrderId}, Email: {Email}",
+                    createdOrder.Entity.OrderId,
+                    guestCheckout.Email);
+
+                return ServiceResult<int>.Success(createdOrder.Entity.OrderId);
             }
             catch (Exception ex)
             {
                 await RollbackTransactionAsync();
-                _logger.LogError(ex, "Error in CreateGuestCheckoutAsync for email: {Email}", guestCheckout?.Email);
-                return ServiceResult<int>.Failure("Failed to create guest checkout. Please try again.");
+                _logger.LogError(ex, "Error placing guest order for email: {Email}", guestCheckout?.Email);
+                return ServiceResult<int>.Failure("Failed to place order. Please try again.");
             }
         }
 
@@ -787,7 +847,7 @@ namespace NHD.Core.Services.Customers
             }
         }
 
-        private async Task<Address> CreateAddressFromGuestModelAsync(int customerId, GuestAddressModel addressModel, int addressTypeId)
+        private async Task<Address> CreateAddressFromGuestModelAsync(int customerId, OrderAddressModel addressModel, int addressTypeId)
         {
             try
             {
@@ -857,7 +917,285 @@ namespace NHD.Core.Services.Customers
             }
         }
 
-        #endregion Guest Checkout
+        public async Task<ServiceResult<int>> PlaceOrderAsync(int customerId, CustomerCheckoutModel checkout)
+        {
+            var validationResult = ValidateCheckout(checkout);
+            if (!validationResult.IsSuccess)
+            {
+                return ServiceResult<int>.Failure(validationResult.ErrorMessage);
+            }
+
+            await BeginTransactionAsync();
+
+            try
+            {
+                var customer = await ValidateCustomerAsync(customerId);
+                if (customer == null)
+                {
+                    return ServiceResult<int>.Failure("Customer not found.");
+                }
+
+                var shippingAddress = await GetOrCreateAddressAsync(
+                    customerId,
+                    checkout.Shipping,
+                    AddressType.Shipping
+                );
+
+                var billingAddress = await ResolveBillingAddressAsync(
+                    customerId,
+                    checkout,
+                    shippingAddress
+                );
+
+                var stockValidationResult = await ValidateAndUpdateStockAsync(checkout.Items);
+                if (!stockValidationResult.IsSuccess)
+                {
+                    await RollbackTransactionAsync();
+                    return ServiceResult<int>.Failure(stockValidationResult.ErrorMessage);
+                }
+
+                var order = await CreateOrderAsync(
+                    customerId,
+                    checkout,
+                    shippingAddress.AddressId,
+                    billingAddress.AddressId
+                );
+
+                await CreateOrderItemsAsync(order.OrderId, checkout.Items);
+                await CommitTransactionAsync();
+
+                _logger.LogInformation(
+                    "Order placed successfully for customer: {CustomerId}, OrderId: {OrderId}",
+                    customerId,
+                    order.OrderId
+                );
+
+                return ServiceResult<int>.Success(order.OrderId);
+            }
+            catch (Exception ex)
+            {
+                await RollbackTransactionAsync();
+                _logger.LogError(ex, "Error placing order for customer: {CustomerId}", customerId);
+                return ServiceResult<int>.Failure("Failed to place order. Please try again.");
+            }
+        }
+
+        private ServiceResult<bool> ValidateCheckout(CustomerCheckoutModel checkout)
+        {
+            if (checkout == null)
+            {
+                return ServiceResult<bool>.Failure("Checkout model is required.");
+            }
+
+            if (checkout.Items == null || !checkout.Items.Any())
+            {
+                return ServiceResult<bool>.Failure("At least one item is required.");
+            }
+
+            return ServiceResult<bool>.Success(true);
+        }
+
+        private async Task<Customer> ValidateCustomerAsync(int customerId)
+        {
+            return await context.Customers.FirstOrDefaultAsync(c => c.CustomerId == customerId);
+        }
+
+        private async Task<Address> GetOrCreateAddressAsync(
+            int customerId,
+            OrderAddressModel addressModel,
+            AddressType addressType)
+        {
+            if (addressModel.Id != 0)
+            {
+                var existingAddress = await context.Addresses
+                    .FirstOrDefaultAsync(a =>
+                        a.AddressId == addressModel.Id &&
+                        a.CustomerId == customerId
+                    );
+
+                if (existingAddress == null)
+                {
+                    throw new InvalidOperationException($"{addressType} address not found.");
+                }
+
+                _logger.LogInformation(
+                    "Using existing {AddressType} address for customer: {CustomerId}",
+                    addressType,
+                    customerId
+                );
+
+                return existingAddress;
+            }
+
+            var newAddress = new Address
+            {
+                CustomerId = customerId,
+                ContactFirstName = addressModel.FirstName,
+                ContactLastName = addressModel.LastName,
+                ContactPhone = addressModel.Phone,
+                StreetName = addressModel.StreetName,
+                StreetNumber = addressModel.StreetNumber,
+                PostalCode = addressModel.PostalCode,
+                City = addressModel.City,
+                CountryCode = "SE",
+                AddressTypeLookupId = addressType.AsInt(),
+                IsPrimary = true,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            context.Addresses.Add(newAddress);
+            await SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Created new {AddressType} address for customer: {CustomerId}",
+                addressType,
+                customerId
+            );
+
+            return newAddress;
+        }
+
+        private async Task<Address> ResolveBillingAddressAsync(
+            int customerId,
+            CustomerCheckoutModel checkout,
+            Address shippingAddress)
+        {
+            if (checkout.IsBillingSameAsShipping || checkout.Billing == null)
+            {
+                return await CreateBillingAddressFromShippingAsync(shippingAddress);
+            }
+
+            return await GetOrCreateAddressAsync(customerId, checkout.Billing, AddressType.Billing);
+        }
+
+        private async Task<Address> CreateBillingAddressFromShippingAsync(Address shippingAddress)
+        {
+            var existingBillingAddress = await context.Addresses
+                .FirstOrDefaultAsync(a =>
+                    a.CustomerId == shippingAddress.CustomerId &&
+                    a.AddressTypeLookupId == AddressType.Billing.AsInt() &&
+                    a.IsActive && a.IsPrimary);
+
+            if (existingBillingAddress != null)
+            {
+                //update existing billing address to match shipping address
+                existingBillingAddress.ContactFirstName = shippingAddress.ContactFirstName;
+                existingBillingAddress.ContactLastName = shippingAddress.ContactLastName;
+                existingBillingAddress.ContactPhone = shippingAddress.ContactPhone;
+                existingBillingAddress.StreetName = shippingAddress.StreetName;
+                existingBillingAddress.StreetNumber = shippingAddress.StreetNumber;
+                existingBillingAddress.PostalCode = shippingAddress.PostalCode;
+                existingBillingAddress.City = shippingAddress.City;
+                existingBillingAddress.CountryCode = shippingAddress.CountryCode;
+                existingBillingAddress.CreatedAt = DateTime.UtcNow;
+
+                context.Addresses.Update(existingBillingAddress);
+                await SaveChangesAsync();
+
+                return existingBillingAddress;
+            }
+            else
+            {
+                var billingAddress = new Address
+                {
+                    CustomerId = shippingAddress.CustomerId,
+                    ContactFirstName = shippingAddress.ContactFirstName,
+                    ContactLastName = shippingAddress.ContactLastName,
+                    ContactPhone = shippingAddress.ContactPhone,
+                    StreetName = shippingAddress.StreetName,
+                    StreetNumber = shippingAddress.StreetNumber,
+                    PostalCode = shippingAddress.PostalCode,
+                    City = shippingAddress.City,
+                    CountryCode = shippingAddress.CountryCode,
+                    AddressTypeLookupId = AddressType.Billing.AsInt(),
+                    IsPrimary = true,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                context.Addresses.Add(billingAddress);
+                await SaveChangesAsync();
+
+                return billingAddress;
+            }
+        }
+
+        private async Task<ServiceResult<bool>> ValidateAndUpdateStockAsync(
+            IEnumerable<OrderItemModel> items)
+        {
+            foreach (var item in items)
+            {
+                var product = await context.Products
+                    .FirstOrDefaultAsync(p => p.PrdId == item.ProductId);
+
+                if (product == null)
+                {
+                    return ServiceResult<bool>.Failure(
+                        $"Product with ID {item.ProductId} not found."
+                    );
+                }
+
+                if (product.Quantity < item.Quantity)
+                {
+                    return ServiceResult<bool>.Failure(
+                        $"Insufficient stock for product ID {item.ProductId}. " +
+                        $"Available: {product.Quantity}, Requested: {item.Quantity}"
+                    );
+                }
+
+                product.Quantity -= item.Quantity;
+                context.Products.Update(product);
+            }
+
+            await SaveChangesAsync();
+            return ServiceResult<bool>.Success(true);
+        }
+
+        private async Task<Order> CreateOrderAsync(
+            int customerId,
+            CustomerCheckoutModel checkout,
+            int shippingAddressId,
+            int billingAddressId)
+        {
+            var order = new Order
+            {
+                CustomerId = customerId,
+                OrderDate = DateTime.UtcNow,
+                OrderStatusLookupId = OrderStatusLookup.Pending.AsInt(),
+                TotalAmount = checkout.TotalPrice,
+                Note = checkout.Note,
+                BillingAddressId = billingAddressId,
+                ShippingAddressId = shippingAddressId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var createdOrder = context.Orders.Add(order);
+            await SaveChangesAsync();
+
+            return createdOrder.Entity;
+        }
+
+        private async Task CreateOrderItemsAsync(int orderId, IEnumerable<OrderItemModel> items)
+        {
+            foreach (var item in items)
+            {
+                var orderItem = new OrderItem
+                {
+                    OrderId = orderId,
+                    PrdId = item.ProductId,
+                    Quantity = item.Quantity,
+                    UnitPrice = (decimal)item.Price,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                context.OrderItems.Add(orderItem);
+            }
+
+            await SaveChangesAsync();
+        }
+
+        #endregion Checkout
 
         #region Transactions
         public async Task BeginTransactionAsync()

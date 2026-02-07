@@ -115,6 +115,11 @@ export interface Address {
     isPrimary?: boolean;
 }
 
+export interface CustomerAddresses {
+    shippingAddressId: number;
+    billingAddressId: number;
+}
+
 export interface ContactMessage {
     subjectId: number;
     firstName: string;

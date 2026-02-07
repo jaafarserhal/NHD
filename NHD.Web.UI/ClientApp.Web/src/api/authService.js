@@ -67,9 +67,18 @@ class authService extends apiService {
         return this.get(`${apiUrls.getCustomerAddress}/${addressId}`);
     }
 
+    async getCustomerAddresses() {
+        return this.get(apiUrls.getCustomerAddresses);
+    }
+
     // Place order as guest
     async placeOrderAsGuest(guestCheckoutData) {
         return this.post(guestCheckoutData, apiUrls.placeOrderAsGuest);
+    }
+
+    // Place order as authenticated customer
+    async placeOrder(customerCheckoutData) {
+        return this.post(customerCheckoutData, apiUrls.placeOrder);
     }
 }
 export default new authService();

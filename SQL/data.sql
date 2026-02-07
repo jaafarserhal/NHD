@@ -66,6 +66,7 @@ VALUES
 (603, 600, N'Guest', N'Gäst', SYSUTCDATETIME(), 1),
 (700, 700, N'Billing', N'Billing',SYSUTCDATETIME(), 1),
 (701, 700, N'Shipping', N'Shipping',SYSUTCDATETIME(), 1),
+(702, 700, N'Both', 'Shipping & Billing', SYSUTCDATETIME(), 1),
 (800, 800, 'Online Shopping', 'Online Shopping', SYSUTCDATETIME(), 1),
 (801, 800, 'Corporate Gifts', 'Corporate Gifts', SYSUTCDATETIME(), 1),
 (802, 800, 'Sales Inquiry', 'Sales Inquiry', SYSUTCDATETIME(), 1),

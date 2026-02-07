@@ -295,6 +295,9 @@ CREATE TABLE dbo.[order] (
     order_status_lookup_id INT NOT NULL,   -- FK to gen_lookup
     payment_gateway_id INT NULL,           -- FK to payment_gateway
     total_amount DECIMAL(18,2) NOT NULL DEFAULT 0 CHECK (total_amount >= 0),
+	shipping_address_id NT NULL,
+    billing_address_id INT NULL,
+    note NVARCHAR(MAX) NULL;
     created_at DATETIME2 NOT NULL 
         CONSTRAINT DF_order_created DEFAULT SYSUTCDATETIME(),
     CONSTRAINT FK_order_customer FOREIGN KEY (customer_id)
@@ -302,7 +305,12 @@ CREATE TABLE dbo.[order] (
     CONSTRAINT FK_order_status FOREIGN KEY (order_status_lookup_id)
         REFERENCES dbo.gen_lookup(lookup_id),
     CONSTRAINT FK_order_payment_gateway FOREIGN KEY (payment_gateway_id)
-        REFERENCES dbo.payment_gateway(payment_gateway_id)
+        REFERENCES dbo.payment_gateway(payment_gateway_id),
+	CONSTRAINT FK_order_shipping_address FOREIGN KEY (shipping_address_id)
+		    REFERENCES dbo.address(address_id),
+	CONSTRAINT FK_order_billing_address FOREIGN KEY (billing_address_id)
+			REFERENCES dbo.address(address_id)		
+		
 );
 
 -- =============================================

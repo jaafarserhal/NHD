@@ -550,6 +550,7 @@ public partial class AppDbContext : DbContext
             entity.HasIndex(e => e.OrderStatusLookupId, "IX_order_status");
 
             entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.BillingAddressId).HasColumnName("billing_address_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
@@ -557,14 +558,20 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.GuestEmail)
                 .HasMaxLength(150)
                 .HasColumnName("guest_email");
+            entity.Property(e => e.Note).HasColumnName("note");
             entity.Property(e => e.OrderDate)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("order_date");
             entity.Property(e => e.OrderStatusLookupId).HasColumnName("order_status_lookup_id");
             entity.Property(e => e.PaymentGatewayId).HasColumnName("payment_gateway_id");
+            entity.Property(e => e.ShippingAddressId).HasColumnName("shipping_address_id");
             entity.Property(e => e.TotalAmount)
                 .HasColumnType("decimal(18, 2)")
                 .HasColumnName("total_amount");
+
+            entity.HasOne(d => d.BillingAddress).WithMany(p => p.OrderBillingAddresses)
+                .HasForeignKey(d => d.BillingAddressId)
+                .HasConstraintName("FK_order_billing_address");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.CustomerId)
@@ -579,6 +586,10 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.PaymentGateway).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.PaymentGatewayId)
                 .HasConstraintName("FK_order_payment_gateway");
+
+            entity.HasOne(d => d.ShippingAddress).WithMany(p => p.OrderShippingAddresses)
+                .HasForeignKey(d => d.ShippingAddressId)
+                .HasConstraintName("FK_order_shipping_address");
         });
 
         modelBuilder.Entity<OrderItem>(entity =>

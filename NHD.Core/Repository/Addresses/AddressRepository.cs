@@ -42,7 +42,7 @@ namespace NHD.Core.Repository.Addresses
         public async Task<IEnumerable<Address>> GetAddressesByCustomerIdAsync(int customerId)
         {
             return await _context.Addresses
-                .Where(a => a.CustomerId == customerId)
+                .Where(a => a.CustomerId == customerId && a.IsActive == true)
                 .AsNoTracking()
                 .ToListAsync();
         }

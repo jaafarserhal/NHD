@@ -38,4 +38,8 @@ public partial class Address
     public virtual GenLookup AddressTypeLookup { get; set; }
 
     public virtual Customer Customer { get; set; }
+
+    public virtual ICollection<Order> OrderBillingAddresses { get; set; } = new List<Order>();
+
+    public virtual ICollection<Order> OrderShippingAddresses { get; set; } = new List<Order>();
 }

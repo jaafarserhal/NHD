@@ -21,6 +21,14 @@ public partial class Order
 
     public string GuestEmail { get; set; }
 
+    public int? ShippingAddressId { get; set; }
+
+    public int? BillingAddressId { get; set; }
+
+    public string Note { get; set; }
+
+    public virtual Address BillingAddress { get; set; }
+
     public virtual Customer Customer { get; set; }
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
@@ -30,4 +38,6 @@ public partial class Order
     public virtual PaymentGateway PaymentGateway { get; set; }
 
     public virtual ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
+
+    public virtual Address ShippingAddress { get; set; }
 }

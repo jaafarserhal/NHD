@@ -433,6 +433,44 @@ namespace NHD.Web.UI.Controllers.Website
 
         #region Address Actions
 
+        [HttpGet("CustomerAddresses")]
+        [Authorize]
+        public async Task<ActionResult<ServiceResult<CustomerAddressesModel>>> GetCustomerAddresses()
+        {
+            // Extract email from JWT token claims
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            // Fetch user details from database
+            var customer = await _customerService.GetCustomerByEmailAsync(email);
+            if (customer == null || customer.StatusCode != HttpStatusCodeEnum.OK.AsInt())
+            {
+                return NotFound(new { message = "User not found" });
+            }
+            var addressesResult = await _customerService.GetCustomerAddressesAsync(customer.Data.CustomerId);
+
+            if (!addressesResult.IsSuccess)
+            {
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = addressesResult.ErrorMessage });
+            }
+            var addresses = addressesResult.Data.ToList();
+            var response = new CustomerAddressesModel
+            {
+                ShippingAddressId = addresses.FirstOrDefault(a => a.AddressTypeLookupId == AddressType.Shipping.AsInt() && a.IsPrimary)?.AddressId ?? 0,
+                BillingAddressId = addresses.FirstOrDefault(a => a.AddressTypeLookupId == AddressType.Billing.AsInt() && a.IsPrimary)?.AddressId ?? 0
+            };
+            return Ok(new ServiceResult<CustomerAddressesModel>
+            {
+                Data = response,
+                IsSuccess = true,
+                Status = HttpStatusCodeEnum.OK.AsInt()
+            });
+        }
+
         [HttpPost("AddAddress")]
         [Authorize]
         public async Task<IActionResult> AddAddress([FromBody] CustomerAddressModel model)
@@ -650,6 +688,7 @@ namespace NHD.Web.UI.Controllers.Website
         #region Guest Checkout
 
         [HttpPost("PlaceOrderAsGuest")]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceResult<int>>> PlaceOrderAsGuest([FromBody] GuestCheckoutModel guestCheckout)
         {
             try
@@ -675,6 +714,52 @@ namespace NHD.Web.UI.Controllers.Website
             {
                 _logger.LogError(ex, "Error creating guest checkout");
                 return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while processing the guest checkout." });
+            }
+        }
+
+        [HttpPost("PlaceOrder")]
+        [Authorize]
+        public async Task<ActionResult<ServiceResult<int>>> PlaceOrder([FromBody] CustomerCheckoutModel checkout)
+        {
+            try
+            {
+                if (checkout == null)
+                    return BadRequest("Checkout data is required");
+
+                // Extract email from JWT token claims
+                var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return Unauthorized(new { message = "Invalid token" });
+                }
+
+                // Fetch user details from database
+                var customer = await _customerService.GetCustomerByEmailAsync(email);
+
+                if (customer == null || customer.StatusCode != HttpStatusCodeEnum.OK.AsInt())
+                {
+                    return NotFound(new { message = "Customer not found" });
+                }
+
+                var result = await _customerService.PlaceOrderAsync(customer.Data.CustomerId, checkout);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(new { message = result.ErrorMessage });
+                }
+
+                return Ok(new ServiceResult<int>
+                {
+                    Data = result.Data,
+                    IsSuccess = true,
+                    Status = HttpStatusCodeEnum.OK.AsInt()
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error placing order for logged in user");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while processing the order." });
             }
         }
 

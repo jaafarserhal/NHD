@@ -10,8 +10,8 @@ namespace NHD.Core.Services.Model.Customer
     {
         public string Email { get; set; }
 
-        public GuestAddressModel Shipping { get; set; }
-        public GuestAddressModel Billing { get; set; }
+        public OrderAddressModel Shipping { get; set; }
+        public OrderAddressModel Billing { get; set; }
 
         public List<OrderItemModel> Items { get; set; }
 
@@ -21,8 +21,23 @@ namespace NHD.Core.Services.Model.Customer
 
         public decimal TotalPrice { get; set; }
     }
-    public class GuestAddressModel
+
+    public class CustomerCheckoutModel
     {
+        public OrderAddressModel Shipping { get; set; }
+        public OrderAddressModel Billing { get; set; }
+
+        public List<OrderItemModel> Items { get; set; }
+
+        public bool IsBillingSameAsShipping { get; set; }
+
+        public string Note { get; set; }
+
+        public decimal TotalPrice { get; set; }
+    }
+    public class OrderAddressModel
+    {
+        public int? Id { get; set; } // Optional for guest checkout
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Phone { get; set; }

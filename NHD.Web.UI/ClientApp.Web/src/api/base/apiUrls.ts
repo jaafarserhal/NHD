@@ -29,4 +29,6 @@ export const apiUrls = {
     details: 'Details',
     dates: 'Dates',
     placeOrderAsGuest: 'PlaceOrderAsGuest',
+    placeOrder: 'PlaceOrder',
+    getCustomerAddresses: 'CustomerAddresses',
 };
