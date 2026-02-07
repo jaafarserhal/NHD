@@ -21,7 +21,6 @@ import ProductDetails from "./pages/ProductDetails";
 import DatesDetails from "./pages/DatesDetails";
 import { CartProvider } from "./contexts/CartContext";
 import Checkout from "./pages/Checkout/index";
-import Payment from "./pages/Payment/Index";
 
 
 const App: React.FC = () => {
@@ -47,7 +46,6 @@ const App: React.FC = () => {
           <Route path={routeUrls.DatesDetails} element={<DatesDetails />} />
           <Route path={routeUrls.cart} element={<CartPage />} />
           <Route path={routeUrls.checkout} element={<Checkout />} />
-          <Route path={routeUrls.payment} element={<Payment />} />
           <Route
             path={routeUrls.myAccount}
             element={

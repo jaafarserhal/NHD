@@ -7,7 +7,7 @@ public partial class Address
 {
     public int AddressId { get; set; }
 
-    public int CustomerId { get; set; }
+    public int? CustomerId { get; set; }
 
     public string StreetName { get; set; }
 

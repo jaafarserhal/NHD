@@ -10,6 +10,7 @@ using NHD.Core.Data;
 using NHD.Core.Models;
 using NHD.Core.Repository.Addresses;
 using NHD.Core.Repository.Customers;
+using NHD.Core.Repository.Orders;
 using NHD.Core.Services.Model.Customer;
 using NHD.Core.Utilities;
 using Org.BouncyCastle.Asn1.Misc;
@@ -21,15 +22,17 @@ namespace NHD.Core.Services.Customers
         protected internal AppDbContext context;
         private readonly ICustomerRepository _customerRepository;
         private readonly IAddressRepository _addressRepository;
+        private readonly IOrderRepository _orderRepository;
         private readonly IEmailService _emailService;
         private readonly ILogger<CustomerService> _logger;
         protected internal IDbContextTransaction Transaction;
 
-        public CustomerService(AppDbContext context, ICustomerRepository customerRepository, IAddressRepository addressRepository, IEmailService emailService, ILogger<CustomerService> logger)
+        public CustomerService(AppDbContext context, ICustomerRepository customerRepository, IAddressRepository addressRepository, IOrderRepository orderRepository, IEmailService emailService, ILogger<CustomerService> logger)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
             _addressRepository = addressRepository ?? throw new ArgumentNullException(nameof(addressRepository));
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -509,23 +512,22 @@ namespace NHD.Core.Services.Customers
 
                 if (existingCustomer != null)
                 {
-                    // Customer exists - update Provider ID if not set and log them in
-                    if (string.IsNullOrEmpty(existingCustomer.ProviderId))
-                    {
-                        existingCustomer.ProviderId = googleLogin.ProviderId;
-                        await _customerRepository.UpdateAsync(existingCustomer);
-                    }
-
-                    if (existingCustomer.StatusLookupId == CustomerStatusLookup.Pending.AsInt())
-                    {
-                        // Auto-verify Google users since Google has already verified their email
-                        existingCustomer.StatusLookupId = CustomerStatusLookup.Active.AsInt();
-                        existingCustomer.EmailVerificationToken = null;
-                        await _customerRepository.UpdateAsync(existingCustomer);
-                    }
-                    else if (existingCustomer.StatusLookupId == CustomerStatusLookup.InActive.AsInt())
+                    // If account id deactivated, prevent login even if Google token is valid
+                    if (existingCustomer.StatusLookupId == CustomerStatusLookup.InActive.AsInt())
                     {
                         return AppApiResponse<Customer>.Failure("Your account is deactivated. Please contact support.", HttpStatusCodeEnum.Unauthorized);
+                    }
+                    // Customer exists - update Provider ID if not set and log them in
+                    else if (!string.IsNullOrEmpty(existingCustomer.ProviderId))
+                    {
+                        existingCustomer.ProviderId = googleLogin.ProviderId;
+                        existingCustomer.FirstName = googleLogin.FirstName;
+                        existingCustomer.LastName = googleLogin.LastName;
+                        existingCustomer.IsGuest = false; // In case they are upgrading from guest to Google login
+                        existingCustomer.StatusLookupId = CustomerStatusLookup.Active.AsInt(); // Auto-verify Google users
+                        existingCustomer.EmailVerificationToken = null; // Clear any existing verification token
+                        existingCustomer.EmailVerificationTokenExpires = null;
+                        await _customerRepository.UpdateAsync(existingCustomer);
                     }
 
                     return AppApiResponse<Customer>.Success(existingCustomer, "Google login successful");
@@ -540,7 +542,7 @@ namespace NHD.Core.Services.Customers
                         LastName = googleLogin.LastName ?? "User",
                         ProviderId = googleLogin.ProviderId,
                         StatusLookupId = CustomerStatusLookup.Active.AsInt(), // Auto-verify Google users
-                        Password = CommonUtilities.HashPassword(Guid.NewGuid().ToString()), // Random password since they use Google
+                        Password = null, // No password since they use Google
                         CreatedAt = DateTime.UtcNow
                     };
 
@@ -619,6 +621,243 @@ namespace NHD.Core.Services.Customers
         }
 
         #endregion Customers
+
+        #region Guest Checkout
+
+        public async Task<ServiceResult<int>> PlaceOrderAsGuest(GuestCheckoutModel guestCheckout)
+        {
+            try
+            {
+                if (guestCheckout == null)
+                {
+                    return ServiceResult<int>.Failure("Guest checkout model is required.");
+                }
+
+                if (string.IsNullOrEmpty(guestCheckout.Email))
+                {
+                    return ServiceResult<int>.Failure("Email is required.");
+                }
+
+                if (guestCheckout.Items == null || !guestCheckout.Items.Any())
+                {
+                    return ServiceResult<int>.Failure("At least one item is required.");
+                }
+
+                if (guestCheckout.Shipping == null)
+                {
+                    return ServiceResult<int>.Failure("Shipping address is required.");
+                }
+
+                await BeginTransactionAsync();
+
+                try
+                {
+                    // Create or get guest customer
+                    var guestCustomer = await GetOrCreateGuestCustomerAsync(guestCheckout.Email);
+
+                    if (guestCustomer == null)
+                    {
+                        return ServiceResult<int>.Failure("Failed to create guest customer.");
+                    }
+
+                    // Create shipping address
+                    var shippingAddress = await CreateAddressFromGuestModelAsync(guestCustomer.CustomerId, guestCheckout.Shipping, AddressType.Shipping.AsInt());
+
+                    // Create billing address if different from shipping
+                    Address billingAddress = null;
+                    if (!guestCheckout.IsBillingSameAsShipping && guestCheckout.Billing != null)
+                    {
+                        billingAddress = await CreateAddressFromGuestModelAsync(guestCustomer.CustomerId, guestCheckout.Billing, AddressType.Billing.AsInt());
+                    }
+                    else
+                    {
+                        // Use shipping address as billing address
+                        billingAddress = shippingAddress;
+                    }
+
+                    // Create order
+                    var order = new Order
+                    {
+                        CustomerId = guestCustomer.CustomerId,
+                        GuestEmail = guestCheckout.Email,
+                        OrderDate = DateTime.UtcNow,
+                        OrderStatusLookupId = OrderStatusLookup.Pending.AsInt(), // Pending order status
+                        TotalAmount = guestCheckout.TotalPrice,
+                        CreatedAt = DateTime.UtcNow,
+                    };
+
+                    var createdOrder = context.Orders.Add(order);
+                    await SaveChangesAsync();
+
+                    // Check product availability and update quantities
+                    foreach (var item in guestCheckout.Items)
+                    {
+                        var product = await context.Products.FirstOrDefaultAsync(p => p.PrdId == item.ProductId);
+                        if (product == null)
+                        {
+                            await RollbackTransactionAsync();
+                            return ServiceResult<int>.Failure($"Product with ID {item.ProductId} not found.");
+                        }
+
+                        if (product.Quantity < item.Quantity)
+                        {
+                            await RollbackTransactionAsync();
+                            return ServiceResult<int>.Failure($"Insufficient stock for product ID {item.ProductId}. Available: {product.Quantity}, Requested: {item.Quantity}");
+                        }
+
+                        // Subtract ordered quantity from product stock
+                        product.Quantity -= item.Quantity;
+                        context.Products.Update(product);
+                    }
+
+                    // Create order items
+                    foreach (var item in guestCheckout.Items)
+                    {
+                        var orderItem = new OrderItem
+                        {
+                            OrderId = createdOrder.Entity.OrderId,
+                            PrdId = item.ProductId,
+                            Quantity = item.Quantity,
+                            UnitPrice = (decimal)item.Price,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        context.OrderItems.Add(orderItem);
+                    }
+
+                    await SaveChangesAsync();
+
+                    await CommitTransactionAsync();
+
+                    _logger.LogInformation("Guest checkout created successfully. OrderId: {OrderId}, Email: {Email}", createdOrder.Entity.OrderId, guestCheckout.Email);
+
+                    return ServiceResult<int>.Success(createdOrder.Entity.OrderId);
+                }
+                catch (Exception ex)
+                {
+                    await RollbackTransactionAsync();
+                    _logger.LogError(ex, "Error creating guest checkout for email: {Email}", guestCheckout.Email);
+                    throw;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await RollbackTransactionAsync();
+                _logger.LogError(ex, "Error in CreateGuestCheckoutAsync for email: {Email}", guestCheckout?.Email);
+                return ServiceResult<int>.Failure("Failed to create guest checkout. Please try again.");
+            }
+        }
+
+        private async Task<Customer> GetOrCreateGuestCustomerAsync(string email)
+        {
+            try
+            {
+                // Check if customer already exists
+                var existingCustomer = await _customerRepository.GetByEmailAsync(email);
+                if (existingCustomer != null)
+                {
+                    return existingCustomer;
+                }
+
+                // Create guest customer
+                var guestCustomer = new Customer
+                {
+                    EmailAddress = email,
+                    FirstName = "Guest",
+                    LastName = "Customer",
+                    Password = null,
+                    StatusLookupId = (int)CustomerStatusLookup.Guest,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    EmailVerificationToken = null,
+                    EmailVerificationTokenExpires = null,
+                    IsGuest = true
+                };
+
+                context.Customers.Add(guestCustomer);
+                await SaveChangesAsync();
+
+                return guestCustomer;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating guest customer for email: {Email}", email);
+                throw;
+            }
+        }
+
+        private async Task<Address> CreateAddressFromGuestModelAsync(int customerId, GuestAddressModel addressModel, int addressTypeId)
+        {
+            try
+            {
+                // Get customer to check if they are a guest
+                var customer = await context.Customers.FirstOrDefaultAsync(c => c.CustomerId == customerId);
+                if (customer == null)
+                {
+                    throw new InvalidOperationException($"Customer with ID {customerId} not found.");
+                }
+
+                // Check if an address with the same type already exists for this customer
+                var existingAddress = await context.Addresses
+                    .FirstOrDefaultAsync(a => a.CustomerId == customerId &&
+                                            a.AddressTypeLookupId == addressTypeId &&
+                                            a.IsActive);
+
+                if (existingAddress != null)
+                {
+                    // Update existing address
+                    existingAddress.ContactFirstName = addressModel.FirstName ?? "Guest";
+                    existingAddress.ContactLastName = addressModel.LastName ?? "Customer";
+                    existingAddress.ContactPhone = addressModel.Phone;
+                    existingAddress.StreetName = addressModel.StreetName;
+                    existingAddress.StreetNumber = addressModel.StreetNumber;
+                    existingAddress.PostalCode = addressModel.PostalCode;
+                    existingAddress.City = addressModel.City;
+                    existingAddress.CountryCode = "SE"; // Default to Sweden
+                    existingAddress.CreatedAt = DateTime.UtcNow;
+
+                    context.Addresses.Update(existingAddress);
+                    await SaveChangesAsync();
+
+                    _logger.LogInformation("Updated existing address for customer: {CustomerId}, AddressType: {AddressTypeId}", customerId, addressTypeId);
+                    return existingAddress;
+                }
+                else
+                {
+                    // Create new address
+                    var address = new Address
+                    {
+                        CustomerId = customerId,
+                        ContactFirstName = addressModel.FirstName ?? "Guest",
+                        ContactLastName = addressModel.LastName ?? "Customer",
+                        ContactPhone = addressModel.Phone,
+                        StreetName = addressModel.StreetName,
+                        StreetNumber = addressModel.StreetNumber,
+                        PostalCode = addressModel.PostalCode,
+                        City = addressModel.City,
+                        CountryCode = "SE", // Default to Sweden
+                        AddressTypeLookupId = addressTypeId,
+                        IsPrimary = true,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    context.Addresses.Add(address);
+                    await SaveChangesAsync();
+
+                    _logger.LogInformation("Created new address for customer: {CustomerId}, AddressType: {AddressTypeId}", customerId, addressTypeId);
+                    return address;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating/updating address for customer: {CustomerId}", customerId);
+                throw;
+            }
+        }
+
+        #endregion Guest Checkout
 
         #region Transactions
         public async Task BeginTransactionAsync()

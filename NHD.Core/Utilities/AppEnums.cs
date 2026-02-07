@@ -57,6 +57,14 @@ namespace NHD.Core.Utilities
         Milliliters_400 = 311
     }
 
+    public enum OrderStatusLookup
+    {
+        Pending = 400,
+        Paid = 401,
+        Shipped = 402,
+        Canceled = 403,
+    }
+
     public enum BoxCategoryLookup
     {
         SignatureDateGifts = 100,

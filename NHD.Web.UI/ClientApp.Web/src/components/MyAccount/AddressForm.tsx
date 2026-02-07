@@ -148,6 +148,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ address, onSubmit, onCancel, 
                                 value={formData.postalCode}
                                 error={errors.postalCode}
                                 onChange={handleChange}
+                                maxLength={5}
                                 placeholder="Enter postal code"
                                 required
                             />

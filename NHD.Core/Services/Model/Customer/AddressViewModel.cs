@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ namespace NHD.Core.Services.Model.Customer
         public string Phone { get; set; }
         public string StreetName { get; set; }
         public string StreetNumber { get; set; }
+        [MaxLength(5)]
         public string PostalCode { get; set; }
         public string City { get; set; }
         public string Type { get; set; }

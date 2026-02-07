@@ -16,6 +16,5 @@ export const routeUrls = {
     productDetails: '/product/:productId/:productName',
     DatesDetails: '/dates/:datesId/:datesName',
     cart: '/cart',
-    checkout: '/checkout',
-    payment: '/payment',
+    checkout: '/checkout'
 };

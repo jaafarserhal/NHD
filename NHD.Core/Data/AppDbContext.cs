@@ -125,7 +125,6 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Addresses)
                 .HasForeignKey(d => d.CustomerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_address_customer");
         });
 
@@ -555,6 +554,9 @@ public partial class AppDbContext : DbContext
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
             entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+            entity.Property(e => e.GuestEmail)
+                .HasMaxLength(150)
+                .HasColumnName("guest_email");
             entity.Property(e => e.OrderDate)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("order_date");

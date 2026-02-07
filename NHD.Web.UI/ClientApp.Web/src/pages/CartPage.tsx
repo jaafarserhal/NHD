@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Common/Header/Index";
 import Footer from "../components/Common/Footer/Index";
 import { useCart } from "../contexts/CartContext";
+import { routeUrls } from "../api/base/routeUrls";
+import { useNavigate } from "react-router-dom";
 
 const CartPage: React.FC = () => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const { cartItems, isLoading, removeFromCart, updateQuantity, clearCart, getTotalItems, getTotalPrice } = useCart();
+    const navigate = useNavigate();
     // preload image
     useEffect(() => {
         const img = new Image();
@@ -49,6 +52,10 @@ const CartPage: React.FC = () => {
             console.error('Failed to clear cart:', error);
         }
     };
+
+    const redirectToCheckout = () => {
+        navigate(routeUrls.checkout);
+    }
 
     return (
         <>
@@ -365,7 +372,7 @@ const CartPage: React.FC = () => {
                                 <button
                                     className="btn btn-dark btn-hover-primary rounded-0 w-100"
                                     disabled={cartItems.length === 0 || isLoading}
-                                    onClick={() => window.location.href = '/checkout'}
+                                    onClick={() => redirectToCheckout()}
                                 >
                                     Proceed to checkout
                                 </button>

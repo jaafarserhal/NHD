@@ -646,5 +646,38 @@ namespace NHD.Web.UI.Controllers.Website
         }
 
         #endregion Address Actions
+
+        #region Guest Checkout
+
+        [HttpPost("PlaceOrderAsGuest")]
+        public async Task<ActionResult<ServiceResult<int>>> PlaceOrderAsGuest([FromBody] GuestCheckoutModel guestCheckout)
+        {
+            try
+            {
+                if (guestCheckout == null)
+                    return BadRequest("Guest checkout data is required");
+
+                var result = await _customerService.PlaceOrderAsGuest(guestCheckout);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(new { message = result.ErrorMessage });
+                }
+
+                return Ok(new ServiceResult<int>
+                {
+                    Data = result.Data,
+                    IsSuccess = true,
+                    Status = HttpStatusCodeEnum.OK.AsInt()
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating guest checkout");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while processing the guest checkout." });
+            }
+        }
+
+        #endregion Guest Checkout
     }
 }

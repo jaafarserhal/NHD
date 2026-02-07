@@ -1,0 +1,37 @@
+{
+    "email": "guest@example.com",
+    "shipping": {
+        "email": "guest@example.com",
+        "firstName": "John",
+        "lastName": "Doe",
+        "phone": "123-456-7890",
+        "streetName": "Main Street",
+        "streetNumber": "123",
+        "postalCode": "12345",
+        "city": "Stockholm",
+        "typeId": 700
+    },
+    "billing": {
+        "email": "guest@example.com",
+        "firstName": "John",
+        "lastName": "Doe",
+        "phone": "123-456-7890",
+        "streetName": "Main Street",
+        "streetNumber": "123",
+        "postalCode": "12345",
+        "city": "Stockholm",
+        "typeId": 701
+    },
+    "items": [
+        {
+            "productId": 1,
+            "price": 29.99,
+            "quantity": 2
+        },
+        {
+            "productId": 2,
+            "price": 15.50,
+            "quantity": 1
+        }
+    ]
+}

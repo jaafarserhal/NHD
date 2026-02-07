@@ -34,5 +34,6 @@ namespace NHD.Core.Services.Customers
         Task<PagedServiceResult<IEnumerable<CustomerViewModel>>> GetCustomersAsync(int page = 1, int limit = 10);
         Task<ServiceResult<Customer>> UpdateCustomerStatusAsync(int customerId, int statusId);
         Task<PagedServiceResult<IEnumerable<AddressViewModel>>> GetAddressesByCustomerId(int customerId, int page = 1, int limit = 10);
+        Task<ServiceResult<int>> PlaceOrderAsGuest(GuestCheckoutModel guestCheckout);
     }
 }

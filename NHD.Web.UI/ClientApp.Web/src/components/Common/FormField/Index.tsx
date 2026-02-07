@@ -10,6 +10,7 @@ interface FormFieldProps {
     placeholder?: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     required?: boolean;
+    maxLength?: number;
 }
 
 const FormField: React.FC<FormFieldProps> = ({
@@ -20,7 +21,8 @@ const FormField: React.FC<FormFieldProps> = ({
     error,
     placeholder,
     onChange,
-    required = false
+    required = false,
+    maxLength
 }) => {
 
     const [showPassword, setShowPassword] = useState(false);
@@ -70,6 +72,7 @@ const FormField: React.FC<FormFieldProps> = ({
                         name={name}
                         value={value}
                         placeholder={placeholder}
+                        maxLength={maxLength}
                         onChange={onChange}
                         style={error
                             ? { borderColor: 'red', paddingRight: isPasswordField ? '45px' : undefined }
