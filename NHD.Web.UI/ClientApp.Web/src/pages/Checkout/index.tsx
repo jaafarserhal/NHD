@@ -12,8 +12,73 @@ import { useCart } from '../../contexts/CartContext';
 import authService from '../../api/authService';
 import Loader from '../../components/Common/Loader/Index';
 import { validateEmail } from '../../api/common/Utils';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-export default function Checkout() {
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || '');
+
+// Main wrapper that manages clientSecret and Elements provider
+export default function CheckoutWrapper() {
+    const [clientSecret, setClientSecret] = useState<string | null>(null);
+
+    // If we have a clientSecret, wrap with Elements provider
+    if (clientSecret) {
+        return (
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <CheckoutWithStripe clientSecret={clientSecret} setClientSecret={setClientSecret} />
+            </Elements>
+        );
+    }
+
+    // Otherwise, render without Stripe context
+    return <CheckoutWithoutStripe setClientSecret={setClientSecret} />;
+}
+
+// Checkout component WITH Stripe hooks (used when clientSecret exists)
+interface CheckoutWithStripeProps {
+    clientSecret: string;
+    setClientSecret: (secret: string | null) => void;
+}
+
+function CheckoutWithStripe({ clientSecret, setClientSecret }: CheckoutWithStripeProps) {
+    const stripe = useStripe();
+    const elements = useElements();
+
+    return (
+        <CheckoutContent
+            clientSecret={clientSecret}
+            setClientSecret={setClientSecret}
+            stripe={stripe}
+            elements={elements}
+        />
+    );
+}
+
+// Checkout component WITHOUT Stripe hooks (used before clientSecret exists)
+interface CheckoutWithoutStripeProps {
+    setClientSecret: (secret: string | null) => void;
+}
+
+function CheckoutWithoutStripe({ setClientSecret }: CheckoutWithoutStripeProps) {
+    return (
+        <CheckoutContent
+            clientSecret={null}
+            setClientSecret={setClientSecret}
+            stripe={null}
+            elements={null}
+        />
+    );
+}
+
+// Main Checkout Content Component (shared by both)
+interface CheckoutContentProps {
+    clientSecret: string | null;
+    setClientSecret: (secret: string | null) => void;
+    stripe: any;
+    elements: any;
+}
+
+function CheckoutContent({ clientSecret, setClientSecret, stripe, elements }: CheckoutContentProps) {
     const [imageLoaded, setImageLoaded] = useState(false);
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -24,6 +89,8 @@ export default function Checkout() {
     const [isLoading, setIsLoading] = useState(false);
     const [cartInitialized, setCartInitialized] = useState(false);
     const [orderPlaced, setOrderPlaced] = useState(false);
+    const [isPaymentReady, setIsPaymentReady] = useState(false);
+    const [isInitializing, setIsInitializing] = useState(true);
 
     // Customer addresses state
     const [customerAddresses, setCustomerAddresses] = useState<CustomerAddresses | null>(null);
@@ -34,6 +101,7 @@ export default function Checkout() {
     const shippingCost = 41.00;
     const subtotal = getTotalPrice();
     const totalAmount = subtotal + shippingCost;
+
     const [formData, setFormData] = useState({
         email: "",
         note: "",
@@ -93,14 +161,11 @@ export default function Checkout() {
                         email: "Invalid email format"
                     }));
                 } else {
-                    // Clear email error if valid
-                    if (errors.email) {
-                        setErrors(prev => {
-                            const newErrors = { ...prev };
-                            delete newErrors.email;
-                            return newErrors;
-                        });
-                    }
+                    setErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors.email;
+                        return newErrors;
+                    });
                 }
             }
         }
@@ -108,12 +173,10 @@ export default function Checkout() {
         if (name === "sameAddress") {
             setIsBillingSameAsShipping(checked);
 
-            // Update billing form visibility based on addresses and same address checkbox
             if (customerAddresses) {
                 const hasBilling = customerAddresses.billingAddressId !== 0;
                 setShowBillingForm(!hasBilling && !checked);
             } else {
-                // For guest users, always show/hide based on same address checkbox
                 setShowBillingForm(!checked);
             }
         }
@@ -131,7 +194,7 @@ export default function Checkout() {
     const validateForm = (): boolean => {
         const validationErrors: { [key: string]: string } = {};
 
-        // Shipping validation (only when form is visible)
+        // Shipping validation
         if (showShippingForm) {
             if (!shippingData.firstName?.trim()) validationErrors.firstName = "First name is required";
             if (!shippingData.lastName?.trim()) validationErrors.lastName = "Last name is required";
@@ -151,7 +214,7 @@ export default function Checkout() {
             }
         }
 
-        // Billing validation when separate billing is enabled and form is visible
+        // Billing validation
         if (!isBillingSameAsShipping && showBillingForm) {
             if (!billingData.firstName?.trim()) validationErrors.billing_firstName = "Billing first name is required";
             if (!billingData.lastName?.trim()) validationErrors.billing_lastName = "Billing last name is required";
@@ -166,143 +229,205 @@ export default function Checkout() {
         return Object.keys(validationErrors).length === 0;
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    // Handle form submission and payment
+    const handleContinueToPayment = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!validateForm()) {
             return;
         }
 
+        if (!stripe || !elements) {
+            setErrors(prev => ({
+                ...prev,
+                payment: 'Payment form is still loading. Please try again in a moment.'
+            }));
+            return;
+        }
+
+        if (!clientSecret) {
+            setErrors(prev => ({
+                ...prev,
+                payment: 'Payment not initialized. Please refresh the page.'
+            }));
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+
+            // Submit the payment element to ensure validation
+            const { error: submitError } = await elements.submit();
+            if (submitError) {
+                throw new Error(submitError.message || 'Please complete all payment fields');
+            }
+
+            // Confirm the payment
+            const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    receipt_email: isLoggedIn ? undefined : formData.email,
+                },
+                redirect: 'if_required',
+            });
+
+            if (confirmError) {
+                throw new Error(confirmError.message || 'Payment failed');
+            }
+
+            if (paymentIntent && paymentIntent.status === 'succeeded') {
+                // Place order after successful payment
+                await handlePaymentSuccess(paymentIntent.id);
+            } else {
+                throw new Error('Payment was not completed');
+            }
+        } catch (err: any) {
+            console.error('Payment error:', err);
+            setErrors(prev => ({
+                ...prev,
+                payment: err.message || 'Payment failed. Please try again.'
+            }));
+            setIsLoading(false);
+        }
+    };
+
+    // Handle successful payment
+    const handlePaymentSuccess = async (paymentIntentId: string) => {
         setIsLoading(true);
 
         try {
-            if (isLoggedIn) {
-                // Authenticated customer checkout
-                const customerCheckoutData = {
-                    shipping: {
-                        id: customerAddresses?.shippingAddressId || 0,
-                        firstName: shippingData.firstName,
-                        lastName: shippingData.lastName,
-                        phone: shippingData.phone,
-                        streetName: shippingData.streetName,
-                        streetNumber: shippingData.streetNumber,
-                        postalCode: shippingData.postalCode,
-                        city: shippingData.city,
-                        typeId: AddressTypeEnum.Shipping
-                    },
-                    billing: isBillingSameAsShipping ? {
-                        id: customerAddresses?.billingAddressId || 0,
-                        firstName: shippingData.firstName,
-                        lastName: shippingData.lastName,
-                        phone: shippingData.phone,
-                        streetName: shippingData.streetName,
-                        streetNumber: shippingData.streetNumber,
-                        postalCode: shippingData.postalCode,
-                        city: shippingData.city,
-                        typeId: AddressTypeEnum.Billing
-                    } : {
-                        id: customerAddresses?.billingAddressId || 0,
-                        firstName: billingData.firstName,
-                        lastName: billingData.lastName,
-                        phone: billingData.phone,
-                        streetName: billingData.streetName,
-                        streetNumber: billingData.streetNumber,
-                        postalCode: billingData.postalCode,
-                        city: billingData.city,
-                        typeId: AddressTypeEnum.Billing
-                    },
-                    items: cartItems.map(item => ({
-                        productId: item.product.id,
-                        price: item.product.fromPrice,
-                        quantity: item.quantity
-                    })),
-                    totalPrice: totalAmount,
-                    note: formData.note || "",
-                    isBillingSameAsShipping: customerAddresses?.billingAddressId !== 0 && customerAddresses?.shippingAddressId !== 0 ? false : isBillingSameAsShipping // Force same as shipping if either address is missing
-                };
+            const orderData = isLoggedIn ? buildAuthenticatedOrderData(paymentIntentId) : buildGuestOrderData(paymentIntentId);
 
-                const response = await authService.placeOrder(customerCheckoutData);
+            const response = isLoggedIn
+                ? await authService.placeOrder(orderData)
+                : await authService.placeOrderAsGuest(orderData);
 
-                if (response && response.data) {
-                    setTimeout(() => {
-                        setIsLoading(false);
-                        clearCart();
-                        setOrderPlaced(true);
-                    }, 2000);
-                } else {
-                    throw new Error('Failed to place order. Please try again.');
-                }
+            if (response?.data) {
+                setTimeout(() => {
+                    setIsLoading(false);
+                    clearCart();
+                    setOrderPlaced(true);
+                }, 2000);
             } else {
-                // Guest checkout
-                const guestCheckoutData = {
-                    email: formData.email,
-                    shipping: {
-                        firstName: shippingData.firstName,
-                        lastName: shippingData.lastName,
-                        phone: shippingData.phone,
-                        streetName: shippingData.streetName,
-                        streetNumber: shippingData.streetNumber,
-                        postalCode: shippingData.postalCode,
-                        city: shippingData.city,
-                        typeId: AddressTypeEnum.Shipping
-                    },
-                    billing: isBillingSameAsShipping ? {
-                        firstName: shippingData.firstName,
-                        lastName: shippingData.lastName,
-                        phone: shippingData.phone,
-                        streetName: shippingData.streetName,
-                        streetNumber: shippingData.streetNumber,
-                        postalCode: shippingData.postalCode,
-                        city: shippingData.city,
-                        typeId: AddressTypeEnum.Billing
-                    } : {
-                        firstName: billingData.firstName,
-                        lastName: billingData.lastName,
-                        phone: billingData.phone,
-                        streetName: billingData.streetName,
-                        streetNumber: billingData.streetNumber,
-                        postalCode: billingData.postalCode,
-                        city: billingData.city,
-                        typeId: AddressTypeEnum.Billing
-                    },
-                    items: cartItems.map(item => ({
-                        productId: item.product.id,
-                        price: item.product.fromPrice,
-                        quantity: item.quantity
-                    })),
-                    totalPrice: totalAmount,
-                    note: formData.note || "",
-                    isBillingSameAsShipping: isBillingSameAsShipping
-                };
-
-                const response = await authService.placeOrderAsGuest(guestCheckoutData);
-
-                if (response && response.data) {
-                    setTimeout(() => {
-                        setIsLoading(false);
-                        clearCart();
-                        setOrderPlaced(true);
-                    }, 2000);
-                } else {
-                    throw new Error('Failed to place order as guest. Please try again.');
-                }
+                throw new Error('Failed to place order');
             }
-
         } catch (error: any) {
             setIsLoading(false);
-            let errorMessage = 'An error occurred during checkout. Please try again.';
-
-            if (error.response?.data?.message) {
-                errorMessage = error.response.data.message;
-            } else if (error.response?.status === 400) {
-                errorMessage = 'Please check your information and try again.';
-            } else if (error.response?.status === 500) {
-                errorMessage = 'Server error. Please try again later.';
-            } else if (error.message) {
-                errorMessage = error.message;
-            }
-            console.error('Error during checkout:', errorMessage);
+            handleOrderError(error);
         }
+    };
+
+    // Helper function to build authenticated order data
+    const buildAuthenticatedOrderData = (paymentIntentId: string) => {
+        return {
+            shipping: {
+                id: customerAddresses?.shippingAddressId || 0,
+                firstName: shippingData.firstName,
+                lastName: shippingData.lastName,
+                phone: shippingData.phone,
+                streetName: shippingData.streetName,
+                streetNumber: shippingData.streetNumber,
+                postalCode: shippingData.postalCode,
+                city: shippingData.city,
+                typeId: AddressTypeEnum.Shipping
+            },
+            billing: isBillingSameAsShipping ? {
+                id: customerAddresses?.billingAddressId || 0,
+                firstName: shippingData.firstName,
+                lastName: shippingData.lastName,
+                phone: shippingData.phone,
+                streetName: shippingData.streetName,
+                streetNumber: shippingData.streetNumber,
+                postalCode: shippingData.postalCode,
+                city: shippingData.city,
+                typeId: AddressTypeEnum.Billing
+            } : {
+                id: customerAddresses?.billingAddressId || 0,
+                firstName: billingData.firstName,
+                lastName: billingData.lastName,
+                phone: billingData.phone,
+                streetName: billingData.streetName,
+                streetNumber: billingData.streetNumber,
+                postalCode: billingData.postalCode,
+                city: billingData.city,
+                typeId: AddressTypeEnum.Billing
+            },
+            items: cartItems.map(item => ({
+                productId: item.product.id,
+                price: item.product.fromPrice,
+                quantity: item.quantity
+            })),
+            totalPrice: totalAmount,
+            note: formData.note || "",
+            paymentIntentId: paymentIntentId,
+            isBillingSameAsShipping: customerAddresses?.billingAddressId !== 0 && customerAddresses?.shippingAddressId !== 0 ? false : isBillingSameAsShipping
+        };
+    };
+
+    // Helper function to build guest order data
+    const buildGuestOrderData = (paymentIntentId: string) => {
+        return {
+            email: formData.email,
+            shipping: {
+                firstName: shippingData.firstName,
+                lastName: shippingData.lastName,
+                phone: shippingData.phone,
+                streetName: shippingData.streetName,
+                streetNumber: shippingData.streetNumber,
+                postalCode: shippingData.postalCode,
+                city: shippingData.city,
+                typeId: AddressTypeEnum.Shipping
+            },
+            billing: isBillingSameAsShipping ? {
+                firstName: shippingData.firstName,
+                lastName: shippingData.lastName,
+                phone: shippingData.phone,
+                streetName: shippingData.streetName,
+                streetNumber: shippingData.streetNumber,
+                postalCode: shippingData.postalCode,
+                city: shippingData.city,
+                typeId: AddressTypeEnum.Billing
+            } : {
+                firstName: billingData.firstName,
+                lastName: billingData.lastName,
+                phone: billingData.phone,
+                streetName: billingData.streetName,
+                streetNumber: billingData.streetNumber,
+                postalCode: billingData.postalCode,
+                city: billingData.city,
+                typeId: AddressTypeEnum.Billing
+            },
+            items: cartItems.map(item => ({
+                productId: item.product.id,
+                price: item.product.fromPrice,
+                quantity: item.quantity
+            })),
+            totalPrice: totalAmount,
+            note: formData.note || "",
+            paymentIntentId: paymentIntentId,
+            isBillingSameAsShipping: isBillingSameAsShipping
+        };
+    };
+
+    // Helper function to handle order errors
+    const handleOrderError = (error: any) => {
+        let errorMessage = 'An error occurred during checkout. Please try again.';
+
+        if (error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+        } else if (error.response?.status === 400) {
+            errorMessage = 'Please check your information and try again.';
+        } else if (error.response?.status === 500) {
+            errorMessage = 'Server error. Please try again later.';
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
+        setErrors(prev => ({
+            ...prev,
+            order: errorMessage
+        }));
+        console.error('Order error:', errorMessage);
     };
 
     // Fetch customer addresses for logged-in users
@@ -314,27 +439,18 @@ export default function Checkout() {
                 const addresses: CustomerAddresses = response.data;
                 setCustomerAddresses(addresses);
 
-                // Update form visibility based on existing addresses
                 const hasShipping = addresses.shippingAddressId !== 0;
                 const hasBilling = addresses.billingAddressId !== 0;
 
                 setShowShippingForm(!hasShipping);
                 setShowBillingForm(!hasBilling);
-
-                // If both addresses exist, hide forms
-                if (hasShipping && hasBilling) {
-                    setShowShippingForm(false);
-                    setShowBillingForm(false);
-                }
             }
         } catch (error) {
             console.error('Error fetching customer addresses:', error);
-            // Keep forms visible if there's an error
         } finally {
             setIsLoading(false);
         }
     };
-
 
     // Initialize component on mount
     useEffect(() => {
@@ -350,7 +466,7 @@ export default function Checkout() {
         const img = new Image();
         img.src = "/assets/images/banner/contact-us-banner.webp";
         img.onload = () => setImageLoaded(true);
-    }, []); // Run only once on mount
+    }, []);
 
     // Handle cart empty redirect
     useEffect(() => {
@@ -358,6 +474,38 @@ export default function Checkout() {
             navigate(routeUrls.cart);
         }
     }, [cartItems.length, cartInitialized, orderPlaced, navigate]);
+
+    // Initialize payment intent when cart is ready
+    useEffect(() => {
+        const initializePayment = async () => {
+            if (cartInitialized && cartItems.length > 0 && !clientSecret && !orderPlaced) {
+                try {
+                    const response = await authService.createPaymentIntent({
+                        amount: totalAmount,
+                        currency: 'sek',
+                        customerEmail: isLoggedIn ? customerAddresses?.email : formData.email,
+                        description: 'NHD Order Payment',
+                    });
+
+                    if (response?.data?.clientSecret) {
+                        setClientSecret(response.data.clientSecret);
+                    }
+                } catch (err) {
+                    console.error('Payment initialization error:', err);
+                    setErrors(prev => ({
+                        ...prev,
+                        payment: 'Failed to initialize payment. Please refresh the page.'
+                    }));
+                    setIsInitializing(false);
+                }
+            }
+        };
+
+        initializePayment();
+    }, [cartInitialized, cartItems.length, clientSecret, orderPlaced, totalAmount, isLoggedIn, formData.email]);
+
+    // Determine if loader should show
+    const shouldShowLoader = isLoading || isInitializing || (!!clientSecret && !isPaymentReady);
 
     // Thank you message component
     const ThankYouMessage = React.memo(() => (
@@ -389,8 +537,7 @@ export default function Checkout() {
             <div
                 className="breadcrumb"
                 style={{
-                    backgroundImage:
-                        "url(/assets/images/banner/contact-us-banner.webp)",
+                    backgroundImage: "url(/assets/images/banner/contact-us-banner.webp)",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
@@ -414,12 +561,18 @@ export default function Checkout() {
                     </div>
                 </div>
             </div>
-            {/* Breadcrumb Section End */}
-            {orderPlaced && <ThankYouMessage key="thank-you" />}
+
+            {orderPlaced && <ThankYouMessage />}
+
             {!orderPlaced && (
-                <div key="checkout-form" className={styles.checkoutContainer}>
-                    <Loader loading={isLoading} fullscreen={false} isDark={true} />
-                    <form className={styles.checkoutForm} onSubmit={handleSubmit}>
+                <div className={styles.checkoutContainer}>
+                    <Loader
+                        loading={shouldShowLoader}
+                        fullscreen={false}
+                        isDark={true}
+                    />
+
+                    <form className={styles.checkoutForm} onSubmit={handleContinueToPayment}>
                         {/* Email Section */}
                         {!isLoggedIn && (
                             <div className={styles.formSection}>
@@ -469,7 +622,6 @@ export default function Checkout() {
                                                 required
                                             />
                                         </div>
-
                                         <div className={styles.formGroup}>
                                             <FormField
                                                 label="Last Name"
@@ -495,7 +647,6 @@ export default function Checkout() {
                                                 required
                                             />
                                         </div>
-
                                         <div className={styles.formGroup}>
                                             <FormField
                                                 label="Street Number"
@@ -521,7 +672,6 @@ export default function Checkout() {
                                                 required
                                             />
                                         </div>
-
                                         <div className={styles.formGroup}>
                                             <FormField
                                                 label="Postal Code"
@@ -552,14 +702,12 @@ export default function Checkout() {
                                 </>
                             )}
 
-                            {/* Show combined message when both addresses exist */}
                             {isLoggedIn && !showShippingForm && !showBillingForm && (
                                 <div className={styles.loggedInMessage}>
                                     <p>✓ Primary Shipping & Billing address already saved to your account.</p>
                                 </div>
                             )}
 
-                            {/* Show checkbox only when at least one address is missing */}
                             {(!isLoggedIn || showShippingForm || showBillingForm) && (
                                 <div className={styles.checkboxWrapper}>
                                     <input
@@ -574,7 +722,7 @@ export default function Checkout() {
                             )}
                         </div>
 
-                        {/* Show message when billing address exists for logged-in users */}
+                        {/* Billing Information */}
                         {isLoggedIn && !isBillingSameAsShipping && !showBillingForm && showShippingForm && (
                             <div className={styles.formSection}>
                                 <h2 className={styles.sectionTitle}>Billing Information</h2>
@@ -584,7 +732,6 @@ export default function Checkout() {
                             </div>
                         )}
 
-                        {/* Billing Information - Show when billing is different and form needs to be shown */}
                         {!isBillingSameAsShipping && showBillingForm && (
                             <div className={styles.formSection}>
                                 <h2 className={styles.sectionTitle}>Billing Information</h2>
@@ -607,7 +754,6 @@ export default function Checkout() {
                                             required
                                         />
                                     </div>
-
                                     <div className={styles.formGroup}>
                                         <FormField
                                             label="Last Name"
@@ -633,7 +779,6 @@ export default function Checkout() {
                                             required
                                         />
                                     </div>
-
                                     <div className={styles.formGroup}>
                                         <FormField
                                             label="Street Number"
@@ -659,7 +804,6 @@ export default function Checkout() {
                                             required
                                         />
                                     </div>
-
                                     <div className={styles.formGroup}>
                                         <FormField
                                             label="Postal Code"
@@ -690,7 +834,7 @@ export default function Checkout() {
                             </div>
                         )}
 
-                        {/* Gift Message Section */}
+                        {/* Order Notes */}
                         <div className={styles.optionalSection}>
                             <div
                                 className={styles.optionalHeader}
@@ -700,10 +844,7 @@ export default function Checkout() {
                                 <span>{showOrderNote ? '−' : '+'}</span>
                             </div>
 
-                            <div
-                                className={`${styles.orderNoteWrapper} ${showOrderNote ? styles.open : ''
-                                    }`}
-                            >
+                            <div className={`${styles.orderNoteWrapper} ${showOrderNote ? styles.open : ''}`}>
                                 <textarea
                                     name="note"
                                     value={formData.note}
@@ -715,8 +856,6 @@ export default function Checkout() {
                             </div>
                         </div>
 
-
-
                         {/* Shipping Methods */}
                         <div className={styles.formSection}>
                             <h2 className={styles.sectionTitle}>Shipping Methods</h2>
@@ -727,7 +866,7 @@ export default function Checkout() {
                                         name="shippingMethod"
                                         value="regular"
                                         checked={true}
-                                        onChange={handleInputChange}
+                                        readOnly
                                     />
                                     <div className={styles.shippingDetails}>
                                         <div className={styles.shippingName}>Regular Shipping (3 to 4 days)</div>
@@ -735,34 +874,78 @@ export default function Checkout() {
                                     <div className={styles.shippingPrice}>$41.00</div>
                                 </label>
                             </div>
-
                         </div>
 
                         {/* Payment Methods */}
                         <div className={styles.formSection}>
                             <h2 className={styles.sectionTitle}>Payment Methods</h2>
-                            <div className={styles.shippingMethods}>
-                                <label className={styles.shippingOption}>
-                                    <input
-                                        type="radio"
-                                        name="paymentMethod"
-                                        value="creditCard"
-                                        checked={true}
-                                        onChange={handleInputChange}
-                                    />
-                                    <div className={styles.shippingDetails}>
-                                        <div className={styles.shippingName}>Credit Card</div>
-                                    </div>
 
-                                </label>
-                            </div>
+                            {clientSecret && (
+                                <div className={styles.paymentElementWrapper}>
+                                    <PaymentElement
+                                        onReady={() => {
+                                            setIsPaymentReady(true);
+                                            setIsInitializing(false);
+                                        }}
+                                        options={{
+                                            layout: 'accordion',
+                                            paymentMethodOrder: ['card'],
+                                            fields: {
+                                                billingDetails: {
+                                                    address: {
+                                                        country: 'never'
+                                                    }
+                                                }
+                                            },
+                                            terms: {
+                                                card: 'never'
+                                            },
+                                            wallets: {
+                                                applePay: 'never',
+                                                googlePay: 'never'
+                                            },
+                                            business: {
+                                                name: 'NHD'
+                                            },
+                                            defaultValues: {
+                                                billingDetails: {
+                                                    address: {
+                                                        country: 'SE'
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                    />
+
+                                    {(!stripe || !elements) && (
+                                        <div className={styles.paymentLoading}>
+                                            Loading payment form...
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {errors.payment && (
+                                <div className={styles.paymentError}>
+                                    {errors.payment}
+                                </div>
+                            )}
+
+                            {errors.order && (
+                                <div className={styles.paymentError}>
+                                    {errors.order}
+                                </div>
+                            )}
 
                             <div className={styles.termsText}>
                                 By placing an order, you agree to our <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a>.
                             </div>
 
-
-                            <button type="submit" className={styles.submitButton} disabled={isLoading || cartItems.length === 0}>
+                            <button
+                                type="submit"
+                                className={styles.submitButton}
+                                disabled={isLoading || cartItems.length === 0 || !clientSecret || !stripe || !elements}
+                            >
                                 {isLoading ? 'Processing...' : 'Place Order'}
                             </button>
                         </div>
@@ -829,6 +1012,7 @@ export default function Checkout() {
                     </aside>
                 </div>
             )}
+
             <Footer isDark={true} />
         </>
     );

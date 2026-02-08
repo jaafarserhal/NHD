@@ -20,6 +20,9 @@ namespace NHD.Core.Services.Model.Customer
         public string Note { get; set; }
 
         public decimal TotalPrice { get; set; }
+
+        // Payment information
+        public string PaymentIntentId { get; set; }
     }
 
     public class CustomerCheckoutModel
@@ -34,6 +37,9 @@ namespace NHD.Core.Services.Model.Customer
         public string Note { get; set; }
 
         public decimal TotalPrice { get; set; }
+
+        // Payment information
+        public string PaymentIntentId { get; set; }
     }
     public class OrderAddressModel
     {

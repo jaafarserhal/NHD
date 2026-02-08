@@ -12,6 +12,8 @@ using NHD.Core.Common.Models;
 using NHD.Core.Models;
 using NHD.Core.Services.Customers;
 using NHD.Core.Services.Model.Customer;
+using NHD.Core.Services.Payments;
+using NHD.Core.Services.Model.Payment;
 using NHD.Core.Utilities;
 
 namespace NHD.Web.UI.Controllers.Website
@@ -22,12 +24,14 @@ namespace NHD.Web.UI.Controllers.Website
     {
         private readonly ILogger<CustomerController> _logger;
         private readonly ICustomerService _customerService;
+        private readonly IPaymentService _paymentService;
         private readonly string _jwtSecret;
 
-        public CustomerController(ILogger<CustomerController> logger, ICustomerService customerService, IConfiguration configuration)
+        public CustomerController(ILogger<CustomerController> logger, ICustomerService customerService, IPaymentService paymentService, IConfiguration configuration)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
+            _paymentService = paymentService ?? throw new ArgumentNullException(nameof(paymentService));
             _jwtSecret = configuration["JwtSettings:SecretKey"] ?? throw new ArgumentNullException("JwtSettings:SecretKey");
         }
 
@@ -460,6 +464,7 @@ namespace NHD.Web.UI.Controllers.Website
             var addresses = addressesResult.Data.ToList();
             var response = new CustomerAddressesModel
             {
+                Email = email,
                 ShippingAddressId = addresses.FirstOrDefault(a => a.AddressTypeLookupId == AddressType.Shipping.AsInt() && a.IsPrimary)?.AddressId ?? 0,
                 BillingAddressId = addresses.FirstOrDefault(a => a.AddressTypeLookupId == AddressType.Billing.AsInt() && a.IsPrimary)?.AddressId ?? 0
             };
@@ -685,6 +690,97 @@ namespace NHD.Web.UI.Controllers.Website
 
         #endregion Address Actions
 
+        #region Payment Actions
+
+        [HttpPost("CreatePaymentIntent")]
+        public async Task<ActionResult<ServiceResult<PaymentIntentResponse>>> CreatePaymentIntent([FromBody] CreatePaymentIntentRequest request)
+        {
+            try
+            {
+                if (request == null || request.Amount <= 0)
+                    return BadRequest(new { message = "Invalid payment request" });
+
+                var result = await _paymentService.CreatePaymentIntentAsync(request);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(new { message = result.ErrorMessage });
+                }
+
+                return Ok(new ServiceResult<PaymentIntentResponse>
+                {
+                    Data = result.Data,
+                    IsSuccess = true,
+                    Status = HttpStatusCodeEnum.OK.AsInt()
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating payment intent");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while creating payment intent." });
+            }
+        }
+
+        [HttpPost("ConfirmPayment")]
+        public async Task<ActionResult<ServiceResult<PaymentConfirmationResponse>>> ConfirmPayment([FromBody] ConfirmPaymentRequest request)
+        {
+            try
+            {
+                if (request == null || string.IsNullOrEmpty(request.PaymentIntentId))
+                    return BadRequest(new { message = "Invalid payment confirmation request" });
+
+                var result = await _paymentService.ConfirmPaymentAsync(request);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(new { message = result.ErrorMessage });
+                }
+
+                return Ok(new ServiceResult<PaymentConfirmationResponse>
+                {
+                    Data = result.Data,
+                    IsSuccess = true,
+                    Status = HttpStatusCodeEnum.OK.AsInt()
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error confirming payment");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while confirming payment." });
+            }
+        }
+
+        [HttpGet("PaymentStatus/{paymentIntentId}")]
+        public async Task<ActionResult<ServiceResult<PaymentStatusResponse>>> GetPaymentStatus(string paymentIntentId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(paymentIntentId))
+                    return BadRequest(new { message = "Payment intent ID is required" });
+
+                var result = await _paymentService.GetPaymentStatusAsync(paymentIntentId);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(new { message = result.ErrorMessage });
+                }
+
+                return Ok(new ServiceResult<PaymentStatusResponse>
+                {
+                    Data = result.Data,
+                    IsSuccess = true,
+                    Status = HttpStatusCodeEnum.OK.AsInt()
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting payment status");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while getting payment status." });
+            }
+        }
+
+        #endregion Payment Actions
+
         #region Guest Checkout
 
         [HttpPost("PlaceOrderAsGuest")]
@@ -696,11 +792,43 @@ namespace NHD.Web.UI.Controllers.Website
                 if (guestCheckout == null)
                     return BadRequest("Guest checkout data is required");
 
+                // Verify payment if PaymentIntentId is provided
+                if (!string.IsNullOrEmpty(guestCheckout.PaymentIntentId))
+                {
+                    var paymentStatus = await _paymentService.GetPaymentStatusAsync(guestCheckout.PaymentIntentId);
+
+                    if (!paymentStatus.IsSuccess)
+                    {
+                        return BadRequest(new { message = "Failed to verify payment status" });
+                    }
+
+                    if (!paymentStatus.Data.IsSuccessful)
+                    {
+                        return BadRequest(new { message = "Payment not completed. Please complete payment before placing order." });
+                    }
+
+                    // Verify payment amount matches order total
+                    if (Math.Abs(paymentStatus.Data.Amount - guestCheckout.TotalPrice) > 0.01m)
+                    {
+                        return BadRequest(new { message = "Payment amount does not match order total" });
+                    }
+                }
+
                 var result = await _customerService.PlaceOrderAsGuest(guestCheckout);
 
                 if (!result.IsSuccess)
                 {
                     return BadRequest(new { message = result.ErrorMessage });
+                }
+
+                // Confirm payment transaction with order ID
+                if (!string.IsNullOrEmpty(guestCheckout.PaymentIntentId))
+                {
+                    await _paymentService.ConfirmPaymentAsync(new ConfirmPaymentRequest
+                    {
+                        PaymentIntentId = guestCheckout.PaymentIntentId,
+                        OrderId = result.Data
+                    });
                 }
 
                 return Ok(new ServiceResult<int>
@@ -742,11 +870,43 @@ namespace NHD.Web.UI.Controllers.Website
                     return NotFound(new { message = "Customer not found" });
                 }
 
+                // Verify payment if PaymentIntentId is provided
+                if (!string.IsNullOrEmpty(checkout.PaymentIntentId))
+                {
+                    var paymentStatus = await _paymentService.GetPaymentStatusAsync(checkout.PaymentIntentId);
+
+                    if (!paymentStatus.IsSuccess)
+                    {
+                        return BadRequest(new { message = "Failed to verify payment status" });
+                    }
+
+                    if (!paymentStatus.Data.IsSuccessful)
+                    {
+                        return BadRequest(new { message = "Payment not completed. Please complete payment before placing order." });
+                    }
+
+                    // Verify payment amount matches order total
+                    if (Math.Abs(paymentStatus.Data.Amount - checkout.TotalPrice) > 0.01m)
+                    {
+                        return BadRequest(new { message = "Payment amount does not match order total" });
+                    }
+                }
+
                 var result = await _customerService.PlaceOrderAsync(customer.Data.CustomerId, checkout);
 
                 if (!result.IsSuccess)
                 {
                     return BadRequest(new { message = result.ErrorMessage });
+                }
+
+                // Confirm payment transaction with order ID
+                if (!string.IsNullOrEmpty(checkout.PaymentIntentId))
+                {
+                    await _paymentService.ConfirmPaymentAsync(new ConfirmPaymentRequest
+                    {
+                        PaymentIntentId = checkout.PaymentIntentId,
+                        OrderId = result.Data
+                    });
                 }
 
                 return Ok(new ServiceResult<int>

@@ -116,6 +116,7 @@ export interface Address {
 }
 
 export interface CustomerAddresses {
+    email: string;
     shippingAddressId: number;
     billingAddressId: number;
 }

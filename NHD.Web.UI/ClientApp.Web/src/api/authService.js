@@ -80,5 +80,18 @@ class authService extends apiService {
     async placeOrder(customerCheckoutData) {
         return this.post(customerCheckoutData, apiUrls.placeOrder);
     }
+
+    // Payment methods
+    async createPaymentIntent(paymentData) {
+        return this.post(paymentData, apiUrls.createPaymentIntent);
+    }
+
+    async confirmPayment(confirmData) {
+        return this.post(confirmData, apiUrls.confirmPayment);
+    }
+
+    async getPaymentStatus(paymentIntentId) {
+        return this.get(`${apiUrls.getPaymentStatus}/${paymentIntentId}`);
+    }
 }
 export default new authService();

@@ -30,6 +30,7 @@ using NHD.Core.Services.FAQ;
 using NHD.Core.Repository.CustomerCart;
 using NHD.Core.Repository.Orders;
 using NHD.Core.Services.CustomerCart;
+using NHD.Core.Services.Payments;
 
 
 namespace NHD.Web.UI
@@ -206,6 +207,7 @@ namespace NHD.Web.UI
             services.AddScoped<IContactMessagesService, ContactMessagesService>();
             services.AddScoped<IFAQService, FAQService>();
             services.AddScoped<ICartService, CartService>();
+            services.AddScoped<IPaymentService, PaymentService>();
         }
     }
 }

@@ -31,4 +31,7 @@ export const apiUrls = {
     placeOrderAsGuest: 'PlaceOrderAsGuest',
     placeOrder: 'PlaceOrder',
     getCustomerAddresses: 'CustomerAddresses',
+    createPaymentIntent: 'CreatePaymentIntent',
+    confirmPayment: 'ConfirmPayment',
+    getPaymentStatus: 'PaymentStatus',
 };
