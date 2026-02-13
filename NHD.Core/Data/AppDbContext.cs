@@ -555,6 +555,10 @@ public partial class AppDbContext : DbContext
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
             entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+            entity.Property(e => e.GeneratedOrderId)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnName("generated_order_id");
             entity.Property(e => e.GuestEmail)
                 .HasMaxLength(150)
                 .HasColumnName("guest_email");

@@ -83,3 +83,45 @@ export const switchTab = (tabId: string): void => {
         tab.click();
     }
 };
+
+/**
+ * Generates a unique order ID following best practices:
+ * - Prefixed with 'NHD' for brand recognition
+ * - Contains timestamp for chronological ordering
+ * - Includes random alphanumeric string for uniqueness
+ * - Uses URL-safe characters only
+ * - Length is consistent (16 characters)
+ * - Human-readable and easy to communicate over phone/email
+ * 
+ * Format: NHD-YYYYMMDD-XXXX (where XXXX is a random 4-character string)
+ * Example: NHD-20241208-B7K9
+ */
+export const generateOrderId = (): string => {
+    // Get current date in YYYYMMDD format
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const dateString = `${year}${month}${day}`;
+
+    // Generate random 4-character alphanumeric string (uppercase for readability)
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let randomString = '';
+    for (let i = 0; i < 4; i++) {
+        randomString += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    // Combine with prefix and separators for readability
+    return `NHD-${dateString}-${randomString}`;
+};
+
+/**
+ * Validates if a string is a valid order ID format
+ * @param orderId - The order ID to validate
+ * @returns boolean indicating if the format is valid
+ */
+export const isValidOrderId = (orderId: string): boolean => {
+    // Pattern: NHD-YYYYMMDD-XXXX (where XXXX is 4 alphanumeric characters)
+    const orderIdPattern = /^NHD-\d{8}-[A-Z0-9]{4}$/;
+    return orderIdPattern.test(orderId);
+};

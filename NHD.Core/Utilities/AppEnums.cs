@@ -63,6 +63,7 @@ namespace NHD.Core.Utilities
         Paid = 401,
         Shipped = 402,
         Canceled = 403,
+        PaymentFailed = 404,
     }
 
     public enum BoxCategoryLookup

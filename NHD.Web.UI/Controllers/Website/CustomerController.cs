@@ -721,64 +721,6 @@ namespace NHD.Web.UI.Controllers.Website
             }
         }
 
-        [HttpPost("ConfirmPayment")]
-        public async Task<ActionResult<ServiceResult<PaymentConfirmationResponse>>> ConfirmPayment([FromBody] ConfirmPaymentRequest request)
-        {
-            try
-            {
-                if (request == null || string.IsNullOrEmpty(request.PaymentIntentId))
-                    return BadRequest(new { message = "Invalid payment confirmation request" });
-
-                var result = await _paymentService.ConfirmPaymentAsync(request);
-
-                if (!result.IsSuccess)
-                {
-                    return BadRequest(new { message = result.ErrorMessage });
-                }
-
-                return Ok(new ServiceResult<PaymentConfirmationResponse>
-                {
-                    Data = result.Data,
-                    IsSuccess = true,
-                    Status = HttpStatusCodeEnum.OK.AsInt()
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error confirming payment");
-                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while confirming payment." });
-            }
-        }
-
-        [HttpGet("PaymentStatus/{paymentIntentId}")]
-        public async Task<ActionResult<ServiceResult<PaymentStatusResponse>>> GetPaymentStatus(string paymentIntentId)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(paymentIntentId))
-                    return BadRequest(new { message = "Payment intent ID is required" });
-
-                var result = await _paymentService.GetPaymentStatusAsync(paymentIntentId);
-
-                if (!result.IsSuccess)
-                {
-                    return BadRequest(new { message = result.ErrorMessage });
-                }
-
-                return Ok(new ServiceResult<PaymentStatusResponse>
-                {
-                    Data = result.Data,
-                    IsSuccess = true,
-                    Status = HttpStatusCodeEnum.OK.AsInt()
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting payment status");
-                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while getting payment status." });
-            }
-        }
-
         #endregion Payment Actions
 
         #region Guest Checkout

@@ -27,6 +27,8 @@ public partial class Order
 
     public string Note { get; set; }
 
+    public string GeneratedOrderId { get; set; }
+
     public virtual Address BillingAddress { get; set; }
 
     public virtual Customer Customer { get; set; }

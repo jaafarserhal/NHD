@@ -6,6 +6,7 @@ using NHD.Core.Data;
 using NHD.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using NHD.Core.Common.Models;
+using NHD.Core.Utilities;
 
 namespace NHD.Core.Services.Payments
 {
@@ -36,7 +37,7 @@ namespace NHD.Core.Services.Payments
                 var options = new PaymentIntentCreateOptions
                 {
                     Amount = (long)(request.Amount * 100), // Convert to cents
-                    Currency = request.Currency?.ToLower() ?? "usd",
+                    Currency = request.Currency?.ToLower(),
                     PaymentMethodTypes = new List<string> { "card" },
                     Metadata = new Dictionary<string, string>
                     {
@@ -210,6 +211,7 @@ namespace NHD.Core.Services.Payments
                 if (order != null)
                 {
                     order.PaymentGatewayId = paymentGateway.PaymentGatewayId;
+                    order.OrderStatusLookupId = paymentIntent.Status == "succeeded" ? OrderStatusLookup.Paid.AsInt() : OrderStatusLookup.PaymentFailed.AsInt();
                     _context.Orders.Update(order);
                 }
 

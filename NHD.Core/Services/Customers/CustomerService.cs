@@ -764,6 +764,7 @@ namespace NHD.Core.Services.Customers
                     Note = guestCheckout.Note,
                     BillingAddressId = billingAddress.AddressId,
                     ShippingAddressId = shippingAddress.AddressId,
+                    GeneratedOrderId = guestCheckout.GeneratedOrderId,
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -1167,6 +1168,7 @@ namespace NHD.Core.Services.Customers
                 Note = checkout.Note,
                 BillingAddressId = billingAddressId,
                 ShippingAddressId = shippingAddressId,
+                GeneratedOrderId = checkout.GeneratedOrderId,
                 CreatedAt = DateTime.UtcNow
             };
 

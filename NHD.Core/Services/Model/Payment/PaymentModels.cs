@@ -3,9 +3,9 @@ namespace NHD.Core.Services.Model.Payment
     public class CreatePaymentIntentRequest
     {
         public decimal Amount { get; set; }
-        public string Currency { get; set; } = "usd";
+        public string Currency { get; set; } = "sek";
         public string CustomerEmail { get; set; }
-        public int? OrderId { get; set; }
+        public string OrderId { get; set; }
         public string Description { get; set; }
     }
 

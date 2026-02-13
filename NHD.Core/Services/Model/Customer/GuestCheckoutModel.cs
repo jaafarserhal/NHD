@@ -23,6 +23,8 @@ namespace NHD.Core.Services.Model.Customer
 
         // Payment information
         public string PaymentIntentId { get; set; }
+
+        public string GeneratedOrderId { get; set; }
     }
 
     public class CustomerCheckoutModel
@@ -40,6 +42,8 @@ namespace NHD.Core.Services.Model.Customer
 
         // Payment information
         public string PaymentIntentId { get; set; }
+
+        public string GeneratedOrderId { get; set; }
     }
     public class OrderAddressModel
     {
