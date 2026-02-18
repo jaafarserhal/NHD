@@ -20,6 +20,10 @@ namespace NHD.Core.Utilities
         Task<bool> SendContactUsEmailAsync(string fromEmail, string fromName, string phone, string subject, string message);
 
         Task<bool> SendSuccessfullContactUsReplyEmailAsync(string toEmail, string toName);
+
+        Task<bool> SendEmailWithAttachmentAsync(string to, string subject, string body, byte[] attachmentData, string attachmentFileName, bool isHtml = true);
+
+        string GenerateReceiptEmailBody(string customerEmail, string orderNumber);
     }
 
     // Email Configuration Model
@@ -625,6 +629,150 @@ namespace NHD.Core.Utilities
             </div>
         </body>
         </html>";
+        }
+
+        public async Task<bool> SendEmailWithAttachmentAsync(string to, string subject, string body, byte[] attachmentData, string attachmentFileName, bool isHtml = true)
+        {
+            try
+            {
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(_emailConfig.FromName, _emailConfig.FromEmail));
+                message.To.Add(new MailboxAddress("", to));
+                message.Subject = subject;
+
+                var bodyBuilder = new BodyBuilder();
+                if (isHtml)
+                {
+                    bodyBuilder.HtmlBody = body;
+                }
+                else
+                {
+                    bodyBuilder.TextBody = body;
+                }
+
+                // Add attachment
+                if (attachmentData != null && attachmentData.Length > 0 && !string.IsNullOrEmpty(attachmentFileName))
+                {
+                    bodyBuilder.Attachments.Add(attachmentFileName, attachmentData, new ContentType("application", "pdf"));
+                }
+
+                message.Body = bodyBuilder.ToMessageBody();
+
+                using var client = new SmtpClient();
+
+                // Connect to SMTP server
+                await client.ConnectAsync(_emailConfig.SmtpServer, _emailConfig.SmtpPort,
+                    _emailConfig.EnableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None);
+
+                // Authenticate if credentials are provided
+                if (!string.IsNullOrEmpty(_emailConfig.SmtpUsername))
+                {
+                    await client.AuthenticateAsync(_emailConfig.SmtpUsername, _emailConfig.SmtpPassword);
+                }
+
+                // Send email
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+
+                _logger.LogInformation($"Email with attachment sent successfully to {to}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to send email with attachment to {to}");
+                return false;
+            }
+        }
+        public string GenerateReceiptEmailBody(string customerEmail, string orderNumber)
+        {
+            return $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Order Confirmation - Nawa</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            text-align: center;
+            margin-bottom: 20px;
+        }}
+        .order-number {{
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 15px 0;
+        }}
+        .footer {{
+            margin-top: 30px;
+            font-size: 12px;
+            text-align: center;
+            color: #777;
+        }}
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>NAWA - HOME OF DATES</h1>
+            <p>Thank you for your order!</p>
+        </div>
+        
+        <h2>Order Confirmation</h2>
+        
+        <p>Dear Customer,</p>
+        
+        <p>We're excited to confirm that your order has been successfully placed!</p>
+        
+        <div class='order-number'>
+            Order Number: {orderNumber}
+        </div>
+        
+        <p>
+            Please find your order receipt attached to this email. This receipt contains 
+            all the details about your order, including itemized list, pricing, and 
+            delivery information.
+        </p>
+        
+        <p>
+            <strong>What happens next?</strong><br/>
+            • You will receive a shipping confirmation email with tracking information<br/>
+            • Your premium dates will be carefully packed and shipped<br/>
+            • Expected delivery: 2-5 business days
+        </p>
+        
+        <p>
+            If you have any questions about your order, please don't hesitate to contact us at 
+            <a href='mailto:kontakt@nawahomeofdates.com'>kontakt@nawahomeofdates.com</a>.
+        </p>
+        
+        <p>Thank you for choosing Nawa - Home of Dates!</p>
+        
+        <p>Best regards,<br/>The Nawa Team</p>
+        
+        <div class='footer'>
+            <p>Visit us at: <a href='https://www.nawahomeofdates.com'>www.nawahomeofdates.com</a></p>
+        </div>
+    </div>
+</body>
+</html>";
         }
     }
 

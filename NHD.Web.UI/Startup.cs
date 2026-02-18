@@ -200,6 +200,7 @@ namespace NHD.Web.UI
             services.AddScoped<ISectionService, SectionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IPdfReceiptService, PdfReceiptService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IDatesService, DatesService>();
             services.AddScoped<IEmailSubscriptionService, EmailSubscriptionService>();

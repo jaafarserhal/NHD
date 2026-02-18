@@ -24,16 +24,18 @@ namespace NHD.Core.Services.Customers
         private readonly IAddressRepository _addressRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IEmailService _emailService;
+        private readonly IPdfReceiptService _pdfReceiptService;
         private readonly ILogger<CustomerService> _logger;
         protected internal IDbContextTransaction Transaction;
 
-        public CustomerService(AppDbContext context, ICustomerRepository customerRepository, IAddressRepository addressRepository, IOrderRepository orderRepository, IEmailService emailService, ILogger<CustomerService> logger)
+        public CustomerService(AppDbContext context, ICustomerRepository customerRepository, IAddressRepository addressRepository, IOrderRepository orderRepository, IEmailService emailService, IPdfReceiptService pdfReceiptService, ILogger<CustomerService> logger)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
             _addressRepository = addressRepository ?? throw new ArgumentNullException(nameof(addressRepository));
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _pdfReceiptService = pdfReceiptService ?? throw new ArgumentNullException(nameof(pdfReceiptService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -800,6 +802,41 @@ namespace NHD.Core.Services.Customers
                     createdOrder.Entity.OrderId,
                     guestCheckout.Email);
 
+                // Send receipt email with PDF attachment
+                try
+                {
+                    var orderItems = await context.OrderItems
+                        .Where(oi => oi.OrderId == createdOrder.Entity.OrderId)
+                        .ToListAsync();
+
+                    var pdfData = await _pdfReceiptService.GenerateGuestReceiptPdfAsync(
+                        createdOrder.Entity,
+                        guestCustomer,
+                        orderItems,
+                        shippingAddress,
+                        billingAddress);
+
+                    var subject = $"Order Confirmation - Nawa #{createdOrder.Entity.GeneratedOrderId ?? createdOrder.Entity.OrderId.ToString()}";
+                    var body = _emailService.GenerateReceiptEmailBody(guestCheckout.Email, createdOrder.Entity.GeneratedOrderId ?? createdOrder.Entity.OrderId.ToString());
+                    var fileName = $"receipt_{createdOrder.Entity.GeneratedOrderId ?? createdOrder.Entity.OrderId.ToString()}.pdf";
+
+                    await _emailService.SendEmailWithAttachmentAsync(
+                        guestCheckout.Email,
+                        subject,
+                        body,
+                        pdfData,
+                        fileName);
+
+                    _logger.LogInformation("Receipt email sent successfully to {Email} for order {OrderId}",
+                        guestCheckout.Email, createdOrder.Entity.OrderId);
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogError(emailEx, "Failed to send receipt email for order {OrderId} to {Email}",
+                        createdOrder.Entity.OrderId, guestCheckout.Email);
+                    // Don't fail the order if email sending fails
+                }
+
                 return ServiceResult<int>.Success(createdOrder.Entity.OrderId);
             }
             catch (Exception ex)
@@ -970,6 +1007,47 @@ namespace NHD.Core.Services.Customers
                     customerId,
                     order.OrderId
                 );
+
+                // Send receipt email with PDF attachment
+                try
+                {
+                    var customerInfo = await context.Customers
+                        .FirstOrDefaultAsync(c => c.CustomerId == customerId);
+
+                    if (customerInfo != null)
+                    {
+                        var orderItems = await context.OrderItems
+                            .Where(oi => oi.OrderId == order.OrderId)
+                            .ToListAsync();
+
+                        var pdfData = await _pdfReceiptService.GenerateCustomerReceiptPdfAsync(
+                            order,
+                            customerInfo,
+                            orderItems,
+                            shippingAddress,
+                            billingAddress);
+
+                        var subject = $"Order Confirmation - Nawa #{order.GeneratedOrderId ?? order.OrderId.ToString()}";
+                        var body = _emailService.GenerateReceiptEmailBody(customerInfo.EmailAddress, order.GeneratedOrderId ?? order.OrderId.ToString());
+                        var fileName = $"receipt_{order.GeneratedOrderId ?? order.OrderId.ToString()}.pdf";
+
+                        await _emailService.SendEmailWithAttachmentAsync(
+                            customerInfo.EmailAddress,
+                            subject,
+                            body,
+                            pdfData,
+                            fileName);
+
+                        _logger.LogInformation("Receipt email sent successfully to {Email} for order {OrderId}",
+                            customerInfo.EmailAddress, order.OrderId);
+                    }
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogError(emailEx, "Failed to send receipt email for order {OrderId} to customer {CustomerId}",
+                        order.OrderId, customerId);
+                    // Don't fail the order if email sending fails
+                }
 
                 return ServiceResult<int>.Success(order.OrderId);
             }
