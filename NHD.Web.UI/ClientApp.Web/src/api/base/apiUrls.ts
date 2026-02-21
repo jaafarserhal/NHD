@@ -34,4 +34,5 @@ export const apiUrls = {
     createPaymentIntent: 'CreatePaymentIntent',
     confirmPayment: 'ConfirmPayment',
     getPaymentStatus: 'PaymentStatus',
+    getSystemProperties: 'SystemProperties'
 };

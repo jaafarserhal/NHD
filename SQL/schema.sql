@@ -431,6 +431,16 @@ CREATE TABLE dbo.cart_items (
         REFERENCES dbo.product(prd_id)
 );
 
+CREATE TABLE dbo.gen_system_parameters (
+    system_parameter_id INT NOT NULL PRIMARY KEY,
+    value_en NVARCHAR(200) NOT NULL,
+    value_sv NVARCHAR(200) NOT NULL,
+    is_active BIT NOT NULL DEFAULT 1,
+    created_at DATETIME2 NOT NULL
+        CONSTRAINT DF_gen_system_parameters_created DEFAULT SYSUTCDATETIME()
+);
+
+
 
 
 -- =============================================

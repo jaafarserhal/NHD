@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NHD.Core.Common.Models;
 using NHD.Core.Models;
+using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Customer;
 
 namespace NHD.Core.Services.Customers
@@ -37,5 +38,6 @@ namespace NHD.Core.Services.Customers
         Task<ServiceResult<IEnumerable<Address>>> GetCustomerAddressesAsync(int customerId);
         Task<ServiceResult<int>> PlaceOrderAsGuest(GuestCheckoutModel guestCheckout);
         Task<ServiceResult<int>> PlaceOrderAsync(int customerId, CustomerCheckoutModel checkout);
+        Task<ServiceResult<PropertiesDto>> GetSystemPropertiesAsync();
     }
 }

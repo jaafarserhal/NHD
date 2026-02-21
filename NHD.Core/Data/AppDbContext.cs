@@ -42,6 +42,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<GenLookupType> GenLookupTypes { get; set; }
 
+    public virtual DbSet<GenSystemParameter> GenSystemParameters { get; set; }
+
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
@@ -535,6 +537,35 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.NameSv)
                 .HasMaxLength(100)
                 .HasColumnName("name_sv");
+        });
+
+        modelBuilder.Entity<GenSystemParameter>(entity =>
+        {
+            entity.HasKey(e => e.SystemParameterId).HasName("PK__gen_syst__02E04C0B2C1E2609");
+
+            entity.ToTable("gen_system_parameters");
+
+            entity.Property(e => e.SystemParameterId)
+                .ValueGeneratedNever()
+                .HasColumnName("system_parameter_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(1)
+                .HasColumnName("title");
+            entity.Property(e => e.ValueEn)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnName("value_en");
+            entity.Property(e => e.ValueSv)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnName("value_sv");
         });
 
         modelBuilder.Entity<Order>(entity =>

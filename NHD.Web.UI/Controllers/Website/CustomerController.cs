@@ -15,6 +15,7 @@ using NHD.Core.Services.Model.Customer;
 using NHD.Core.Services.Payments;
 using NHD.Core.Services.Model.Payment;
 using NHD.Core.Utilities;
+using NHD.Core.Services.Model;
 
 namespace NHD.Web.UI.Controllers.Website
 {
@@ -866,5 +867,32 @@ namespace NHD.Web.UI.Controllers.Website
         }
 
         #endregion Guest Checkout
+
+        [HttpGet("SystemProperties")]
+        [AllowAnonymous]
+        public async Task<ActionResult<ServiceResult<PropertiesDto>>> GetSystemProperties()
+        {
+            try
+            {
+                var result = await _customerService.GetSystemPropertiesAsync();
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(new { message = result.ErrorMessage });
+                }
+
+                return Ok(new ServiceResult<PropertiesDto>
+                {
+                    Data = result.Data,
+                    IsSuccess = true,
+                    Status = HttpStatusCodeEnum.OK.AsInt()
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving system properties");
+                return StatusCode(HttpStatusCodeEnum.InternalServerError.AsInt(), new { message = "An error occurred while retrieving system properties." });
+            }
+        }
     }
 }

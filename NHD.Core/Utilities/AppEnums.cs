@@ -144,5 +144,12 @@ namespace NHD.Core.Utilities
         SalesInquiry = 802,
     }
 
+    public enum SystemParameterLookup
+    {
+        Undefined = 0,
+        ShippingCost = 100,
+        ShippingArrivalTime = 200,
+    }
+
 
 }

@@ -959,7 +959,7 @@ function CheckoutContent({
                                         <div className={styles.productImage}>
                                             {item.product.imageUrl?.length > 0 ? (
                                                 <img
-                                                    src={item.product.imageUrl}
+                                                    src={`${process.env.REACT_APP_BASE_URL || ""}${item.product.imageUrl ?? "/assets/images/placeholder.png"}`}
                                                     alt={item.product.titleEn}
                                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                                 />

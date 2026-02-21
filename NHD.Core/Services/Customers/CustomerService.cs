@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using iText.Commons.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,8 @@ using NHD.Core.Data;
 using NHD.Core.Models;
 using NHD.Core.Repository.Addresses;
 using NHD.Core.Repository.Customers;
-using NHD.Core.Repository.Orders;
+using NHD.Core.Repository.Parameters;
+using NHD.Core.Services.Model;
 using NHD.Core.Services.Model.Customer;
 using NHD.Core.Utilities;
 using Org.BouncyCastle.Asn1.Misc;
@@ -22,18 +24,18 @@ namespace NHD.Core.Services.Customers
         protected internal AppDbContext context;
         private readonly ICustomerRepository _customerRepository;
         private readonly IAddressRepository _addressRepository;
-        private readonly IOrderRepository _orderRepository;
+        private readonly IGenSystemParameterRepository _genSystemParameterRepository;
         private readonly IEmailService _emailService;
         private readonly IPdfReceiptService _pdfReceiptService;
         private readonly ILogger<CustomerService> _logger;
         protected internal IDbContextTransaction Transaction;
 
-        public CustomerService(AppDbContext context, ICustomerRepository customerRepository, IAddressRepository addressRepository, IOrderRepository orderRepository, IEmailService emailService, IPdfReceiptService pdfReceiptService, ILogger<CustomerService> logger)
+        public CustomerService(AppDbContext context, ICustomerRepository customerRepository, IAddressRepository addressRepository, IGenSystemParameterRepository genSystemParameterRepository, IEmailService emailService, IPdfReceiptService pdfReceiptService, ILogger<CustomerService> logger)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
             _addressRepository = addressRepository ?? throw new ArgumentNullException(nameof(addressRepository));
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            _genSystemParameterRepository = genSystemParameterRepository ?? throw new ArgumentNullException(nameof(genSystemParameterRepository));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _pdfReceiptService = pdfReceiptService ?? throw new ArgumentNullException(nameof(pdfReceiptService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -240,6 +242,27 @@ namespace NHD.Core.Services.Customers
         #endregion Addresses
 
         #region Customers
+
+        public async Task<ServiceResult<PropertiesDto>> GetSystemPropertiesAsync()
+        {
+            try
+            {
+                var parameters = await _genSystemParameterRepository.GetActiveParametersAsync();
+
+                var propertiesDto = new PropertiesDto
+                {
+                    ShippingCost = parameters.FirstOrDefault(p => p.SystemParameterId == SystemParameterLookup.ShippingCost.AsInt())?.ValueEn,
+                    ShippingArrivalTime = parameters.FirstOrDefault(p => p.SystemParameterId == SystemParameterLookup.ShippingArrivalTime.AsInt())?.ValueEn
+                };
+
+                return ServiceResult<PropertiesDto>.Success(propertiesDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving system properties");
+                return ServiceResult<PropertiesDto>.Failure("An error occurred while retrieving system properties.");
+            }
+        }
         public async Task<PagedServiceResult<IEnumerable<CustomerViewModel>>> GetCustomersAsync(int page = 1, int limit = 10)
         {
             try

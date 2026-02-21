@@ -93,5 +93,9 @@ class authService extends apiService {
     async getPaymentStatus(paymentIntentId) {
         return this.get(`${apiUrls.getPaymentStatus}/${paymentIntentId}`);
     }
+
+    async getSystemProperties() {
+        return this.get(apiUrls.getSystemProperties);
+    }
 }
 export default new authService();
