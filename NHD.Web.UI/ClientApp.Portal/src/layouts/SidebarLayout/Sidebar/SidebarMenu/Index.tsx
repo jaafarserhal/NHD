@@ -186,6 +186,18 @@ function SidebarMenu() {
               </Button>
             </ListItem>
 
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to={RouterUrls.propertiesList}
+                startIcon={<TableChartTwoToneIcon />}
+              >
+                Properties
+              </Button>
+            </ListItem>
+
           </List>
         </SubMenuWrapper>
       </List>

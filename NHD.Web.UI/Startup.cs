@@ -32,6 +32,7 @@ using NHD.Core.Repository.Orders;
 using NHD.Core.Services.CustomerCart;
 using NHD.Core.Services.Payments;
 using NHD.Core.Repository.Parameters;
+using NHD.Core.Services.Parameters;
 
 
 namespace NHD.Web.UI
@@ -211,6 +212,7 @@ namespace NHD.Web.UI
             services.AddScoped<IFAQService, FAQService>();
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IPropertiesService, PropertiesService>();
         }
     }
 }

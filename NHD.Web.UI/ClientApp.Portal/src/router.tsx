@@ -24,6 +24,8 @@ import Faqs from './portal/faqs/Index';
 import UpdateFaq from './portal/faqs/Update';
 import AddFaq from './portal/faqs/Add';
 import Contacts from './portal/contacts/Index';
+import UpdateProperty from './portal/properties/Update';
+import Properties from './portal/properties/Index';
 
 const Loader = (Component) => (props) => (
   <Suspense fallback={<SuspenseLoader />}>
@@ -70,7 +72,9 @@ const routes: RouteObject[] = [
       { path: RouterUrls.faqsList, element: <Faqs /> },
       { path: RouterUrls.faqAdd, element: <AddFaq /> },
       { path: RouterUrls.faqEdit, element: <UpdateFaq /> },
-      { path: RouterUrls.contactsList, element: <Contacts /> }
+      { path: RouterUrls.contactsList, element: <Contacts /> },
+      { path: RouterUrls.propertiesList, element: <Properties /> },
+      { path: RouterUrls.propertyEdit, element: <UpdateProperty /> }
     ]
   },
   {

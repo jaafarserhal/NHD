@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using NHD.Core.Repository.Base;
 using NHD.Core.Models;
 using NHD.Core.Utilities;
+using NHD.Core.Common.Models;
 
 namespace NHD.Core.Repository.Parameters
 {
     public interface IGenSystemParameterRepository : IRepository<GenSystemParameter>
     {
+        Task<PagedResult<GenSystemParameter>> GetParameters(int page, int limit);
         Task<List<GenSystemParameter>> GetActiveParametersAsync();
         Task<List<GenSystemParameter>> GetParametersByActiveStatusAsync(bool isActive);
         Task<GenSystemParameter> GetParameterByIdAsync(SystemParameterLookup parameterId);

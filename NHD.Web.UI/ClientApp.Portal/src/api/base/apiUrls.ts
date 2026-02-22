@@ -41,5 +41,9 @@ export const apiUrls = {
     exportContacts: '/export',
     customers: '/Customer',
     updateCustomerStatus: '/UpdateStatus',
-    addressesByCustomerId: '/Addresses' // New endpoint for addresses by customer ID
+    addressesByCustomerId: '/Addresses',
+    properties: '/Properties',
+    addProperty: '/Add',
+    updateProperty: '/Update',
+    getPropertyById: '/GetById/',
 };

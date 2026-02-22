@@ -7,6 +7,7 @@ using NHD.Core.Repository.Base;
 using NHD.Core.Data;
 using NHD.Core.Models;
 using NHD.Core.Utilities;
+using NHD.Core.Common.Models;
 
 namespace NHD.Core.Repository.Parameters
 {
@@ -15,7 +16,26 @@ namespace NHD.Core.Repository.Parameters
         public GenSystemParameterRepository(AppDbContext context) : base(context)
         {
         }
+        public async Task<PagedResult<GenSystemParameter>> GetParameters(int page, int limit)
+        {
+            var query = _context.GenSystemParameters
+                .OrderByDescending(p => p.CreatedAt);
 
+            var total = await query.CountAsync();
+
+            var sections = await query
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .ToListAsync();
+
+            return new PagedResult<GenSystemParameter>
+            {
+                Data = sections,
+                Total = total,
+                Page = page,
+                Limit = limit
+            };
+        }
         public async Task<List<GenSystemParameter>> GetActiveParametersAsync()
         {
             return await _context.GenSystemParameters

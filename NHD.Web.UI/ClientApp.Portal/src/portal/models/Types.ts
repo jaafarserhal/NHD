@@ -98,6 +98,14 @@ export interface Faq {
     isActive: boolean;
 }
 
+export interface Property {
+    id?: number;
+    title: string;
+    valueEn: string;
+    valueSv: string;
+    isActive: boolean;
+}
+
 export interface ProductCollection {
     id?: number;
     collectionId: number;
