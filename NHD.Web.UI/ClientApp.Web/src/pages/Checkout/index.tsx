@@ -14,6 +14,8 @@ import Loader from '../../components/Common/Loader/Index';
 import { validateEmail, generateOrderId } from '../../api/common/Utils';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { useSystemProperties } from '../../contexts/SystemPropertiesContext';
+import useSystemPropertiesHelper from '../../hooks/useSystemPropertiesHelper';
 
 // Initialize Stripe with error handling
 const stripePublishableKey = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
@@ -61,6 +63,7 @@ const emptyAddress = (): AddressData => ({
 //   • billingData    – same reason
 // ─────────────────────────────────────────────────────────────────────────────
 export default function CheckoutWrapper() {
+    const { systemProperties } = useSystemProperties();
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [showPaymentSection, setShowPaymentSection] = useState(false);
     const [stripeError, setStripeError] = useState<string | null>(null);
@@ -243,7 +246,8 @@ function CheckoutContent({
     const [showBillingForm, setShowBillingForm] = useState(true);
 
     // Calculate summary values
-    const shippingCost = 41.00;
+    const shippingCost = useSystemPropertiesHelper().getShippingCost();
+    const shippingArrivalTime = useSystemPropertiesHelper().getShippingArrivalTime();
     const subtotal = getTotalPrice();
     // ✅ orderId comes from props (stable parent) — no local useState here
     const totalAmount = subtotal + shippingCost;
@@ -824,9 +828,9 @@ function CheckoutContent({
                                     <label className={styles.shippingOption}>
                                         <input type="radio" name="shippingMethod" value="regular" checked readOnly />
                                         <div className={styles.shippingDetails}>
-                                            <div className={styles.shippingName}>Regular Shipping (3 to 4 days)</div>
+                                            <div className={styles.shippingName}>{shippingArrivalTime}</div>
                                         </div>
-                                        <div className={styles.shippingPrice}>$41.00</div>
+                                        <div className={styles.shippingPrice}>{useSystemPropertiesHelper().getShippingCostDisplay()}</div>
                                     </label>
                                 </div>
                             </div>
@@ -985,7 +989,7 @@ function CheckoutContent({
                                             <div className={styles.productName}>{item.product.titleEn}</div>
                                             <div className={styles.productMeta}>Qty: {item.quantity}</div>
                                             <div className={styles.productPrice}>
-                                                ${(item.product.fromPrice * item.quantity).toFixed(2)}
+                                                SEK {(item.product.fromPrice * item.quantity).toFixed(2)}
                                             </div>
                                         </div>
                                     </div>
@@ -994,18 +998,18 @@ function CheckoutContent({
 
                             <div className={styles.summaryRow}>
                                 <span className={styles.summaryLabel}>Subtotal</span>
-                                <span className={styles.summaryValue}>${subtotal.toFixed(2)}</span>
+                                <span className={styles.summaryValue}>SEK {subtotal.toFixed(2)}</span>
                             </div>
                             <div className={styles.summaryRow}>
                                 <span className={styles.summaryLabel}>Shipping</span>
-                                <span className={styles.summaryValue}>${shippingCost.toFixed(2)}</span>
+                                <span className={styles.summaryValue}>{useSystemPropertiesHelper().getShippingCostDisplay()}</span>
                             </div>
-                            <div className={styles.shippingNote}>Regular Shipping (3 to 4 days)</div>
+                            <div className={styles.shippingNote}>{shippingArrivalTime}</div>
 
                             <div className={styles.summaryTotal}>
                                 <div className={styles.summaryRow}>
                                     <span className={styles.summaryLabel}>Total</span>
-                                    <span className={styles.summaryValue}>${totalAmount.toFixed(2)}</span>
+                                    <span className={styles.summaryValue}>SEK {totalAmount.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
