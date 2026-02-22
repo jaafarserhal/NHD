@@ -8,11 +8,13 @@ import Loader from "../components/Common/Loader/Index";
 import sectionService from '../api/sectionService';
 import { SectionType } from "../api/common/Enums";
 import { routeUrls } from "../api/base/routeUrls";
+import { useSystemPropertiesHelper } from '../hooks/useSystemPropertiesHelper';
 
 const ProductDetails: React.FC = () => {
     const [productDetails, setProductDetails] = useState<ProductsWithGallery | null>(null);
     const [error, setError] = useState<string | null>(null);
     const { productId } = useParams<{ productId: string }>();
+    const { getCurrencySymbol } = useSystemPropertiesHelper();
     const [loading, setLoading] = useState(false);
     const [mainSection, setMainSection] = useState<any>(null);
     const [bannerImageLoaded, setBannerImageLoaded] = useState(false);
@@ -210,7 +212,7 @@ const ProductDetails: React.FC = () => {
                                 {/* Product Head Start */}
                                 <div className="product-head flex-column align-items-start mb-3 mb-md-5">
                                     <h2 className="product-title mb-2">{productDetails?.titleEn}</h2>
-                                    <span className="product-head-price">${productDetails?.fromPrice}</span>
+                                    <span className="product-head-price">{getCurrencySymbol()} {productDetails?.fromPrice}</span>
                                 </div>
                                 <ul className="product-cta">
                                     <li>

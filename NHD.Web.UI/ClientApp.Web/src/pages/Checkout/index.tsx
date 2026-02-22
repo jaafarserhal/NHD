@@ -14,7 +14,6 @@ import Loader from '../../components/Common/Loader/Index';
 import { validateEmail, generateOrderId } from '../../api/common/Utils';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useSystemProperties } from '../../contexts/SystemPropertiesContext';
 import useSystemPropertiesHelper from '../../hooks/useSystemPropertiesHelper';
 
 // Initialize Stripe with error handling
@@ -63,7 +62,7 @@ const emptyAddress = (): AddressData => ({
 //   • billingData    – same reason
 // ─────────────────────────────────────────────────────────────────────────────
 export default function CheckoutWrapper() {
-    const { systemProperties } = useSystemProperties();
+
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [showPaymentSection, setShowPaymentSection] = useState(false);
     const [stripeError, setStripeError] = useState<string | null>(null);
@@ -248,6 +247,7 @@ function CheckoutContent({
     // Calculate summary values
     const shippingCost = useSystemPropertiesHelper().getShippingCost();
     const shippingArrivalTime = useSystemPropertiesHelper().getShippingArrivalTime();
+    const { getCurrencySymbol, getShippingCostDisplay } = useSystemPropertiesHelper();
     const subtotal = getTotalPrice();
     // ✅ orderId comes from props (stable parent) — no local useState here
     const totalAmount = subtotal + shippingCost;
@@ -378,7 +378,7 @@ function CheckoutContent({
 
             const response = await authService.createPaymentIntent({
                 amount: totalAmount,
-                currency: 'sek',
+                currency: getCurrencySymbol(),
                 customerEmail,
                 description: orderId,
                 orderId: orderId,
@@ -830,7 +830,7 @@ function CheckoutContent({
                                         <div className={styles.shippingDetails}>
                                             <div className={styles.shippingName}>{shippingArrivalTime}</div>
                                         </div>
-                                        <div className={styles.shippingPrice}>{useSystemPropertiesHelper().getShippingCostDisplay()}</div>
+                                        <div className={styles.shippingPrice}>{getShippingCostDisplay()}</div>
                                     </label>
                                 </div>
                             </div>
@@ -989,7 +989,7 @@ function CheckoutContent({
                                             <div className={styles.productName}>{item.product.titleEn}</div>
                                             <div className={styles.productMeta}>Qty: {item.quantity}</div>
                                             <div className={styles.productPrice}>
-                                                SEK {(item.product.fromPrice * item.quantity).toFixed(2)}
+                                                {getCurrencySymbol()} {(item.product.fromPrice * item.quantity).toFixed(2)}
                                             </div>
                                         </div>
                                     </div>
@@ -998,18 +998,18 @@ function CheckoutContent({
 
                             <div className={styles.summaryRow}>
                                 <span className={styles.summaryLabel}>Subtotal</span>
-                                <span className={styles.summaryValue}>SEK {subtotal.toFixed(2)}</span>
+                                <span className={styles.summaryValue}>{getCurrencySymbol()} {subtotal.toFixed(2)}</span>
                             </div>
                             <div className={styles.summaryRow}>
                                 <span className={styles.summaryLabel}>Shipping</span>
-                                <span className={styles.summaryValue}>{useSystemPropertiesHelper().getShippingCostDisplay()}</span>
+                                <span className={styles.summaryValue}>{getShippingCostDisplay()}</span>
                             </div>
                             <div className={styles.shippingNote}>{shippingArrivalTime}</div>
 
                             <div className={styles.summaryTotal}>
                                 <div className={styles.summaryRow}>
                                     <span className={styles.summaryLabel}>Total</span>
-                                    <span className={styles.summaryValue}>SEK {totalAmount.toFixed(2)}</span>
+                                    <span className={styles.summaryValue}>{getCurrencySymbol()} {totalAmount.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

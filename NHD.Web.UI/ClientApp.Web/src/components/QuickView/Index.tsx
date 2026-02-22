@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import Swiper from "swiper";
 import { Navigation, Thumbs, FreeMode } from "swiper/modules";
 import { ProductsWithGallery } from "../../api/common/Types";
+import { useSystemPropertiesHelper } from '../../hooks/useSystemPropertiesHelper';
 
 interface QuickViewProps {
     product: ProductsWithGallery | null;
@@ -9,6 +10,7 @@ interface QuickViewProps {
 }
 
 const QuickView: React.FC<QuickViewProps> = ({ product, modalId }) => {
+    const { getCurrencySymbol } = useSystemPropertiesHelper();
     const thumbSwiperRef = useRef<Swiper | null>(null);
     const mainSwiperRef = useRef<Swiper | null>(null);
 
@@ -147,7 +149,7 @@ const QuickView: React.FC<QuickViewProps> = ({ product, modalId }) => {
                                     <div className="product-summery position-relative">
                                         <div className="product-head mb-3">
                                             <span className="product-head-price">
-                                                ${product?.fromPrice.toFixed(2)}
+                                                {getCurrencySymbol()} {product?.fromPrice.toFixed(2)}
                                             </span>
                                         </div>
                                         <p className="desc-content">{product?.descriptionEn}</p>

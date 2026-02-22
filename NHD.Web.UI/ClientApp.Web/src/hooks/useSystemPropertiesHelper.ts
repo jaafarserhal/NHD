@@ -24,6 +24,10 @@ export const useSystemPropertiesHelper = () => {
         return systemProperties?.shippingArrivalTime || 'Not specified';
     };
 
+    const getCurrencySymbol = (): string => {
+        return systemProperties?.currencySymbol || '$';
+    }
+
     const isShippingFree = (): boolean => {
         return getShippingCost() === 0;
     };
@@ -43,6 +47,7 @@ export const useSystemPropertiesHelper = () => {
         getShippingCost,
         getShippingCostDisplay,
         getShippingArrivalTime,
+        getCurrencySymbol,
         isShippingFree,
         hasProperties,
     };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSystemPropertiesHelper } from '../../hooks/useSystemPropertiesHelper';
 import { useNavigate } from 'react-router-dom';
 
 interface Order {
@@ -11,6 +12,7 @@ interface Order {
 
 const OrdersTab: React.FC = () => {
     const navigate = useNavigate();
+    const { getCurrencySymbol } = useSystemPropertiesHelper();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -26,21 +28,21 @@ const OrdersTab: React.FC = () => {
                 orderNumber: '#10001',
                 date: 'Aug 22, 2018',
                 status: 'Pending',
-                total: '$3000'
+                total: `${getCurrencySymbol()}3000`
             },
             {
                 id: 2,
                 orderNumber: '#10002',
                 date: 'July 22, 2018',
                 status: 'Approved',
-                total: '$200'
+                total: `${getCurrencySymbol()}200`
             },
             {
                 id: 3,
                 orderNumber: '#10003',
                 date: 'June 12, 2017',
                 status: 'On Hold',
-                total: '$990'
+                total: `${getCurrencySymbol()}990`
             }
         ]);
     }, []);

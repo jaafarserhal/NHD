@@ -4,11 +4,13 @@ import Footer from "../components/Common/Footer/Index";
 import { useCart } from "../contexts/CartContext";
 import { routeUrls } from "../api/base/routeUrls";
 import { useNavigate } from "react-router-dom";
+import { useSystemPropertiesHelper } from '../hooks/useSystemPropertiesHelper';
 
 const CartPage: React.FC = () => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const { cartItems, isLoading, removeFromCart, updateQuantity, clearCart, getTotalItems, getTotalPrice } = useCart();
+    const { getCurrencySymbol } = useSystemPropertiesHelper();
     const navigate = useNavigate();
     // preload image
     useEffect(() => {
@@ -163,7 +165,7 @@ const CartPage: React.FC = () => {
                                                             </small>
                                                         </div>
                                                     </th>
-                                                    <td>${item.product.fromPrice?.toFixed(2) || '0.00'}</td>
+                                                    <td>{getCurrencySymbol()} {item.product.fromPrice?.toFixed(2) || '0.00'}</td>
                                                     <td className="text-center cart-quantity">
                                                         <div className="quantity">
                                                             <div className="d-flex align-items-center justify-content-center gap-2">
@@ -211,7 +213,7 @@ const CartPage: React.FC = () => {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td>${((item.product.fromPrice || 0) * item.quantity).toFixed(2)}</td>
+                                                    <td>{getCurrencySymbol()} {((item.product.fromPrice || 0) * item.quantity).toFixed(2)}</td>
                                                 </tr>
                                             ))
                                         )}
@@ -269,10 +271,10 @@ const CartPage: React.FC = () => {
                                                     </small>
                                                 </div>
                                                 <span className="cart-product-mobile-quantity">
-                                                    {item.quantity} x ${item.product.fromPrice?.toFixed(2) || '0.00'}
+                                                    {item.quantity} x {getCurrencySymbol()} {item.product.fromPrice?.toFixed(2) || '0.00'}
                                                 </span>
                                                 <span className="cart-product-mobile-total">
-                                                    <b>Total:</b> ${((item.product.fromPrice || 0) * item.quantity).toFixed(2)}
+                                                    <b>Total:</b> {getCurrencySymbol()} {((item.product.fromPrice || 0) * item.quantity).toFixed(2)}
                                                 </span>
                                                 <div className="quantity">
                                                     <div className="d-flex align-items-center gap-2 mt-2">
@@ -357,13 +359,13 @@ const CartPage: React.FC = () => {
                                             <tr className="subtotal">
                                                 <th className="sub-title">Subtotal</th>
                                                 <td className="amount">
-                                                    <span>${getTotalPrice().toFixed(2)}</span>
+                                                    <span>{getCurrencySymbol()} {getTotalPrice().toFixed(2)}</span>
                                                 </td>
                                             </tr>
                                             <tr className="total">
                                                 <th className="sub-title">Total</th>
                                                 <td className="amount">
-                                                    <strong>${getTotalPrice().toFixed(2)}</strong>
+                                                    <strong>{getCurrencySymbol()} {getTotalPrice().toFixed(2)}</strong>
                                                 </td>
                                             </tr>
                                         </tbody>

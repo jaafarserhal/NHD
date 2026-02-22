@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ProductsWithGallery } from "../../api/common/Types";
 import PromptModal from "../Common/PromptModal/Index";
 import { useCart } from "../../contexts/CartContext";
+import { useSystemPropertiesHelper } from '../../hooks/useSystemPropertiesHelper';
 import styles from "./index.module.css";
 
 interface ProductProps {
@@ -15,6 +16,7 @@ interface ProductProps {
 const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, modalId, urlPrefix = '/product' }) => {
     console.log('Product quantity:', product);
     const { addToCart } = useCart();
+    const { getCurrencySymbol } = useSystemPropertiesHelper();
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -98,7 +100,7 @@ const Product: React.FC<ProductProps> = ({ product, onQuickView, isByCategory, m
                         <a href={`${urlPrefix}/${product.id}/${product.titleEn.replace(/\s+/g, '-').toLowerCase()}`}>{product.titleEn}</a>
                     </h5>
                     {(product.fromPrice || product.fromPrice !== 0) && <span className={`product-item__price ${isByCategory ? '' : 'fs-2'}`}>
-                        ${product.fromPrice?.toFixed(2)}
+                        {getCurrencySymbol()}{product.fromPrice?.toFixed(2)}
                     </span>}
                     <div className="mt-2">
                         {product.quantity === 0 ? (

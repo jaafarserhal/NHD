@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { useCart } from "../../contexts/CartContext";
 import styles from "./index.module.css";
 import { routeUrls } from "../../api/base/routeUrls";
+import { useSystemPropertiesHelper } from '../../hooks/useSystemPropertiesHelper';
 
 const Cart: React.FC = () => {
     const { cartItems, removeFromCart, updateQuantity, getTotalItems, getTotalPrice } = useCart();
+    const { getCurrencySymbol } = useSystemPropertiesHelper();
     const [errorMessage, setErrorMessage] = useState<string>('');
 
     const handleQuantityUpdate = async (productId: number, newQuantity: number) => {
@@ -121,7 +123,7 @@ const Cart: React.FC = () => {
                                                     </button>
                                                 </div>
                                                 <span className="mini-cart-item__price">
-                                                    ${((item.product.fromPrice || 0) * item.quantity).toFixed(2)}
+                                                    {getCurrencySymbol()} {((item.product.fromPrice || 0) * item.quantity).toFixed(2)}
                                                 </span>
                                             </div>
                                         </div>
@@ -137,7 +139,7 @@ const Cart: React.FC = () => {
                 <div className="offcanvas-footer d-flex flex-column gap-4">
                     <div className={styles.miniCartInfo}>
                         <span className={styles.itemCartCount}>{getTotalItems()} item in a cart</span>
-                        <span className={styles.totalPrice}>${getTotalPrice().toFixed(2)}</span>
+                        <span className={styles.totalPrice}>{getCurrencySymbol()} {getTotalPrice().toFixed(2)}</span>
                     </div>
 
                     <div className="mini-cart-btn d-flex flex-column gap-2">
